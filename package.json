@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/mttdev382/es-utilities/issues"
   },
-  "homepage": "https://github.com/mttdev382/es-utilities#readme"
+  "homepage": "https://github.com/mttdev382/es-utilities#readme",
+  "dependencies": {
+    "es-node-firebird": "^1.1.8",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3"
+  }
 }

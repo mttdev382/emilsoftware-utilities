@@ -1,7 +1,7 @@
 import {Utilities} from "./utilities";
 import winston from "winston";
 import * as path from "path";
-import fs from "fs";
+import * as fs from "fs";
 
 export enum LogLevels {
     INFO = "INFO", ERROR = "ERROR", DEBUG = "DEBUG", LOG = "LOG"
