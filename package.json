@@ -1,22 +1,23 @@
 {
-  "name": "es-utilities",
+  "name": "emilsoftware-utilities",
   "version": "1.0.0",
   "description": "Utilities for EmilSoftware",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mttdev382/es-utilities.git"
+    "url": "git+https://github.com/mttdev382/emilsoftware-utilities.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mttdev382/es-utilities/issues"
+    "url": "https://github.com/mttdev382/emilsoftware-utilities/issues"
   },
-  "homepage": "https://github.com/mttdev382/es-utilities#readme",
+  "homepage": "https://github.com/mttdev382/emilsoftware-utilities#readme",
   "dependencies": {
     "es-node-firebird": "^1.1.8",
     "winston": "^3.11.0"
