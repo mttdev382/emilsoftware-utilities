@@ -1,6 +1,6 @@
 {
   "name": "emilsoftware-utilities",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Utilities for EmilSoftware",
   "main": "index.js",
   "scripts": {

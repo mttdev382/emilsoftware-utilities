@@ -1,6 +1,8 @@
+import {Logger} from "./logger";
+
 export class Utilities {
 
-    public static parseDate(date: string) {
+    public static parseDate(date: string): Date {
         const parts: string[] = date.split("/");
         return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
     }
@@ -15,7 +17,7 @@ export class Utilities {
         });
     }
 
-    public static getNowDateString() {
+    public static getNowDateString(): string {
         const now: Date = new Date();
         const day: string | number = now.getDate() < 9 ? "0" + now.getDate() : now.getDate();
         const month: string | number = (now.getMonth() + 1) < 9 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1);
@@ -28,39 +30,12 @@ export class Utilities {
 
 
     public static sendErrorMessage(res: any, err: any, tag: string = "[BASE ERROR]", status: number = 500) {
-        // tslint:disable-next-line:no-console
-        console.error(err);
         return res.status(status).send({
             severity: "error",
             status: 500,
             statusCode: this.STATUS_CODE.ERROR,
             message: " Si è verificato un errore",
             error: tag + ": " + err,
-        });
-    }
-
-    // Risposte per funzioni in stile ES
-    public static sendOpenResponse(res: any, payload: any) {
-        try {
-            payload = JSON.parse(JSON.stringify(payload));
-            const clearPayload = payload;           // this.keysToCamel(payload);
-            const response = {
-                Status: {
-                    errorCode: "0", errorDescription: "",
-                }, Result: clearPayload, Message: ""
-            };
-            return res.send(response);
-        } catch (error) {
-            return this.sendOpenErrorMessage(res, "Errore nell'invio della risposta: " + error, "[UTILITIES]", 500);
-        }
-    }
-
-
-    public static sendOpenErrorMessage(res: any, err: any, tag = "[BASE ERROR]", status = 500) {
-        return res.status(status).send({
-            Status: {
-                errorCode: "500", errorDescription: err,
-            }, Result: [], Message: err,
         });
     }
 
@@ -86,7 +61,6 @@ export class Utilities {
                 // @ts-ignore
                 n[this.toCamel(k)] = this.keysToCamel(o[k]);
             });
-
             return n;
         } else if (this.isArray(o)) {
             return o.map((i: any) => {
@@ -97,11 +71,11 @@ export class Utilities {
         return o;
     };
 
-    public static addStartingZeros(num: number, totalLength: number) {
+    public static addStartingZeros(num: number, totalLength: number): string {
         return String(num).padStart(totalLength, '0');
     }
 
-    public static dateToMoncler(dData: Date, bAddMs: boolean = false) {
+    public static dateToMoncler(dData: Date, bAddMs: boolean = false): string {
         const yy: number = dData.getFullYear();
         const mm: string = this.addStartingZeros(dData.getMonth() + 1, 2);
         const dd: string = this.addStartingZeros(dData.getDate(), 2);
@@ -116,7 +90,7 @@ export class Utilities {
         }
     }
 
-    public static dateToSql(dData: Date, bAddMs: boolean = false) {
+    public static dateToSql(dData: Date, bAddMs: boolean = false): string {
         const yy: number = dData.getFullYear();
         const mm: string = this.addStartingZeros(dData.getMonth() + 1, 2);
         const dd: string = this.addStartingZeros(dData.getDate(), 2);
@@ -132,7 +106,7 @@ export class Utilities {
         }
     }
 
-    public static dateToSimple(dData: Date) {
+    public static dateToSimple(dData: Date): string {
         const yy: number = dData.getFullYear();
         const mm: string = this.addStartingZeros(dData.getMonth() + 1, 2);
         const dd: string = this.addStartingZeros(dData.getDate(), 2);

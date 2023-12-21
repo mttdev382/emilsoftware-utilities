@@ -1,6 +1,6 @@
 import {Logger} from "../logger";
 
-export function logExecutionTime(fileName: string = "") {
+export default function logExecutionTime(fileName: string = "") {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
         const logger: Logger = new Logger(fileName);
         const originalMethod = descriptor.value;

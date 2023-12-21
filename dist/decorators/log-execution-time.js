@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logExecutionTime = void 0;
 var logger_1 = require("../logger");
 function logExecutionTime(fileName) {
     if (fileName === void 0) { fileName = ""; }
@@ -76,4 +75,4 @@ function logExecutionTime(fileName) {
         return descriptor;
     };
 }
-exports.logExecutionTime = logExecutionTime;
+exports.default = logExecutionTime;
