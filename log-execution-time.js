@@ -36,7 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var logger_1 = require("../logger");
+// DECORATOR
+var logger_1 = require("./logger");
 function logExecutionTime(fileName) {
     if (fileName === void 0) { fileName = ""; }
     return function (target, propertyKey, descriptor) {

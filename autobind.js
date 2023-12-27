@@ -1,4 +1,5 @@
 "use strict";
+// DECORATOR
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.boundClass = exports.boundMethod = void 0;
 /**

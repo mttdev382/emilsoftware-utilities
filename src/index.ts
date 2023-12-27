@@ -1,7 +1,6 @@
-import autobind from "./decorators/autobind"
-import logExecutionTime from "./decorators/log-execution-time"
-import {Logger} from "./logger";
+import autobind from "./autobind"
+import logExecutionTime from "./log-execution-time"
+import {Logger, LogLevels} from "./logger";
 import {Orm} from "./orm";
 import {Utilities} from "./utilities";
-
-export {autobind, logExecutionTime, Logger, Orm, Utilities};
+export {autobind, logExecutionTime, Logger, LogLevels, Orm, Utilities};

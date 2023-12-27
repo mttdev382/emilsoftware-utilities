@@ -1,113 +1,120 @@
 // @ts-ignore
 import * as Firebird from "es-node-firebird";
 import {Logger} from "./logger";
+import {Database, Options, Transaction} from "node-firebird";
 
-export class Orm {
-    public static RESULT_EXEC_OK: string = "ok!";
 
-    public static quote(value: string): string {
-        return "\"" + value + "\"";
-    };
-
-    public static testConnection(options: any): Promise<any> {
-        const logger: Logger = new Logger(__filename);
-        return new Promise((resolve): void => {
-            Firebird.attach(options, (err: any, db: any): void => {
-                if (err) {
-                    logger.error("La connessione con il DATABASE non è andata a buon fine.");
-                    return resolve(false);
-                }
-                logger.info("DATABASE connesso.");
-                return resolve(true);
-            })
+const quote = (value: string): string => {
+    return "\"" + value + "\"";
+};
+const testConnection = (options: Options): Promise<any> => {
+    const logger: Logger = new Logger(__filename);
+    return new Promise((resolve): void => {
+        Firebird.attach(options, (err: any, db: any): void => {
+            if (err) {
+                logger.error("La connessione con il DATABASE non è andata a buon fine.");
+                return resolve(false);
+            }
+            logger.info("DATABASE connesso.");
+            return resolve(true);
         })
-    }
+    })
+}
 
-
-    public static query(options: any, query: any, parameters: any[] = []): Promise<any> {
-        return new Promise((resolve, reject): void => {
-            Firebird.attach(options, (err: any, db: {
-                query: (arg0: any, arg1: any[], arg2: (err: any, result: any) => void) => void; detach: () => void;
-            }) => {
-                if (err) {
-                    return reject(err);
-                }
-                db.query(query, parameters, (error: any, result: any) => {
-                    if (error) {
-                        db.detach();
-                        return reject(error);
-                    }
+const query = (options: Options, query: string, parameters: any[] = []): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        Firebird.attach(options, (err: any, db: {
+            query: (arg0: any, arg1: any[], arg2: (err: any, result: any) => void) => void; detach: () => void;
+        }) => {
+            if (err) {
+                return reject(err);
+            }
+            db.query(query, parameters, (error: any, result: any) => {
+                if (error) {
                     db.detach();
-                    return resolve(result);
-                });
-            });
-        });
-    }
-
-
-    public static execute(options: any, query: any, parameters: any = []): Promise<any> {
-        return new Promise((resolve, reject): void => {
-            Firebird.attach(options, (err: any, db: {
-                execute: (arg0: any, arg1: any, arg2: (error: any, result: any) => void) => void; detach: () => void;
-            }) => {
-                if (err) {
-                    return reject(err);
+                    return reject(error);
                 }
+                db.detach();
+                return resolve(result);
+            });
+        });
+    });
+}
+const execute = (options: Options, query: string, parameters: any = []): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        Firebird.attach(options, (err: any, db: {
+            execute: (arg0: any, arg1: any, arg2: (error: any, result: any) => void) => void; detach: () => void;
+        }) => {
+            if (err) {
+                return reject(err);
+            }
 
-                db.execute(query, parameters, (error, result) => {
-                    if (error) {
-                        db.detach();
-                        return reject(error);
-                    }
+            db.execute(query, parameters, (error, result): void => {
+                if (error) {
                     db.detach();
-                    return resolve(result);
-                });
+                    return reject(error);
+                }
+                db.detach();
+                return resolve(result);
             });
         });
-    }
+    });
+}
 
-    public static trimParam(param: any) {
-        if (typeof param === "string" || param instanceof String) {
-            return param.trim();
-        }
-        return param;
+const trimParam = (param: any): string => {
+    if (typeof param === "string" || param instanceof String) {
+        return param.trim();
     }
+    return param;
+}
 
-    public static connect(options: any): Promise<any> {
-        return new Promise((resolve, reject): void => {
-            Firebird.attach(options, function (err: any, db: any): void {
-                if (err) return reject(err); else return resolve(db);
-            });
+const connect = (options: Options): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        Firebird.attach(options, function (err: any, db: any): void {
+            if (err) return reject(err); else return resolve(db);
         });
-    }
+    });
+}
 
-    public static startTransaction(db: any): Promise<any> {
-        return new Promise((resolve, reject): void => {
-            db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err: any, transaction: any) {
-                if (err) return reject(err); else return resolve(transaction);
-            });
+const startTransaction = (db: Database): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err: any, transaction: any) {
+            if (err) return reject(err); else return resolve(transaction);
         });
-    }
-
-    public static executeQueries(transaction: any, queries: any, params: any) {
-        return queries.reduce((promiseChain: any, currentQuery: any, index: any) => {
-            return promiseChain.then(() => new Promise((resolve, reject): void => {
-                transaction.query(currentQuery, params[index], (err: any, result: any): void => {
-                    if (err) return reject(err); else return resolve(result);
-                });
-            }));
-        }, Promise.resolve());
-    }
-
-    public static commitTransaction(transaction: any): Promise<any> {
-        return new Promise((resolve, reject): void => {
-            transaction.commit((err: any) => {
-                if (err) return reject(err); else return resolve('Transaction committed successfully.');
+    });
+}
+const executeQueries = (transaction: Transaction, queries: string[], params: any[]) => {
+    return queries.reduce((promiseChain: any, currentQuery: any, index: any) => {
+        return promiseChain.then(() => new Promise((resolve, reject): void => {
+            transaction.query(currentQuery, params[index], (err: any, result: any): void => {
+                if (err) return reject(err); else return resolve(result);
             });
+        }));
+    }, Promise.resolve());
+}
+
+const commitTransaction = (transaction: Transaction): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        transaction.commit((err: any): void => {
+            if (err) return reject(err); else return resolve('Transaction committed successfully.');
         });
-    }
+    });
+}
 
+interface Orm {
+    quote: (value: string) => string,
+    testConnection: (options: Options) => Promise<any>,
+    query: (options: Options, query: any, parameters?: any[]) => Promise<any>,
+    execute: (options: Options, query: any, parameters?: any[]) => Promise<any>,
+    trimParam: (param: any) => string,
+    connect: (options: Options) => Promise<any>,
+    startTransaction: (db: Database) => Promise<any>,
+    executeQueries: (transaction: Transaction, queries: string[], params: any[]) => any,
+    commitTransaction: (transaction: Transaction) => Promise<any>
+}
 
+export const Orm: Orm = {
+    quote, testConnection, query, execute, trimParam, connect, startTransaction, executeQueries, commitTransaction
 }
 
 

@@ -1,4 +1,5 @@
-import {Logger} from "../logger";
+// DECORATOR
+import {Logger} from "./logger";
 
 export default function logExecutionTime(fileName: string = "") {
     return (target: any, propertyKey: string, descriptor: PropertyDescriptor) => {
