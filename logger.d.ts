@@ -2,19 +2,23 @@ export declare enum LogLevels {
     INFO = "INFO",
     ERROR = "ERROR",
     DEBUG = "DEBUG",
-    LOG = "LOG"
+    LOG = "LOG",
+    DATABASE = "DATABASE"
 }
 export declare class Logger {
     private readonly winstonLogger;
-    tag: string;
+    private readonly tag;
     private logFormat;
+    private replaceAll;
     constructor(tag: string);
     private getFileName;
-    execStart(prefix?: string): any;
-    execStop(prefix: string, startTime: any, error?: boolean): any;
-    info(...data: any): void;
-    debug(...data: any): void;
-    log(...data: any): void;
-    error(...data: any): void;
+    execStart(prefix?: string): number;
+    execStop(prefix: string, startTime: number, error?: boolean): void;
+    info(...data: Object[]): void;
+    dbLog(...data: Object[]): void;
+    debug(...data: Object[]): void;
+    log(...data: Object[]): void;
+    error(...data: Object[]): void;
+    private test;
     private print;
 }

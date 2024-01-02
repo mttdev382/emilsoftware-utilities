@@ -1,9 +1,12 @@
+import { Response } from 'express';
 interface Utilities {
     parseDate: (date: string) => Date;
-    sendOKMessage: (res: any, message: any) => any;
+    printQueryWithParams: (query: string, params: any[]) => string;
+    sendOKMessage: (res: Response, message: string) => Response;
+    sendExecMessage: (res: Response, executionObject: any, title: string) => Response;
     getNowDateString: () => {};
-    sendErrorMessage: (res: any, err: any, tag?: string, status?: number) => any;
-    sendBaseResponse: (res: any, payload: any) => any;
+    sendErrorMessage: (res: Response, error: any, tag?: string, status?: number) => Response;
+    sendBaseResponse: (res: Response, payload: any) => Response;
     toCamel: (s: any) => any;
     isArray: (a: any) => boolean;
     isObject: (o: any) => boolean;

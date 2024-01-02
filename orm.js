@@ -35,10 +35,12 @@ var testConnection = function (options) {
     return new Promise(function (resolve) {
         Firebird.attach(options, function (err, db) {
             if (err) {
-                logger.error("La connessione con il DATABASE non è andata a buon fine.");
+                logger.error('La connessione con il DATABASE non è andata a buon fine.');
+                db.detach();
                 return resolve(false);
             }
             logger.info("DATABASE connesso.");
+            db.detach();
             return resolve(true);
         });
     });

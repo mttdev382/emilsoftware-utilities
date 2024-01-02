@@ -1,20 +1,24 @@
-import {Utilities} from "./utilities";
 import winston from "winston";
 import * as path from "path";
 import * as fs from "fs";
 
 export enum LogLevels {
-    INFO = "INFO", ERROR = "ERROR", DEBUG = "DEBUG", LOG = "LOG"
+    INFO = "INFO", ERROR = "ERROR", DEBUG = "DEBUG", LOG = "LOG", DATABASE = "DATABASE"
 }
 
 export class Logger {
-    private readonly winstonLogger: any;
-    public tag: string = "[UNTAGGED]";
+    private readonly winstonLogger: winston.Logger;
+    private readonly tag: string = "[UNTAGGED]";
 
     private logFormat: winston.Logform.Format = winston.format.printf((tmp: winston.Logform.TransformableInfo): string => {
         const {time, file, level, message} = tmp;
-        return `${JSON.stringify({time, file: file?.replaceAll("\\", "/"), level, message})},`;
+        return `${JSON.stringify({time, file: this.replaceAll(file, "\\", "/"), level, message})},`;
     });
+
+    private replaceAll(string: string, match: string, replacer: string) {
+        // @ts-ignore
+        return ("" + string)?.replaceAll(match, replacer);
+    }
 
     constructor(tag: string) {
         const fileName: string = this.getFileName();
@@ -31,17 +35,18 @@ export class Logger {
         });
     }
 
+
     private getFileName(): string {
         const now = new Date();
         return now.getDate() + "-" + (now.getMonth() + 1) + "-" + now.getFullYear();
     }
 
-    public execStart(prefix: string = ""): any {
+    public execStart(prefix: string = ""): number {
         this.print(LogLevels.INFO, `${prefix} - Execution started`);
         return performance.now();
     }
 
-    public execStop(prefix: string = "", startTime: any, error: boolean = false): any {
+    public execStop(prefix: string = "", startTime: number, error: boolean = false): void {
         switch (error) {
             case true: {
                 this.print(LogLevels.ERROR, `${prefix} - Execution ended due to an error. Execution time: ${performance.now() - startTime} ms`);
@@ -54,30 +59,63 @@ export class Logger {
         }
     }
 
-    public info(...data: any): void {
+    public info(...data: Object[]): void {
         this.print(LogLevels.INFO, ...data);
     }
 
-    public debug(...data: any): void {
+    public dbLog(...data: Object[]): void {
+        this.print(LogLevels.DATABASE, ...data);
+    }
+
+    public debug(...data: Object[]): void {
         this.print(LogLevels.DEBUG, ...data);
     }
 
-    public log(...data: any): void {
+    public log(...data: Object[]): void {
         this.print(LogLevels.LOG, ...data);
     }
 
-    public error(...data: any): void {
+    public error(...data: Object[]): void {
         this.print(LogLevels.ERROR, ...data);
     }
 
-    private print(level: LogLevels = LogLevels.INFO, ...data: any): void {
-        const now = new Date();
-        // Utilities.getNowDateString();
+    private test() {
+        let startTime = this.execStart("test");
+        this.execStop("test", startTime);
+        this.debug("test");
+        this.log("test");
+        this.error("test")
+        this.dbLog("test");
+    }
+
+    private print(level: LogLevels = LogLevels.INFO, ...data: Object[]): void {
+        const now: Date = new Date();
+        let tag = this.tag.split("\\").pop();
+
         this.winstonLogger.defaultMeta = {
-            file: this.tag, time: now, level
+            file: tag, time: now, level
         };
-        this.winstonLogger[level.toLowerCase()](...data);
-        // @ts-ignore
-        console[level.toLowerCase()](`[${level}][${now}][${this.tag.split("\\").pop()}]`, ...data);
+
+        let logEntry: winston.LogEntry = {level: level, message: [...data].join(",")};
+        //JSON.stringify([...data]);
+        switch (level) {
+            case LogLevels.INFO:
+                this.winstonLogger.info(logEntry);
+                console.info(`[INFO][${now}][${tag}]`, logEntry.message);
+                break;
+            case LogLevels.ERROR:
+                this.winstonLogger.error(logEntry);
+                console.error(`[ERROR][${now}][${tag}]`, logEntry.message);
+                break;
+            case LogLevels.DEBUG:
+                this.winstonLogger.debug(logEntry);
+                console.debug(`[DEBUG][${now}][${tag}]`, logEntry.message);
+                break;
+            case LogLevels.LOG: {
+                this.winstonLogger.log(logEntry);
+                console.log(`[LOG][${now}][${tag}]`, logEntry.message);
+            }
+        }
+
     }
 }

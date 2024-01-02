@@ -1,3 +1,6 @@
+import {Response} from 'express';
+
+
 enum STATUS_CODE {
     OK = 0, WARNING = 1, ERROR = 2,
 }
@@ -7,7 +10,7 @@ const parseDate = (date: string) => {
     return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
 }
 
-const sendOKMessage = (res: any, message: any) => {
+const sendOKMessage = (res: Response, message: string): Response => {
     return res.send({
         severity: "success", status: 200, statusCode: STATUS_CODE.OK, message,
     });
@@ -26,17 +29,17 @@ const getNowDateString = (): string => {
 }
 
 
-const sendErrorMessage = (res: any, err: any, tag: string = "[BASE ERROR]", status: number = 500) => {
+const sendErrorMessage = (res: Response, error: any, tag: string = "[BASE ERROR]", status: number = 500): Response => {
     return res.status(status).send({
         severity: "error",
         status: 500,
         statusCode: STATUS_CODE.ERROR,
         message: " Si è verificato un errore",
-        error: tag + ": " + err,
+        error: tag + ": " + error,
     });
 }
 
-const sendBaseResponse = (res: any, payload: any) => {
+const sendBaseResponse = (res: Response, payload: any): Response => {
     try {
         payload = JSON.parse(JSON.stringify(payload));
         const clearPayload = payload;           // this.keysToCamel(payload);
@@ -67,7 +70,7 @@ const isObject = (o: any): boolean => {
 };
 
 
-const keysToCamel = (o: any) => {
+const keysToCamel = (o: any): any => {
     if (isObject(o)) {
         const n = {};
 
@@ -127,12 +130,40 @@ const dateToSimple = (dData: Date): string => {
     return dd + '-' + mm + '-' + yy;
 }
 
+const sendExecMessage = (res: Response, executionObject: any, title: string): Response => {
+    try {
+        let sSql = "";
+        let response = {
+            Status: {
+                errorCode: "0", errorDescription: "",
+            }, Sql: sSql, ID: executionObject?.id, Title: title
+        };
+        return res.send(response);
+    } catch (error) {
+        return sendErrorMessage(res, "Errore nell'invio della risposta: " + error, title, 500);
+    }
+}
+
+const printQueryWithParams = (query: string = "", params: any[]): string => {
+    try {
+        params.forEach(param => {
+            query = query.replace("?", param);
+        });
+        return query;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 interface Utilities {
     parseDate: (date: string) => Date,
-    sendOKMessage: (res: any, message: any) => any,
+    printQueryWithParams: (query: string, params: any[]) => string,
+    sendOKMessage: (res: Response, message: string) => Response,
+    sendExecMessage: (res: Response, executionObject: any, title: string) => Response,
     getNowDateString: () => {},
-    sendErrorMessage: (res: any, err: any, tag?: string, status?: number) => any,
-    sendBaseResponse: (res: any, payload: any) => any,
+    sendErrorMessage: (res: Response, error: any, tag?: string, status?: number) => Response,
+    sendBaseResponse: (res: Response, payload: any) => Response,
     toCamel: (s: any) => any,
     isArray: (a: any) => boolean,
     isObject: (o: any) => boolean,
@@ -145,7 +176,9 @@ interface Utilities {
 
 export const Utilities: Utilities = {
     parseDate,
+    printQueryWithParams,
     sendOKMessage,
+    sendExecMessage,
     getNowDateString,
     sendErrorMessage,
     sendBaseResponse,

@@ -10,12 +10,14 @@ const quote = (value: string): string => {
 const testConnection = (options: Options): Promise<any> => {
     const logger: Logger = new Logger(__filename);
     return new Promise((resolve): void => {
-        Firebird.attach(options, (err: any, db: any): void => {
+        Firebird.attach(options, (err: Error, db: Database): void => {
             if (err) {
-                logger.error("La connessione con il DATABASE non è andata a buon fine.");
+                logger.error('La connessione con il DATABASE non è andata a buon fine.');
+                db.detach();
                 return resolve(false);
             }
             logger.info("DATABASE connesso.");
+            db.detach();
             return resolve(true);
         })
     })

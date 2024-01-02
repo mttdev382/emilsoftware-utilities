@@ -27,7 +27,7 @@ var getNowDateString = function () {
     var seconds = now.getSeconds() < 9 ? "0" + now.getSeconds() : now.getSeconds();
     return day + "." + month + "." + year + " " + hours + ":" + minutes + ":" + seconds;
 };
-var sendErrorMessage = function (res, err, tag, status) {
+var sendErrorMessage = function (res, error, tag, status) {
     if (tag === void 0) { tag = "[BASE ERROR]"; }
     if (status === void 0) { status = 500; }
     return res.status(status).send({
@@ -35,7 +35,7 @@ var sendErrorMessage = function (res, err, tag, status) {
         status: 500,
         statusCode: STATUS_CODE.ERROR,
         message: " Si è verificato un errore",
-        error: tag + ": " + err,
+        error: tag + ": " + error,
     });
 };
 var sendBaseResponse = function (res, payload) {
@@ -121,9 +121,37 @@ var dateToSimple = function (dData) {
     var dd = addStartingZeros(dData.getDate(), 2);
     return dd + '-' + mm + '-' + yy;
 };
+var sendExecMessage = function (res, executionObject, title) {
+    try {
+        var sSql = "";
+        var response = {
+            Status: {
+                errorCode: "0", errorDescription: "",
+            }, Sql: sSql, ID: executionObject === null || executionObject === void 0 ? void 0 : executionObject.id, Title: title
+        };
+        return res.send(response);
+    }
+    catch (error) {
+        return sendErrorMessage(res, "Errore nell'invio della risposta: " + error, title, 500);
+    }
+};
+var printQueryWithParams = function (query, params) {
+    if (query === void 0) { query = ""; }
+    try {
+        params.forEach(function (param) {
+            query = query.replace("?", param);
+        });
+        return query;
+    }
+    catch (error) {
+        throw error;
+    }
+};
 exports.Utilities = {
     parseDate: parseDate,
+    printQueryWithParams: printQueryWithParams,
     sendOKMessage: sendOKMessage,
+    sendExecMessage: sendExecMessage,
     getNowDateString: getNowDateString,
     sendErrorMessage: sendErrorMessage,
     sendBaseResponse: sendBaseResponse,
