@@ -36,11 +36,11 @@ var testConnection = function (options) {
         Firebird.attach(options, function (err, db) {
             if (err) {
                 logger.error('La connessione con il DATABASE non è andata a buon fine.');
-                db.detach();
                 return resolve(false);
             }
             logger.info("DATABASE connesso.");
-            db.detach();
+            if (db)
+                db.detach();
             return resolve(true);
         });
     });

@@ -13,11 +13,10 @@ const testConnection = (options: Options): Promise<any> => {
         Firebird.attach(options, (err: Error, db: Database): void => {
             if (err) {
                 logger.error('La connessione con il DATABASE non è andata a buon fine.');
-                db.detach();
                 return resolve(false);
             }
             logger.info("DATABASE connesso.");
-            db.detach();
+            if (db) db.detach();
             return resolve(true);
         })
     })

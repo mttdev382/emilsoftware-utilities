@@ -2,6 +2,7 @@ import winston from "winston";
 import * as path from "path";
 import * as fs from "fs";
 
+
 export enum LogLevels {
     INFO = "INFO", ERROR = "ERROR", DEBUG = "DEBUG", LOG = "LOG", DATABASE = "DATABASE"
 }
@@ -29,16 +30,34 @@ export class Logger {
             fs.mkdirSync(logsDirectory);
         }
         this.tag = tag;
+
+        winston.addColors({
+            database: 'green',
+        });
+
         this.winstonLogger = winston.createLogger({
             format: winston.format.json(),
             transports: [new winston.transports.File({filename: logFilePath, format: this.logFormat})],
+            levels: {
+                error: 1, warn: 2, info: 3, http: 4, verbose: 5, debug: 6, silly: 7, database: 8
+            }
         });
+
     }
 
 
     private getFileName(): string {
         const now = new Date();
-        return now.getDate() + "-" + (now.getMonth() + 1) + "-" + now.getFullYear();
+        let date = now.getDate();
+        let dateString = "" + date;
+        if (date < 10) dateString = "0" + dateString;
+
+        let month = (now.getMonth() + 1);
+        let monthString = "" + month;
+        if (month < 10) monthString = "0" + monthString;
+
+        let yearString = now.getFullYear() + "";
+        return dateString + "-" + monthString + "-" + yearString;
     }
 
     public execStart(prefix: string = ""): number {
@@ -96,7 +115,7 @@ export class Logger {
             file: tag, time: now, level
         };
 
-        let logEntry: winston.LogEntry = {level: level, message: [...data].join(",")};
+        let logEntry: winston.LogEntry = {level: level.toLowerCase(), message: [...data].join(",")};
         //JSON.stringify([...data]);
         switch (level) {
             case LogLevels.INFO:
@@ -114,6 +133,10 @@ export class Logger {
             case LogLevels.LOG: {
                 this.winstonLogger.log(logEntry);
                 console.log(`[LOG][${now}][${tag}]`, logEntry.message);
+            }
+            case LogLevels.DATABASE: {
+                this.winstonLogger.info(logEntry);
+                console.log(`[DATABASE][${now}][${tag}]`, logEntry.message);
             }
         }
 

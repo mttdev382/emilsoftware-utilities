@@ -62,9 +62,15 @@ var Logger = /** @class */ (function () {
             fs.mkdirSync(logsDirectory);
         }
         this.tag = tag;
+        winston_1.default.addColors({
+            database: 'green',
+        });
         this.winstonLogger = winston_1.default.createLogger({
             format: winston_1.default.format.json(),
             transports: [new winston_1.default.transports.File({ filename: logFilePath, format: this.logFormat })],
+            levels: {
+                error: 1, warn: 2, info: 3, http: 4, verbose: 5, debug: 6, silly: 7, database: 8
+            }
         });
     }
     Logger.prototype.replaceAll = function (string, match, replacer) {
@@ -74,7 +80,16 @@ var Logger = /** @class */ (function () {
     };
     Logger.prototype.getFileName = function () {
         var now = new Date();
-        return now.getDate() + "-" + (now.getMonth() + 1) + "-" + now.getFullYear();
+        var date = now.getDate();
+        var dateString = "" + date;
+        if (date < 10)
+            dateString = "0" + dateString;
+        var month = (now.getMonth() + 1);
+        var monthString = "" + month;
+        if (month < 10)
+            monthString = "0" + monthString;
+        var yearString = now.getFullYear() + "";
+        return dateString + "-" + monthString + "-" + yearString;
     };
     Logger.prototype.execStart = function (prefix) {
         if (prefix === void 0) { prefix = ""; }
@@ -150,7 +165,7 @@ var Logger = /** @class */ (function () {
             file: tag, time: now,
             level: level
         };
-        var logEntry = { level: level, message: __spreadArray([], data, true).join(",") };
+        var logEntry = { level: level.toLowerCase(), message: __spreadArray([], data, true).join(",") };
         //JSON.stringify([...data]);
         switch (level) {
             case LogLevels.INFO:
@@ -168,6 +183,10 @@ var Logger = /** @class */ (function () {
             case LogLevels.LOG: {
                 this.winstonLogger.log(logEntry);
                 console.log("[LOG][".concat(now, "][").concat(tag, "]"), logEntry.message);
+            }
+            case LogLevels.DATABASE: {
+                this.winstonLogger.info(logEntry);
+                console.log("[DATABASE][".concat(now, "][").concat(tag, "]"), logEntry.message);
             }
         }
     };
