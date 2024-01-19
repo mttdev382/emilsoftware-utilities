@@ -27,6 +27,7 @@ exports.Orm = void 0;
 // @ts-ignore
 var Firebird = __importStar(require("es-node-firebird"));
 var logger_1 = require("./logger");
+var utilities_1 = require("./utilities");
 var quote = function (value) {
     return "\"" + value + "\"";
 };
@@ -47,13 +48,17 @@ var testConnection = function (options) {
 };
 var query = function (options, query, parameters) {
     if (parameters === void 0) { parameters = []; }
+    var logger = new logger_1.Logger(__filename);
     return new Promise(function (resolve, reject) {
         Firebird.attach(options, function (err, db) {
             if (err) {
+                logger.error(err);
                 return reject(err);
             }
+            logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
             db.query(query, parameters, function (error, result) {
                 if (error) {
+                    logger.error(error);
                     db.detach();
                     return reject(error);
                 }
@@ -107,6 +112,26 @@ var startTransaction = function (db) {
         });
     });
 };
+var commitTransaction = function (transaction) {
+    return new Promise(function (resolve, reject) {
+        transaction.commit(function (err) {
+            if (err)
+                return reject(err);
+            else
+                return resolve('Transaction committed successfully.');
+        });
+    });
+};
+var rollbackTransaction = function (transaction) {
+    return new Promise(function (resolve, reject) {
+        transaction.rollback(function (err) {
+            if (err)
+                return reject(err);
+            else
+                return resolve('Transaction rolled back successfully.');
+        });
+    });
+};
 var executeQueries = function (transaction, queries, params) {
     return queries.reduce(function (promiseChain, currentQuery, index) {
         return promiseChain.then(function () { return new Promise(function (resolve, reject) {
@@ -119,16 +144,6 @@ var executeQueries = function (transaction, queries, params) {
         }); });
     }, Promise.resolve());
 };
-var commitTransaction = function (transaction) {
-    return new Promise(function (resolve, reject) {
-        transaction.commit(function (err) {
-            if (err)
-                return reject(err);
-            else
-                return resolve('Transaction committed successfully.');
-        });
-    });
-};
 exports.Orm = {
     quote: quote,
     testConnection: testConnection,
@@ -138,5 +153,6 @@ exports.Orm = {
     connect: connect,
     startTransaction: startTransaction,
     executeQueries: executeQueries,
-    commitTransaction: commitTransaction
+    commitTransaction: commitTransaction,
+    rollbackTransaction: rollbackTransaction
 };

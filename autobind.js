@@ -1,7 +1,7 @@
 "use strict";
-// DECORATOR
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.boundClass = exports.boundMethod = void 0;
+// DECORATOR
 /**
  * Return a descriptor removing the value and returning a getter
  * The getter will return a .bind version of the function

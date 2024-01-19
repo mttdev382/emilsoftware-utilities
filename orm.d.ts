@@ -9,6 +9,7 @@ interface Orm {
     startTransaction: (db: Database) => Promise<any>;
     executeQueries: (transaction: Transaction, queries: string[], params: any[]) => any;
     commitTransaction: (transaction: Transaction) => Promise<any>;
+    rollbackTransaction: (transaction: Transaction) => Promise<any>;
 }
 export declare const Orm: Orm;
 export {};
