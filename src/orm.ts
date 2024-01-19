@@ -4,12 +4,12 @@ import {Logger} from "./logger";
 import {Database, Options, Transaction} from "node-firebird";
 import {Utilities} from "./utilities";
 
+const logger: Logger = new Logger(__filename);
 
 const quote = (value: string): string => {
     return "\"" + value + "\"";
 };
 const testConnection = (options: Options): Promise<any> => {
-    const logger: Logger = new Logger(__filename);
     return new Promise((resolve): void => {
         Firebird.attach(options, (err: Error, db: Database): void => {
             if (err) {
@@ -24,47 +24,56 @@ const testConnection = (options: Options): Promise<any> => {
 }
 
 const query = (options: Options, query: string, parameters: any[] = []): Promise<any> => {
-    const logger: Logger = new Logger(__filename);
-    return new Promise((resolve, reject): void => {
-        Firebird.attach(options, (err: any, db: {
-            query: (arg0: any, arg1: any[], arg2: (err: any, result: any) => void) => void; detach: () => void;
-        }) => {
-            if (err) {
-                logger.error(err);
-                return reject(err);
-            }
-
-            logger.info(Utilities.printQueryWithParams(query, parameters));
-            db.query(query, parameters, (error: any, result: any) => {
-                if (error) {
-                    logger.error(error);
-                    db.detach();
-                    return reject(error);
+    try {
+        return new Promise((resolve, reject): void => {
+            Firebird.attach(options, (err: any, db: Database) => {
+                if (err) {
+                    logger.error(err);
+                    return reject(err);
                 }
-                db.detach();
-                return resolve(result);
+
+                logger.info(Utilities.printQueryWithParams(query, parameters));
+                db.query(query, parameters, (error: any, result: any) => {
+                    if (error) {
+                        logger.error(error);
+                        db.detach();
+                        return reject(error);
+                    }
+                    db.detach();
+                    return resolve(result);
+                });
             });
         });
-    });
+    } catch (error) {
+        logger.error(error);
+        throw error;
+    }
 }
 const execute = (options: Options, query: string, parameters: any = []): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        Firebird.attach(options, (err: any, db: {
-            execute: (arg0: any, arg1: any, arg2: (error: any, result: any) => void) => void; detach: () => void;
-        }) => {
-            if (err) {
-                return reject(err);
-            }
-            db.execute(query, parameters, (error, result): void => {
-                if (error) {
-                    db.detach();
-                    return reject(error);
+    try {
+        return new Promise((resolve, reject): void => {
+            Firebird.attach(options, (err: any, db: Database) => {
+                if (err) {
+                    logger.error(err);
+                    return reject(err);
                 }
-                db.detach();
-                return resolve(result);
+
+                logger.info(Utilities.printQueryWithParams(query, parameters));
+                db.execute(query, parameters, (error, result: any): void => {
+                    if (error) {
+                        logger.error(error);
+                        db.detach();
+                        return reject(error);
+                    }
+                    db.detach();
+                    return resolve(result);
+                });
             });
         });
-    });
+    } catch (error) {
+        logger.error(error);
+        throw error;
+    }
 }
 
 const trimParam = (param: any): string => {
