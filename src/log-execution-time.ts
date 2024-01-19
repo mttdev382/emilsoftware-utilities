@@ -19,7 +19,5 @@ export default function logExecutionTime(fileName: string = "") {
             }
         };
         return descriptor;
-
     }
-
 }

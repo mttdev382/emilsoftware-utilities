@@ -1,5 +1,4 @@
 // DECORATOR
-
 /**
  * Return a descriptor removing the value and returning a getter
  * The getter will return a .bind version of the function

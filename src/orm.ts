@@ -2,6 +2,7 @@
 import * as Firebird from "es-node-firebird";
 import {Logger} from "./logger";
 import {Database, Options, Transaction} from "node-firebird";
+import {Utilities} from "./utilities";
 
 
 const quote = (value: string): string => {
@@ -23,15 +24,20 @@ const testConnection = (options: Options): Promise<any> => {
 }
 
 const query = (options: Options, query: string, parameters: any[] = []): Promise<any> => {
+    const logger: Logger = new Logger(__filename);
     return new Promise((resolve, reject): void => {
         Firebird.attach(options, (err: any, db: {
             query: (arg0: any, arg1: any[], arg2: (err: any, result: any) => void) => void; detach: () => void;
         }) => {
             if (err) {
+                logger.error(err);
                 return reject(err);
             }
+
+            logger.info(Utilities.printQueryWithParams(query, parameters));
             db.query(query, parameters, (error: any, result: any) => {
                 if (error) {
+                    logger.error(error);
                     db.detach();
                     return reject(error);
                 }
@@ -49,7 +55,6 @@ const execute = (options: Options, query: string, parameters: any = []): Promise
             if (err) {
                 return reject(err);
             }
-
             db.execute(query, parameters, (error, result): void => {
                 if (error) {
                     db.detach();
@@ -84,6 +89,24 @@ const startTransaction = (db: Database): Promise<any> => {
         });
     });
 }
+
+const commitTransaction = (transaction: Transaction): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        transaction.commit((err: any): void => {
+            if (err) return reject(err); else return resolve('Transaction committed successfully.');
+        });
+    });
+}
+
+const rollbackTransaction = (transaction: Transaction): Promise<any> => {
+    return new Promise((resolve, reject) => {
+        transaction.rollback(err => {
+            if (err) return reject(err); else return resolve('Transaction rolled back successfully.');
+        });
+    });
+}
+
+
 const executeQueries = (transaction: Transaction, queries: string[], params: any[]) => {
     return queries.reduce((promiseChain: any, currentQuery: any, index: any) => {
         return promiseChain.then(() => new Promise((resolve, reject): void => {
@@ -94,13 +117,6 @@ const executeQueries = (transaction: Transaction, queries: string[], params: any
     }, Promise.resolve());
 }
 
-const commitTransaction = (transaction: Transaction): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        transaction.commit((err: any): void => {
-            if (err) return reject(err); else return resolve('Transaction committed successfully.');
-        });
-    });
-}
 
 interface Orm {
     quote: (value: string) => string,
@@ -111,11 +127,21 @@ interface Orm {
     connect: (options: Options) => Promise<any>,
     startTransaction: (db: Database) => Promise<any>,
     executeQueries: (transaction: Transaction, queries: string[], params: any[]) => any,
-    commitTransaction: (transaction: Transaction) => Promise<any>
+    commitTransaction: (transaction: Transaction) => Promise<any>,
+    rollbackTransaction: (transaction: Transaction) => Promise<any>
 }
 
 export const Orm: Orm = {
-    quote, testConnection, query, execute, trimParam, connect, startTransaction, executeQueries, commitTransaction
+    quote,
+    testConnection,
+    query,
+    execute,
+    trimParam,
+    connect,
+    startTransaction,
+    executeQueries,
+    commitTransaction,
+    rollbackTransaction
 }
 
 
