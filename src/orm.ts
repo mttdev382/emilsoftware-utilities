@@ -116,15 +116,31 @@ const rollbackTransaction = (transaction: Transaction): Promise<any> => {
 }
 
 
-const executeQueries = (transaction: Transaction, queries: string[], params: any[]) => {
-    return queries.reduce((promiseChain: any, currentQuery: any, index: any) => {
-        return promiseChain.then(() => new Promise((resolve, reject): void => {
-            transaction.query(currentQuery, params[index], (err: any, result: any): void => {
-                if (err) return reject(err); else return resolve(result);
+const executeQueries = (transaction: Transaction, queries: string[], params: any[]): Promise<any> => {
+    try {
+        return queries.reduce((promiseChain: Promise<any>, currentQuery: string, index: number) => {
+            return promiseChain.then(() => new Promise((resolve, reject) => {
+                transaction.query(currentQuery, params[index], (err: any, result: any): void => {
+                    if (err) return reject(err);
+                    else return resolve(result);
+                });
+            }));
+        }, Promise.resolve())
+            .catch(error => {
+                return new Promise((resolve, reject) => {
+                    transaction.rollback((rollbackErr: any) => {
+                        if (rollbackErr) {
+                            return reject(rollbackErr);
+                        } else {
+                            return reject(error);
+                        }
+                    });
+                });
             });
-        }));
-    }, Promise.resolve());
-}
+    } catch (error) {
+        throw error;
+    }
+};
 
 
 interface Orm {
