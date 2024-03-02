@@ -126,7 +126,6 @@ const executeQueries = (transaction: Transaction, queries: string[], params: any
     }, Promise.resolve());
 }
 
-
 interface Orm {
     quote: (value: string) => string,
     testConnection: (options: Options) => Promise<any>,

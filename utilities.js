@@ -127,7 +127,7 @@ var sendExecMessage = function (res, executionObject, title) {
         var response = {
             Status: {
                 errorCode: "0", errorDescription: "",
-            }, Sql: sSql, ID: executionObject === null || executionObject === void 0 ? void 0 : executionObject.id, Title: title
+            }, Sql: sSql, ID: executionObject === null || executionObject === void 0 ? void 0 : executionObject.id, data: executionObject, Title: title
         };
         return res.send(response);
     }

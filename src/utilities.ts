@@ -136,7 +136,7 @@ const sendExecMessage = (res: Response, executionObject: any, title: string): Re
         let response = {
             Status: {
                 errorCode: "0", errorDescription: "",
-            }, Sql: sSql, ID: executionObject?.id, Title: title
+            }, Sql: sSql, ID: executionObject?.id, data: executionObject, Title: title
         };
         return res.send(response);
     } catch (error) {

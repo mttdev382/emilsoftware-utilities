@@ -28,11 +28,11 @@ exports.Orm = void 0;
 var Firebird = __importStar(require("es-node-firebird"));
 var logger_1 = require("./logger");
 var utilities_1 = require("./utilities");
+var logger = new logger_1.Logger(__filename);
 var quote = function (value) {
     return "\"" + value + "\"";
 };
 var testConnection = function (options) {
-    var logger = new logger_1.Logger(__filename);
     return new Promise(function (resolve) {
         Firebird.attach(options, function (err, db) {
             if (err) {
@@ -48,43 +48,57 @@ var testConnection = function (options) {
 };
 var query = function (options, query, parameters) {
     if (parameters === void 0) { parameters = []; }
-    var logger = new logger_1.Logger(__filename);
-    return new Promise(function (resolve, reject) {
-        Firebird.attach(options, function (err, db) {
-            if (err) {
-                logger.error(err);
-                return reject(err);
-            }
-            logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
-            db.query(query, parameters, function (error, result) {
-                if (error) {
-                    logger.error(error);
-                    db.detach();
-                    return reject(error);
+    try {
+        return new Promise(function (resolve, reject) {
+            Firebird.attach(options, function (err, db) {
+                if (err) {
+                    logger.error(err);
+                    return reject(err);
                 }
-                db.detach();
-                return resolve(result);
+                logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
+                db.query(query, parameters, function (error, result) {
+                    if (error) {
+                        logger.error(error);
+                        db.detach();
+                        return reject(error);
+                    }
+                    db.detach();
+                    return resolve(result);
+                });
             });
         });
-    });
+    }
+    catch (error) {
+        logger.error(error);
+        throw error;
+    }
 };
 var execute = function (options, query, parameters) {
     if (parameters === void 0) { parameters = []; }
-    return new Promise(function (resolve, reject) {
-        Firebird.attach(options, function (err, db) {
-            if (err) {
-                return reject(err);
-            }
-            db.execute(query, parameters, function (error, result) {
-                if (error) {
-                    db.detach();
-                    return reject(error);
+    try {
+        return new Promise(function (resolve, reject) {
+            Firebird.attach(options, function (err, db) {
+                if (err) {
+                    logger.error(err);
+                    return reject(err);
                 }
-                db.detach();
-                return resolve(result);
+                logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
+                db.execute(query, parameters, function (error, result) {
+                    if (error) {
+                        logger.error(error);
+                        db.detach();
+                        return reject(error);
+                    }
+                    db.detach();
+                    return resolve(result);
+                });
             });
         });
-    });
+    }
+    catch (error) {
+        logger.error(error);
+        throw error;
+    }
 };
 var trimParam = function (param) {
     if (typeof param === "string" || param instanceof String) {
