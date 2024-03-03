@@ -147,16 +147,33 @@ var rollbackTransaction = function (transaction) {
     });
 };
 var executeQueries = function (transaction, queries, params) {
-    return queries.reduce(function (promiseChain, currentQuery, index) {
-        return promiseChain.then(function () { return new Promise(function (resolve, reject) {
-            transaction.query(currentQuery, params[index], function (err, result) {
-                if (err)
-                    return reject(err);
-                else
-                    return resolve(result);
+    try {
+        return queries.reduce(function (promiseChain, currentQuery, index) {
+            return promiseChain.then(function () { return new Promise(function (resolve, reject) {
+                transaction.query(currentQuery, params[index], function (err, result) {
+                    if (err)
+                        return reject(err);
+                    else
+                        return resolve(result);
+                });
+            }); });
+        }, Promise.resolve())
+            .catch(function (error) {
+            return new Promise(function (resolve, reject) {
+                transaction.rollback(function (rollbackErr) {
+                    if (rollbackErr) {
+                        return reject(rollbackErr);
+                    }
+                    else {
+                        return reject(error);
+                    }
+                });
             });
-        }); });
-    }, Promise.resolve());
+        });
+    }
+    catch (error) {
+        throw error;
+    }
 };
 exports.Orm = {
     quote: quote,
