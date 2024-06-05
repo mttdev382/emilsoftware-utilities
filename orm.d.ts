@@ -1,4 +1,4 @@
-import { Database, Options, Transaction } from "node-firebird";
+import { Database, Options, Transaction } from "es-node-firebird";
 interface Orm {
     quote: (value: string) => string;
     testConnection: (options: Options) => Promise<any>;

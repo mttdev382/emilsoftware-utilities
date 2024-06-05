@@ -1,7 +1,7 @@
 // @ts-ignore
 import * as Firebird from "es-node-firebird";
 import {Logger} from "./logger";
-import {Database, Options, Transaction} from "node-firebird";
+import {Database, Options, Transaction} from "es-node-firebird";
 import {Utilities} from "./utilities";
 
 const logger: Logger = new Logger(__filename);
