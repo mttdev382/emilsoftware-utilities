@@ -1,9 +1,9 @@
 import { Database, Options, Transaction } from "es-node-firebird";
-interface QueryWithParams {
+export interface QueryWithParams {
     query: string;
     params: any[];
 }
-interface Orm {
+export interface Orm {
     quote: (value: string) => string;
     testConnection: (options: Options) => Promise<any>;
     query: (options: Options, query: any, parameters?: any[]) => Promise<any>;
