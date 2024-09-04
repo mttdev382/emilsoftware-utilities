@@ -1,8 +1,8 @@
 // @ts-ignore
 import * as Firebird from "es-node-firebird";
-import {Logger} from "./logger";
-import {Database, Options, Transaction} from "es-node-firebird";
-import {Utilities} from "./utilities";
+import { Logger } from "./logger";
+import { Database, Options, Transaction } from "es-node-firebird";
+import { Utilities } from "./utilities";
 
 const logger: Logger = new Logger(__filename);
 
@@ -122,56 +122,69 @@ interface QueryWithParams {
 }
 
 const executeMultiple = async (options: Options, queriesWithParams: QueryWithParams[]): Promise<any> => {
-    try {
-        let db = await connect(options);
-        let transaction = await startTransaction(db);
+    let db: Database;
+    let transaction: Transaction;
 
-        return queriesWithParams.reduce(async (promiseChain: Promise<any>, qwp: QueryWithParams) => {
-            await promiseChain;
-            return await new Promise((resolve, reject) => {
+    try {
+        // Connetti al database
+        db = await connect(options);
+
+        // Inizia la transazione
+        transaction = await startTransaction(db);
+
+        // Esegui le query in serie
+        for (const qwp of queriesWithParams) {
+            await new Promise((resolve, reject) => {
                 transaction.query(qwp.query, qwp.params, (err: any, result: any): void => {
                     if (err) return reject(err);
                     else return resolve(result);
                 });
             });
-        }, Promise.resolve("Queries eseguite con successo"))
-            .catch(error => {
-                return new Promise((resolve, reject) => {
-                    transaction.rollback((rollbackErr: any) => {
-                        if (rollbackErr) {
-                            return reject(rollbackErr);
-                        } else {
-                            return reject(error);
-                        }
-                    });
-                });
-            });
+        }
+
+        // Commit della transazione
+        await commitTransaction(transaction);
+
+        // Stacca il database
+        db.detach();
+
+        // Ritorna il messaggio di successo
+        return 'OK';
+
     } catch (error) {
+        // In caso di errore, fai rollback della transazione
+        if (transaction) {
+            await rollbackTransaction(transaction);
+        }
+        if (db) {
+            db.detach();
+        }
         throw error;
     }
-}
+};
 
-const executeQueries = (transaction: Transaction, queries: string[], params: any[]): Promise<any> => {
+const executeQueries = async (transaction: Transaction, queries: string[], params: any[]): Promise<any> => {
     try {
-        return queries.reduce((promiseChain: Promise<any>, currentQuery: string, index: number) => {
-            return promiseChain.then(() => new Promise((resolve, reject) => {
-                transaction.query(currentQuery, params[index], (err: any, result: any): void => {
-                    if (err) return reject(err);
-                    else return resolve(result);
-                });
-            }));
-        }, Promise.resolve())
-            .catch(error => {
-                return new Promise((resolve, reject) => {
-                    transaction.rollback((rollbackErr: any) => {
-                        if (rollbackErr) {
-                            return reject(rollbackErr);
-                        } else {
-                            return reject(error);
-                        }
+        try {
+            return await queries.reduce((promiseChain: Promise<any>, currentQuery: string, index: number) => {
+                return promiseChain.then(() => new Promise((resolve, reject) => {
+                    transaction.query(currentQuery, params[index], (err: any, result: any): void => {
+                        if (err) return reject(err);
+                        else return resolve(result);
                     });
+                }));
+            }, Promise.resolve());
+        } catch (error) {
+            return await new Promise((resolve_1, reject_1) => {
+                transaction.rollback((rollbackErr: any) => {
+                    if (rollbackErr) {
+                        return reject_1(rollbackErr);
+                    } else {
+                        return reject_1(error);
+                    }
                 });
             });
+        }
     } catch (error) {
         throw error;
     }
@@ -185,7 +198,7 @@ interface Orm {
     trimParam: (param: any) => string,
     connect: (options: Options) => Promise<any>,
     startTransaction: (db: Database) => Promise<any>,
-    executeMultiple: (options:Options,  qwps: QueryWithParams[]) => any,
+    executeMultiple: (options: Options, qwps: QueryWithParams[]) => any,
     executeQueries: (transaction: Transaction, queries: string[], params: any[]) => any,
     commitTransaction: (transaction: Transaction) => Promise<any>,
     rollbackTransaction: (transaction: Transaction) => Promise<any>,
