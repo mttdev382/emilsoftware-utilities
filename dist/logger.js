@@ -97,7 +97,7 @@ exports.Logger = exports.LogLevels = void 0;
 var winston_1 = __importDefault(require("winston"));
 var path = __importStar(require("path"));
 var fs_1 = require("fs");
-var chalk_1 = __importDefault(require("chalk"));
+var colorette_1 = require("colorette");
 var LogLevels;
 (function (LogLevels) {
     LogLevels["INFO"] = "INFO";
@@ -247,19 +247,19 @@ var Logger = /** @class */ (function () {
         // Log to console with colors
         switch (level) {
             case LogLevels.INFO:
-                console.info(chalk_1.default.blue("[INFO][".concat(now, "][").concat(fileName, "]")), logEntry.message);
+                console.info((0, colorette_1.blue)("[INFO][".concat(now, "][").concat(fileName, "]")), logEntry.message);
                 break;
             case LogLevels.ERROR:
-                console.error(chalk_1.default.red("[ERROR][".concat(now, "][").concat(fileName, "]")), logEntry.message);
+                console.error((0, colorette_1.red)("[ERROR][".concat(now, "][").concat(fileName, "]")), logEntry.message);
                 break;
             case LogLevels.DEBUG:
-                console.debug(chalk_1.default.magenta("[DEBUG][".concat(now, "][").concat(fileName, "]")), logEntry.message);
+                console.debug((0, colorette_1.magenta)("[DEBUG][".concat(now, "][").concat(fileName, "]")), logEntry.message);
                 break;
             case LogLevels.LOG:
-                console.log(chalk_1.default.cyan("[LOG][".concat(now, "][").concat(fileName, "]")), logEntry.message);
+                console.log((0, colorette_1.cyan)("[LOG][".concat(now, "][").concat(fileName, "]")), logEntry.message);
                 break;
             case LogLevels.DATABASE:
-                console.log(chalk_1.default.green("[DATABASE][".concat(now, "][").concat(fileName, "]")), logEntry.message);
+                console.log((0, colorette_1.green)("[DATABASE][".concat(now, "][").concat(fileName, "]")), logEntry.message);
                 break;
         }
         // Log to file

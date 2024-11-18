@@ -1,7 +1,7 @@
 import winston from "winston";
 import * as path from "path";
 import { promises as fs } from "fs";
-import chalk from "chalk";
+import { blue, red, magenta, green, cyan } from 'colorette';
 
 export enum LogLevels {
     INFO = "INFO",
@@ -147,19 +147,19 @@ export class Logger {
         // Log to console with colors
         switch (level) {
             case LogLevels.INFO:
-                console.info(chalk.blue(`[INFO][${now}][${fileName}]`), logEntry.message);
+                console.info(blue(`[INFO][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.ERROR:
-                console.error(chalk.red(`[ERROR][${now}][${fileName}]`), logEntry.message);
+                console.error(red(`[ERROR][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.DEBUG:
-                console.debug(chalk.magenta(`[DEBUG][${now}][${fileName}]`), logEntry.message);
+                console.debug(magenta(`[DEBUG][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.LOG:
-                console.log(chalk.cyan(`[LOG][${now}][${fileName}]`), logEntry.message);
+                console.log(cyan(`[LOG][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.DATABASE:
-                console.log(chalk.green(`[DATABASE][${now}][${fileName}]`), logEntry.message);
+                console.log(green(`[DATABASE][${now}][${fileName}]`), logEntry.message);
                 break;
         }
 
