@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.boundClass = exports.boundMethod = void 0;
+exports.boundMethod = boundMethod;
+exports.boundClass = boundClass;
+exports.default = autobind;
 // DECORATOR
 /**
  * Return a descriptor removing the value and returning a getter
@@ -47,7 +49,6 @@ function boundMethod(target, key, descriptor) {
         }
     };
 }
-exports.boundMethod = boundMethod;
 /**
  * Use boundMethod to bind all methods on the target.prototype
  */
@@ -79,7 +80,6 @@ function boundClass(target) {
     });
     return target;
 }
-exports.boundClass = boundClass;
 function autobind() {
     var args = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -92,4 +92,3 @@ function autobind() {
     // @ts-ignore
     return boundMethod.apply(void 0, args);
 }
-exports.default = autobind;

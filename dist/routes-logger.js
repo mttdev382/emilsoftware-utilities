@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.routesLogger = void 0;
+exports.routesLogger = routesLogger;
 // Middleware per misurare il tempo di esecuzione
 function routesLogger(req, res, next, logger) {
     var start = new Date();
@@ -13,4 +13,3 @@ function routesLogger(req, res, next, logger) {
     // Continua l'esecuzione della catena middleware
     return next();
 }
-exports.routesLogger = routesLogger;

@@ -1,63 +1,98 @@
 import winston from "winston";
 import * as path from "path";
-import * as fs from "fs";
-
+import { promises as fs } from "fs";
+import chalk from "chalk";
 
 export enum LogLevels {
-    INFO = "INFO", ERROR = "ERROR", DEBUG = "DEBUG", LOG = "LOG", DATABASE = "DATABASE"
+    INFO = "INFO",
+    ERROR = "ERROR",
+    DEBUG = "DEBUG",
+    LOG = "LOG",
+    DATABASE = "DATABASE",
 }
 
 export class Logger {
     private readonly winstonLogger: winston.Logger;
-    private readonly tag: string = "[UNTAGGED]";
+    private readonly tag: string;
+    private readonly logDirectory: string;
+    private logFormat: winston.Logform.Format;
 
-    private logFormat: winston.Logform.Format = winston.format.printf((tmp: winston.Logform.TransformableInfo): string => {
-        const {time, file, level, message} = tmp;
-        return `${JSON.stringify({time, file: this.replaceAll(file, "\\", "/"), level, message})},`;
-    });
-
-    private replaceAll(string: string, match: string, replacer: string) {
-        // @ts-ignore
-        return ("" + string)?.replaceAll(match, replacer);
-    }
-
-    constructor(tag: string) {
-        const fileName: string = this.getFileName();
-        const logsDirectory = "logs";
-        const logFilePath = path.join(logsDirectory, fileName + ".json");
-
-        if (!fs.existsSync(logsDirectory)) {
-            fs.mkdirSync(logsDirectory);
+    constructor(
+        tag: string,
+        config?: {
+            logDirectory?: string;
+            customFormat?: winston.Logform.Format;
+            transports?: winston.transport[];
         }
-        this.tag = tag;
+    ) {
+        this.tag = tag || "[UNTAGGED]";
+        this.logDirectory = config?.logDirectory || "logs";
 
-        winston.addColors({
-            database: 'green',
-        });
+        // Default log format
+        this.logFormat =
+            config?.customFormat ||
+            winston.format.printf(({ timestamp, file, level, message, ...meta }) => {
+                return JSON.stringify({
+                    timestamp: timestamp || new Date().toISOString(),
+                    tag: this.tag,
+                    file: this.replaceAll(file+"", "\\", "/"),
+                    level,
+                    message,
+                    ...meta,
+                });
+            });
 
+        this.initializeDirectory();
+
+        // Configure logger
         this.winstonLogger = winston.createLogger({
-            format: winston.format.json(),
-            transports: [new winston.transports.File({filename: logFilePath, format: this.logFormat})],
+            format: winston.format.combine(winston.format.timestamp(), this.logFormat),
+            transports: config?.transports || [
+                new winston.transports.File({
+                    filename: path.join(this.logDirectory, this.getFileName() + ".json"),
+                }),
+            ],
             levels: {
-                error: 1, warn: 2, info: 3, http: 4, verbose: 5, debug: 6, silly: 7, database: 8
-            }
+                error: 1,
+                warn: 2,
+                info: 3,
+                http: 4,
+                verbose: 5,
+                debug: 6,
+                silly: 7,
+                database: 8,
+            },
         });
 
+        // Add colors for console logging
+        winston.addColors({
+            database: "green",
+            error: "red",
+            info: "blue",
+            debug: "magenta",
+            log: "cyan",
+        });
     }
 
+    private async initializeDirectory() {
+        try {
+            const exists = await fs.access(this.logDirectory).then(() => true).catch(() => false);
+            if (!exists) {
+                await fs.mkdir(this.logDirectory);
+            }
+        } catch (err) {
+            console.error("Error initializing log directory:", err);
+        }
+    }
 
     private getFileName(): string {
         const now = new Date();
-        let date = now.getDate();
-        let dateString = "" + date;
-        if (date < 10) dateString = "0" + dateString;
+        const dateString = now.toISOString().split("T")[0]; // YYYY-MM-DD
+        return dateString;
+    }
 
-        let month = (now.getMonth() + 1);
-        let monthString = "" + month;
-        if (month < 10) monthString = "0" + monthString;
-
-        let yearString = now.getFullYear() + "";
-        return dateString + "-" + monthString + "-" + yearString;
+    private replaceAll(string: string, match: string, replacer: string) {
+        return string.split(match).join(replacer);
     }
 
     public execStart(prefix: string = ""): number {
@@ -66,16 +101,11 @@ export class Logger {
     }
 
     public execStop(prefix: string = "", startTime: number, error: boolean = false): void {
-        switch (error) {
-            case true: {
-                this.print(LogLevels.ERROR, `${prefix} - Execution ended due to an error. Execution time: ${performance.now() - startTime} ms`);
-                break;
-            }
-            case false: {
-                this.print(LogLevels.INFO, `${prefix} - Execution ended successfully. Execution time: ${performance.now() - startTime} ms`);
-                break;
-            }
-        }
+        const executionTime = performance.now() - startTime;
+        const message = `${prefix} - Execution ended ${
+            error ? "due to an error" : "successfully"
+        }. Execution time: ${executionTime.toFixed(2)} ms`;
+        this.print(error ? LogLevels.ERROR : LogLevels.INFO, message);
     }
 
     public info(...data: Object[]): void {
@@ -98,47 +128,46 @@ export class Logger {
         this.print(LogLevels.ERROR, ...data);
     }
 
-    private test() {
-        let startTime = this.execStart("test");
-        this.execStop("test", startTime);
-        this.debug("test");
-        this.log("test");
-        this.error("test")
-        this.dbLog("test");
-    }
-
-    private print(level: LogLevels = LogLevels.INFO, ...data: Object[]): void {
+    private print(level: LogLevels, ...data: Object[]): void {
         const now: Date = new Date();
-        let tag = this.tag.split("\\").pop();
+        const fileName = this.tag.split("\\").pop() || this.tag;
 
+        // Attach metadata to Winston logger
         this.winstonLogger.defaultMeta = {
-            file: tag, time: now, level
+            file: fileName,
+            time: now,
+            level,
         };
 
-        let logEntry: winston.LogEntry = {level: level.toLowerCase(), message: [...data].join(",")};
-        //JSON.stringify([...data]);
+        const logEntry: winston.LogEntry = {
+            level: level.toLowerCase(),
+            message: [...data].join(","),
+        };
+
+        // Log to console with colors
         switch (level) {
             case LogLevels.INFO:
-                this.winstonLogger.info(logEntry);
-                console.info(`[INFO][${now}][${tag}]`, logEntry.message);
+                console.info(chalk.blue(`[INFO][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.ERROR:
-                this.winstonLogger.error(logEntry);
-                console.error(`[ERROR][${now}][${tag}]`, logEntry.message);
+                console.error(chalk.red(`[ERROR][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.DEBUG:
-                this.winstonLogger.debug(logEntry);
-                console.debug(`[DEBUG][${now}][${tag}]`, logEntry.message);
+                console.debug(chalk.magenta(`[DEBUG][${now}][${fileName}]`), logEntry.message);
                 break;
-            case LogLevels.LOG: {
-                this.winstonLogger.log(logEntry);
-                console.log(`[LOG][${now}][${tag}]`, logEntry.message);
-            }
-            case LogLevels.DATABASE: {
-                this.winstonLogger.info(logEntry);
-                console.log(`[DATABASE][${now}][${tag}]`, logEntry.message);
-            }
+            case LogLevels.LOG:
+                console.log(chalk.cyan(`[LOG][${now}][${fileName}]`), logEntry.message);
+                break;
+            case LogLevels.DATABASE:
+                console.log(chalk.green(`[DATABASE][${now}][${fileName}]`), logEntry.message);
+                break;
         }
 
+        // Log to file
+        this.winstonLogger.log(logEntry);
+    }
+
+    public static createLogger(tag: string, config?: { logDirectory?: string }): Logger {
+        return new Logger(tag, config);
     }
 }
