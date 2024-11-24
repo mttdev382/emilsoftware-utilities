@@ -3,168 +3,156 @@ import * as Firebird from "es-node-firebird";
 import { Logger } from "./logger";
 import { Database, Options, Transaction } from "es-node-firebird";
 import { Utilities } from "./utilities";
+import autobind from "./autobind";
 
-const logger: Logger = new Logger(__filename);
+@autobind
+export class Orm {
+    private static logger: Logger = new Logger(Orm.name);
 
-const quote = (value: string): string => {
-    return "\"" + value + "\"";
-};
-const testConnection = (options: Options): Promise<any> => {
-    return new Promise((resolve): void => {
-        Firebird.attach(options, (err: Error, db: Database): void => {
-            if (err) {
-                logger.error('La connessione con il DATABASE non è andata a buon fine.');
-                return resolve(false);
+    public static quote(value: string): string {
+        return "\"" + value + "\"";
+    }
+
+    public static async testConnection(options: Options): Promise<boolean> {
+        return new Promise((resolve): void => {
+            Firebird.attach(options, (err: Error, db: Database): void => {
+                if (err) {
+                    this.logger.error('La connessione con il DATABASE non è andata a buon fine.');
+                    return resolve(false);
+                }
+                this.logger.info("DATABASE connesso.");
+                if (db) db.detach();
+                return resolve(true);
+            });
+        });
+    }
+
+    public static async query(options: Options, query: string, parameters: any[] = []): Promise<any> {
+        try {
+            return new Promise((resolve, reject): void => {
+                Firebird.attach(options, (err: any, db: Database) => {
+                    if (err) {
+                        this.logger.error(err);
+                        return reject(err);
+                    }
+
+                    this.logger.info(Utilities.printQueryWithParams(query, parameters));
+                    db.query(query, parameters, (error: any, result: any) => {
+                        if (error) {
+                            this.logger.error(error);
+                            db.detach();
+                            return reject(error);
+                        }
+                        db.detach();
+                        return resolve(result);
+                    });
+                });
+            });
+        } catch (error) {
+            this.logger.error(error);
+            throw error;
+        }
+    }
+
+    public static async execute(options: Options, query: string, parameters: any = []): Promise<any> {
+        try {
+            return new Promise((resolve, reject): void => {
+                Firebird.attach(options, (err: any, db: Database) => {
+                    if (err) {
+                        this.logger.error(err);
+                        return reject(err);
+                    }
+
+                    this.logger.info(Utilities.printQueryWithParams(query, parameters));
+                    db.execute(query, parameters, (error, result: any): void => {
+                        if (error) {
+                            this.logger.error(error);
+                            db.detach();
+                            return reject(error);
+                        }
+                        db.detach();
+                        return resolve(result);
+                    });
+                });
+            });
+        } catch (error) {
+            this.logger.error(error);
+            throw error;
+        }
+    }
+
+    public static trimParam(param: any): string {
+        if (typeof param === "string" || param instanceof String) {
+            return param.trim();
+        }
+        return param;
+    }
+
+    public static async connect(options: Options): Promise<Database> {
+        return new Promise((resolve, reject): void => {
+            Firebird.attach(options, function (err: any, db: Database): void {
+                if (err) return reject(err); else return resolve(db);
+            });
+        });
+    }
+
+    public static async startTransaction(db: Database): Promise<Transaction> {
+        return new Promise((resolve, reject): void => {
+            db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err: any, transaction: Transaction): void {
+                if (err) return reject(err); else return resolve(transaction);
+            });
+        });
+    }
+
+    public static async commitTransaction(transaction: Transaction): Promise<string> {
+        return new Promise((resolve, reject): void => {
+            transaction.commit((err: any): void => {
+                if (err) return reject(err); else return resolve('Transaction committed successfully.');
+            });
+        });
+    }
+
+    public static async rollbackTransaction(transaction: Transaction): Promise<string> {
+        return new Promise((resolve, reject): void => {
+            transaction.rollback((err: any): void => {
+                if (err) return reject(err); else return resolve('Transaction rolled back successfully.');
+            });
+        });
+    }
+
+    public static async executeMultiple(options: Options, queriesWithParams: { query: string, params: any[] }[]): Promise<string> {
+        let db: Database | undefined;
+        let transaction: Transaction | undefined;
+
+        try {
+            db = await Orm.connect(options);
+            transaction = await Orm.startTransaction(db);
+
+            for (const qwp of queriesWithParams) {
+                await new Promise((resolve, reject) => {
+                    transaction.query(qwp.query, qwp.params, (err: any, result: any): void => {
+                        if (err) return reject(err);
+                        else return resolve(result);
+                    });
+                });
             }
-            logger.info("DATABASE connesso.");
-            if (db) db.detach();
-            return resolve(true);
-        })
-    })
-}
 
-const query = (options: Options, query: string, parameters: any[] = []): Promise<any> => {
-    try {
-        return new Promise((resolve, reject): void => {
-            Firebird.attach(options, (err: any, db: Database) => {
-                if (err) {
-                    logger.error(err);
-                    return reject(err);
-                }
-
-                logger.info(Utilities.printQueryWithParams(query, parameters));
-                db.query(query, parameters, (error: any, result: any) => {
-                    if (error) {
-                        logger.error(error);
-                        db.detach();
-                        return reject(error);
-                    }
-                    db.detach();
-                    return resolve(result);
-                });
-            });
-        });
-    } catch (error) {
-        logger.error(error);
-        throw error;
-    }
-}
-const execute = (options: Options, query: string, parameters: any = []): Promise<any> => {
-    try {
-        return new Promise((resolve, reject): void => {
-            Firebird.attach(options, (err: any, db: Database) => {
-                if (err) {
-                    logger.error(err);
-                    return reject(err);
-                }
-
-                logger.info(Utilities.printQueryWithParams(query, parameters));
-                db.execute(query, parameters, (error, result: any): void => {
-                    if (error) {
-                        logger.error(error);
-                        db.detach();
-                        return reject(error);
-                    }
-                    db.detach();
-                    return resolve(result);
-                });
-            });
-        });
-    } catch (error) {
-        logger.error(error);
-        throw error;
-    }
-}
-
-const trimParam = (param: any): string => {
-    if (typeof param === "string" || param instanceof String) {
-        return param.trim();
-    }
-    return param;
-}
-
-const connect = (options: Options): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        Firebird.attach(options, function (err: any, db: any): void {
-            if (err) return reject(err); else return resolve(db);
-        });
-    });
-}
-
-const startTransaction = (db: Database): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err: any, transaction: any) {
-            if (err) return reject(err); else return resolve(transaction);
-        });
-    });
-}
-
-const commitTransaction = (transaction: Transaction): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        transaction.commit((err: any): void => {
-            if (err) return reject(err); else return resolve('Transaction committed successfully.');
-        });
-    });
-}
-
-const rollbackTransaction = (transaction: Transaction): Promise<any> => {
-    return new Promise((resolve, reject) => {
-        transaction.rollback(err => {
-            if (err) return reject(err);
-            else return resolve('Transaction rolled back successfully.');
-        });
-    });
-}
-
-interface QueryWithParams {
-    query: string,
-    params: any[]
-}
-
-const executeMultiple = async (options: Options, queriesWithParams: QueryWithParams[]): Promise<any> => {
-    let db: Database;
-    let transaction: Transaction;
-
-    try {
-        // Connetti al database
-        db = await connect(options);
-
-        // Inizia la transazione
-        transaction = await startTransaction(db);
-
-        // Esegui le query in serie
-        for (const qwp of queriesWithParams) {
-            await new Promise((resolve, reject) => {
-                transaction.query(qwp.query, qwp.params, (err: any, result: any): void => {
-                    if (err) return reject(err);
-                    else return resolve(result);
-                });
-            });
-        }
-
-        // Commit della transazione
-        await commitTransaction(transaction);
-
-        // Stacca il database
-        db.detach();
-
-        // Ritorna il messaggio di successo
-        return 'OK';
-
-    } catch (error) {
-        // In caso di errore, fai rollback della transazione
-        if (transaction) {
-            await rollbackTransaction(transaction);
-        }
-        if (db) {
+            await Orm.commitTransaction(transaction);
             db.detach();
-        }
-        throw error;
-    }
-};
+            return 'OK';
 
-const executeQueries = async (transaction: Transaction, queries: string[], params: any[]): Promise<any> => {
-    try {
+        } catch (error) {
+            if (transaction) {
+                await Orm.rollbackTransaction(transaction);
+            }
+            if (db) {
+                db.detach();
+            }
+            throw error;
+        }
+    }
+
+    public static async executeQueries(transaction: Transaction, queries: string[], params: any[]): Promise<any> {
         try {
             return await queries.reduce((promiseChain: Promise<any>, currentQuery: string, index: number) => {
                 return promiseChain.then(() => new Promise((resolve, reject) => {
@@ -175,47 +163,15 @@ const executeQueries = async (transaction: Transaction, queries: string[], param
                 }));
             }, Promise.resolve());
         } catch (error) {
-            return await new Promise((resolve_1, reject_1) => {
-                transaction.rollback((rollbackErr: any) => {
+            return await new Promise((resolve, reject) => {
+                transaction.rollback((rollbackErr: any): void => {
                     if (rollbackErr) {
-                        return reject_1(rollbackErr);
+                        return reject(rollbackErr);
                     } else {
-                        return reject_1(error);
+                        return reject(error);
                     }
                 });
             });
         }
-    } catch (error) {
-        throw error;
     }
-};
-
-interface Orm {
-    quote: (value: string) => string,
-    testConnection: (options: Options) => Promise<any>,
-    query: (options: Options, query: any, parameters?: any[]) => Promise<any>,
-    execute: (options: Options, query: any, parameters?: any[]) => Promise<any>,
-    trimParam: (param: any) => string,
-    connect: (options: Options) => Promise<any>,
-    startTransaction: (db: Database) => Promise<any>,
-    executeMultiple: (options: Options, qwps: QueryWithParams[]) => any,
-    executeQueries: (transaction: Transaction, queries: string[], params: any[]) => any,
-    commitTransaction: (transaction: Transaction) => Promise<any>,
-    rollbackTransaction: (transaction: Transaction) => Promise<any>,
 }
-
-export const Orm: Orm = {
-    quote,
-    testConnection,
-    query,
-    execute,
-    trimParam,
-    connect,
-    startTransaction,
-    executeQueries,
-    executeMultiple,
-    commitTransaction,
-    rollbackTransaction
-}
-
-

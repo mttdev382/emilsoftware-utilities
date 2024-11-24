@@ -1,4 +1,4 @@
-import { Orm } from "./orm";
+import { Orm } from "./Orm";
 import { Logger } from "./logger";
 import { Options } from "es-node-firebird";
 
