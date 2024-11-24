@@ -6,6 +6,7 @@ import { blue, red, magenta, green, cyan } from 'colorette';
 export enum LogLevels {
     INFO = "INFO",
     ERROR = "ERROR",
+    WARNING = "WARNING",
     DEBUG = "DEBUG",
     LOG = "LOG",
     DATABASE = "DATABASE",
@@ -35,7 +36,7 @@ export class Logger {
                 return JSON.stringify({
                     timestamp: timestamp || new Date().toISOString(),
                     tag: this.tag,
-                    file: this.replaceAll(file+"", "\\", "/"),
+                    file: this.replaceAll(file + "", "\\", "/"),
                     level,
                     message,
                     ...meta,
@@ -55,6 +56,7 @@ export class Logger {
             levels: {
                 error: 1,
                 warn: 2,
+                warning: 2,
                 info: 3,
                 http: 4,
                 verbose: 5,
@@ -68,6 +70,7 @@ export class Logger {
         winston.addColors({
             database: "green",
             error: "red",
+            warning: "yellow",
             info: "blue",
             debug: "magenta",
             log: "cyan",
@@ -102,9 +105,8 @@ export class Logger {
 
     public execStop(prefix: string = "", startTime: number, error: boolean = false): void {
         const executionTime = performance.now() - startTime;
-        const message = `${prefix} - Execution ended ${
-            error ? "due to an error" : "successfully"
-        }. Execution time: ${executionTime.toFixed(2)} ms`;
+        const message = `${prefix} - Execution ended ${error ? "due to an error" : "successfully"
+            }. Execution time: ${executionTime.toFixed(2)} ms`;
         this.print(error ? LogLevels.ERROR : LogLevels.INFO, message);
     }
 
@@ -118,6 +120,10 @@ export class Logger {
 
     public debug(...data: Object[]): void {
         this.print(LogLevels.DEBUG, ...data);
+    }
+
+    public warning(...data: Object[]): void {
+        this.print(LogLevels.WARNING, ...data);
     }
 
     public log(...data: Object[]): void {
