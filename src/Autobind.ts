@@ -1,31 +1,29 @@
-export class Autobind {
-    /**
-     * Binds a method to the instance, ensuring `this` references are preserved.
-     */
-    static boundMethod(target: any, key: any, descriptor: any) {
-        let fn = descriptor?.value;
-
-        if (typeof fn !== 'function') {
-            throw new TypeError(`@boundMethod decorator can only be applied to methods, not: ${typeof fn}`);
-        }
-
-        let definingProperty = false;
-
-        return {
-            configurable: true,
-            get() {
-                if (
-                    definingProperty ||
-                    this === target.prototype ||
-                    Object.prototype.hasOwnProperty.call(this, key) ||
-                    typeof fn !== 'function'
-                ) {
-                    return fn;
-                }
-
-                const boundFn = fn.bind(this);
-                definingProperty = true;
-
+// DECORATOR
+/**
+ * Return a descriptor removing the value and returning a getter
+ * The getter will return a .bind version of the function
+ * and memoize the result against a symbol on the instance
+ */
+function boundMethod(target:any, key: any, descriptor: any) {
+    let fn = descriptor?.value;
+    if (typeof fn !== 'function') {
+        throw new TypeError(`@boundMethod decorator can only be applied to methods not: ${typeof fn}`);
+    }
+    // In IE11 calling Object.defineProperty has a side effect of evaluating the
+    // getter for the property which is being replaced. This causes infinite
+    // recursion and an "Out of stack space" error.
+    let definingProperty = false;
+    return {
+        configurable: true,
+        get() {
+            // eslint-disable-next-line no-prototype-builtins
+            if (definingProperty || this === target.prototype || this.hasOwnProperty(key as string | number | symbol) ||
+                typeof fn !== 'function') {
+                return fn;
+            }
+            const boundFn = fn.bind(this);
+            definingProperty = true;
+            if (key) {
                 Object.defineProperty(this, key, {
                     configurable: true,
                     get() {
@@ -33,61 +31,54 @@ export class Autobind {
                     },
                     set(value) {
                         fn = value;
+                        // @ts-ignore
                         delete this[key];
-                    },
+                    }
                 });
-
-                definingProperty = false;
-                return boundFn;
-            },
-            set(value: any) {
-                fn = value;
-            },
-        };
-    }
-
-    /**
-     * Applies `boundMethod` to all methods in the class prototype.
-     */
-    static boundClass(target: any) {
-        const keys = Autobind.getPrototypeKeys(target.prototype);
-
-        keys.forEach((key) => {
-            if (key === 'constructor') return;
-
-            const descriptor = Object.getOwnPropertyDescriptor(target.prototype, key);
-
-            if (descriptor && typeof descriptor.value === 'function') {
-                Object.defineProperty(target.prototype, key, Autobind.boundMethod(target, key, descriptor));
             }
-        });
-
-        return target;
-    }
-
-    /**
-     * Retrieves all property keys (including symbols) from the prototype.
-     */
-    private static getPrototypeKeys(proto: any): Array<string | symbol> {
-        if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
-            return Reflect.ownKeys(proto);
+            definingProperty = false;
+            return boundFn;
+        },
+        set(value: any) {
+            fn = value;
         }
-
-        const keys = Object.getOwnPropertyNames(proto);
-
+    };
+}
+/**
+ * Use boundMethod to bind all methods on the target.prototype
+ */
+function boundClass(target: any) {
+    // (Using reflect to get all keys including symbols)
+    let keys;
+    // Use Reflect if exists
+    if (typeof Reflect !== 'undefined' && typeof Reflect.ownKeys === 'function') {
+        keys = Reflect.ownKeys(target.prototype);
+    } else {
+        keys = Object.getOwnPropertyNames(target.prototype);
+        // Use symbols if support is provided
         if (typeof Object.getOwnPropertySymbols === 'function') {
-            return keys.concat(Object.getOwnPropertySymbols(proto) as any);
+            // @ts-ignore
+            keys = keys.concat(Object.getOwnPropertySymbols(target.prototype));
         }
-
-        return keys;
     }
-
-    public static apply(...args: any[]) {
-        if (args.length === 1) {
-            return Autobind.boundClass(args[0]);
+    keys.forEach(key => {
+        // Ignore special case target method
+        if (key === 'constructor') {
+            return;
         }
-    
-        return Autobind.boundMethod(args[0], args[1], args[2]);
+        const descriptor = Object.getOwnPropertyDescriptor(target.prototype, key);
+        // Only methods need binding
+        if (typeof descriptor?.value === 'function') {
+            Object.defineProperty(target.prototype, key, boundMethod(target, key, descriptor));
+        }
+    });
+    return target;
+}
+export function autobind(...args: any[]) {
+    if (args.length === 1) {
+        // @ts-ignore
+        return boundClass(...args);
     }
-
+    // @ts-ignore
+    return boundMethod(...args);
 }
