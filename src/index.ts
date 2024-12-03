@@ -1,4 +1,4 @@
-import { Autobind } from "./Autbobind"
+import { Autobind } from "./Autobind"
 import { DatabaseUpdater } from "./DatabaseUpdater";
 import { ExecutionTimeLogger } from "./ExecutionTimeLogger"
 import { LogLevels, Logger } from "./Logger";
