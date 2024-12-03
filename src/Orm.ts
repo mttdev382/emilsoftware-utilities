@@ -2,9 +2,9 @@ import * as Firebird from "es-node-firebird";
 import { Logger } from "./Logger";
 import { Database, Options, Transaction } from "es-node-firebird";
 import { RestUtilities } from "./Utilities";
-import {Autobind} from "./Autobind";
+import {autobind} from "./Autobind";
 
-@Autobind.apply
+@autobind
 export class Orm {
     private static logger: Logger = new Logger(Orm.name);
 
