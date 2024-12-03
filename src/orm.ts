@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as Firebird from "es-node-firebird";
 import { Logger } from "./Logger";
 import { Database, Options, Transaction } from "es-node-firebird";
