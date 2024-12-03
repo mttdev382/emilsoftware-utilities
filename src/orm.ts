@@ -2,8 +2,8 @@
 import * as Firebird from "es-node-firebird";
 import { Logger } from "./logger";
 import { Database, Options, Transaction } from "es-node-firebird";
-import { Utilities } from "./utilities";
-import autobind from "./autobind";
+import { Utilities } from "./Utilities";
+import autobind from "./AutbobindHelper";
 
 @autobind
 export class Orm {
