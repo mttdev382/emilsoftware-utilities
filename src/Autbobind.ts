@@ -1,4 +1,4 @@
-class AutobindHelper {
+export class Autobind {
     /**
      * Binds a method to the instance, ensuring `this` references are preserved.
      */
@@ -81,16 +81,13 @@ class AutobindHelper {
 
         return keys;
     }
-}
 
-/**
- * Exported function to use as the main decorator.
- * Determines whether to apply `boundMethod` or `boundClass`.
- */
-export default function autobind(...args: any[]) {
-    if (args.length === 1) {
-        return AutobindHelper.boundClass(args[0]);
+    public static apply(...args: any[]) {
+        if (args.length === 1) {
+            return AutobindHelper.boundClass(args[0]);
+        }
+    
+        return AutobindHelper.boundMethod(args[0], args[1], args[2]);
     }
 
-    return AutobindHelper.boundMethod(args[0], args[1], args[2]);
 }

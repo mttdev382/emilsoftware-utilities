@@ -1,11 +1,11 @@
 // @ts-ignore
 import * as Firebird from "es-node-firebird";
-import { Logger } from "./logger";
+import { Logger } from "./Logger";
 import { Database, Options, Transaction } from "es-node-firebird";
-import { DateUtilities, RestUtilities } from "./utilities";
-import autobind from "./AutbobindHelper";
+import { RestUtilities } from "./Utilities";
+import {Autobind} from "./Autbobind";
 
-@autobind
+@Autobind.apply
 export class Orm {
     private static logger: Logger = new Logger(Orm.name);
 

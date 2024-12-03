@@ -1,9 +1,11 @@
 import { Response } from 'express';
+import { Options } from "es-node-firebird";
 
-enum STATUS_CODE {
-    OK = 0,
-    WARNING = 1,
-    ERROR = 2,
+
+export enum StatusCode {
+    Ok = 0,
+    Warning = 1,
+    Error = 2,
 }
 
 export class DateUtilities {
@@ -103,7 +105,7 @@ export class RestUtilities {
         return res.send({
             severity: "success",
             status: 200,
-            statusCode: STATUS_CODE.OK,
+            statusCode: StatusCode.Ok,
             message,
         });
     }
@@ -120,7 +122,7 @@ export class RestUtilities {
         return res.status(status).send({
             severity: "error",
             status,
-            statusCode: STATUS_CODE.ERROR,
+            statusCode: StatusCode.Error,
             message: "An error occurred",
             error: `${tag}: ${error}`,
         });
@@ -190,4 +192,51 @@ export class RestUtilities {
             throw error;
         }
     }
+}
+
+/**
+ * Utility class for managing database-related configurations and operations.
+ */
+export class DatabaseUtilities {
+  /**
+   * Creates a configuration object for connecting to a Firebird database.
+   *
+   * @param {string} host - The hostname or IP address of the database server.
+   * @param {number} port - The port number on which the database server is running.
+   * @param {string} database - The path or alias of the database to connect to.
+   * @param {string} [username='SYSDBA'] - The username for authentication. Defaults to 'SYSDBA'.
+   * @param {string} [password='masterkey'] - The password for authentication. Defaults to 'masterkey'.
+   * @returns {Options} - The configuration object to use for establishing a Firebird database connection.
+   *
+   * @example
+   * ```typescript
+   * const options = DatabaseUtilities.createOption(
+   *   'localhost',
+   *   3050,
+   *   '/path/to/database.fdb',
+   *   'myUsername',
+   *   'myPassword'
+   * );
+   * ```
+   */
+  static createOption(
+    host: string,
+    port: number,
+    database: string,
+    username = 'SYSDBA',
+    password = 'masterkey'
+  ): Options {
+    return {
+      host,                   // The hostname or IP address of the database server.
+      port,                   // The port number used by the database server.
+      user: username,         // The username for database authentication.
+      password,               // The password for database authentication.
+      database,               // The path or alias of the target database.
+      lowercase_keys: false,  // Determines if the keys in query results should be in lowercase. Default: false.
+      role: undefined,        // The role for the database connection. Default: undefined.
+      pageSize: 100000,       // The page size for database transactions. Default: 100,000.
+      retryConnectionInterval: 1000, // The interval (in ms) to retry a failed connection. Default: 1,000 ms.
+      blobAsText: true,       // Determines if BLOB fields should be treated as text. Default: true.
+    };
+  }
 }

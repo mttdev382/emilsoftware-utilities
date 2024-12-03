@@ -1,10 +1,10 @@
 import { Logger } from "winston";
-import autobind from "./AutbobindHelper"
+import {Autobind} from "./Autbobind"
 import { DatabaseUpdater } from "./DatabaseUpdater";
 import { ExecutionTimeLogger } from "./ExecutionTimeLogger"
-import { LogLevels } from "./logger";
+import { LogLevels } from "./Logger";
 import { Orm } from "./Orm";
-import { DateUtilities, RestUtilities } from "./utilities";
+import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./Utilities";
 
 export * from "es-node-firebird";
-export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUpdater };
+export { Autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode };
