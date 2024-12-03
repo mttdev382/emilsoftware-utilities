@@ -2,7 +2,7 @@
 import * as Firebird from "es-node-firebird";
 import { Logger } from "./logger";
 import { Database, Options, Transaction } from "es-node-firebird";
-import { Utilities } from "./Utilities";
+import { DateUtilities, RestUtilities } from "./utilities";
 import autobind from "./AutbobindHelper";
 
 @autobind
@@ -27,7 +27,7 @@ export class Orm {
         });
     }
 
-    public static async query(options: Options, query: string, parameters: any[] = []): Promise<any> {
+    public static async query(options: Options, query: string, parameters: any[] = [], logQuery = false): Promise<any> {
         try {
             return new Promise((resolve, reject): void => {
                 Firebird.attach(options, (err: any, db: Database) => {
@@ -36,7 +36,7 @@ export class Orm {
                         return reject(err);
                     }
 
-                    this.logger.info(Utilities.printQueryWithParams(query, parameters));
+                    if(logQuery) this.logger.info(RestUtilities.printQueryWithParams(query, parameters));
                     db.query(query, parameters, (error: any, result: any) => {
                         if (error) {
                             this.logger.error(error);
@@ -54,7 +54,7 @@ export class Orm {
         }
     }
 
-    public static async execute(options: Options, query: string, parameters: any = []): Promise<any> {
+    public static async execute(options: Options, query: string, parameters: any = [], logQuery = false): Promise<any> {
         try {
             return new Promise((resolve, reject): void => {
                 Firebird.attach(options, (err: any, db: Database) => {
@@ -63,7 +63,7 @@ export class Orm {
                         return reject(err);
                     }
 
-                    this.logger.info(Utilities.printQueryWithParams(query, parameters));
+                    if(logQuery) this.logger.info(RestUtilities.printQueryWithParams(query, parameters));
                     db.execute(query, parameters, (error, result: any): void => {
                         if (error) {
                             this.logger.error(error);
