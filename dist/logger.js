@@ -102,6 +102,7 @@ var LogLevels;
 (function (LogLevels) {
     LogLevels["INFO"] = "INFO";
     LogLevels["ERROR"] = "ERROR";
+    LogLevels["WARNING"] = "WARNING";
     LogLevels["DEBUG"] = "DEBUG";
     LogLevels["LOG"] = "LOG";
     LogLevels["DATABASE"] = "DATABASE";
@@ -130,6 +131,7 @@ var Logger = /** @class */ (function () {
             levels: {
                 error: 1,
                 warn: 2,
+                warning: 2,
                 info: 3,
                 http: 4,
                 verbose: 5,
@@ -142,6 +144,7 @@ var Logger = /** @class */ (function () {
         winston_1.default.addColors({
             database: "green",
             error: "red",
+            warning: "yellow",
             info: "blue",
             debug: "magenta",
             log: "cyan",
@@ -212,6 +215,13 @@ var Logger = /** @class */ (function () {
             data[_i] = arguments[_i];
         }
         this.print.apply(this, __spreadArray([LogLevels.DEBUG], data, false));
+    };
+    Logger.prototype.warning = function () {
+        var data = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            data[_i] = arguments[_i];
+        }
+        this.print.apply(this, __spreadArray([LogLevels.WARNING], data, false));
     };
     Logger.prototype.log = function () {
         var data = [];

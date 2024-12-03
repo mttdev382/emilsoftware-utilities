@@ -15,6 +15,40 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
+var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+    function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+    var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+    var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+    var _, done = false;
+    for (var i = decorators.length - 1; i >= 0; i--) {
+        var context = {};
+        for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+        for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+        context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+        var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+        if (kind === "accessor") {
+            if (result === void 0) continue;
+            if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+            if (_ = accept(result.get)) descriptor.get = _;
+            if (_ = accept(result.set)) descriptor.set = _;
+            if (_ = accept(result.init)) initializers.unshift(_);
+        }
+        else if (_ = accept(result)) {
+            if (kind === "field") initializers.unshift(_);
+            else descriptor[key] = _;
+        }
+    }
+    if (target) Object.defineProperty(target, contextIn.name, descriptor);
+    done = true;
+};
+var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
+    var useValue = arguments.length > 2;
+    for (var i = 0; i < initializers.length; i++) {
+        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+    }
+    return useValue ? value : void 0;
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -58,250 +92,293 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {
+    if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+    return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Orm = void 0;
 // @ts-ignore
 var Firebird = __importStar(require("es-node-firebird"));
-var logger_1 = require("./logger");
-var utilities_1 = require("./utilities");
-var logger = new logger_1.Logger(__filename);
-var quote = function (value) {
-    return "\"" + value + "\"";
-};
-var testConnection = function (options) {
-    return new Promise(function (resolve) {
-        Firebird.attach(options, function (err, db) {
-            if (err) {
-                logger.error('La connessione con il DATABASE non è andata a buon fine.');
-                return resolve(false);
-            }
-            logger.info("DATABASE connesso.");
-            if (db)
-                db.detach();
-            return resolve(true);
-        });
-    });
-};
-var query = function (options, query, parameters) {
-    if (parameters === void 0) { parameters = []; }
-    try {
-        return new Promise(function (resolve, reject) {
-            Firebird.attach(options, function (err, db) {
-                if (err) {
-                    logger.error(err);
-                    return reject(err);
-                }
-                logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
-                db.query(query, parameters, function (error, result) {
-                    if (error) {
-                        logger.error(error);
-                        db.detach();
-                        return reject(error);
-                    }
-                    db.detach();
-                    return resolve(result);
-                });
-            });
-        });
-    }
-    catch (error) {
-        logger.error(error);
-        throw error;
-    }
-};
-var execute = function (options, query, parameters) {
-    if (parameters === void 0) { parameters = []; }
-    try {
-        return new Promise(function (resolve, reject) {
-            Firebird.attach(options, function (err, db) {
-                if (err) {
-                    logger.error(err);
-                    return reject(err);
-                }
-                logger.info(utilities_1.Utilities.printQueryWithParams(query, parameters));
-                db.execute(query, parameters, function (error, result) {
-                    if (error) {
-                        logger.error(error);
-                        db.detach();
-                        return reject(error);
-                    }
-                    db.detach();
-                    return resolve(result);
-                });
-            });
-        });
-    }
-    catch (error) {
-        logger.error(error);
-        throw error;
-    }
-};
-var trimParam = function (param) {
-    if (typeof param === "string" || param instanceof String) {
-        return param.trim();
-    }
-    return param;
-};
-var connect = function (options) {
-    return new Promise(function (resolve, reject) {
-        Firebird.attach(options, function (err, db) {
-            if (err)
-                return reject(err);
-            else
-                return resolve(db);
-        });
-    });
-};
-var startTransaction = function (db) {
-    return new Promise(function (resolve, reject) {
-        db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err, transaction) {
-            if (err)
-                return reject(err);
-            else
-                return resolve(transaction);
-        });
-    });
-};
-var commitTransaction = function (transaction) {
-    return new Promise(function (resolve, reject) {
-        transaction.commit(function (err) {
-            if (err)
-                return reject(err);
-            else
-                return resolve('Transaction committed successfully.');
-        });
-    });
-};
-var rollbackTransaction = function (transaction) {
-    return new Promise(function (resolve, reject) {
-        transaction.rollback(function (err) {
-            if (err)
-                return reject(err);
-            else
-                return resolve('Transaction rolled back successfully.');
-        });
-    });
-};
-var executeMultiple = function (options, queriesWithParams) { return __awaiter(void 0, void 0, void 0, function () {
-    var db, transaction, _loop_1, _i, queriesWithParams_1, qwp, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 8, , 11]);
-                return [4 /*yield*/, connect(options)];
-            case 1:
-                // Connetti al database
-                db = _a.sent();
-                return [4 /*yield*/, startTransaction(db)];
-            case 2:
-                // Inizia la transazione
-                transaction = _a.sent();
-                _loop_1 = function (qwp) {
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
-                            case 0: return [4 /*yield*/, new Promise(function (resolve, reject) {
-                                    transaction.query(qwp.query, qwp.params, function (err, result) {
-                                        if (err)
-                                            return reject(err);
-                                        else
-                                            return resolve(result);
-                                    });
-                                })];
-                            case 1:
-                                _b.sent();
-                                return [2 /*return*/];
-                        }
-                    });
-                };
-                _i = 0, queriesWithParams_1 = queriesWithParams;
-                _a.label = 3;
-            case 3:
-                if (!(_i < queriesWithParams_1.length)) return [3 /*break*/, 6];
-                qwp = queriesWithParams_1[_i];
-                return [5 /*yield**/, _loop_1(qwp)];
-            case 4:
-                _a.sent();
-                _a.label = 5;
-            case 5:
-                _i++;
-                return [3 /*break*/, 3];
-            case 6: 
-            // Commit della transazione
-            return [4 /*yield*/, commitTransaction(transaction)];
-            case 7:
-                // Commit della transazione
-                _a.sent();
-                // Stacca il database
-                db.detach();
-                // Ritorna il messaggio di successo
-                return [2 /*return*/, 'OK'];
-            case 8:
-                error_1 = _a.sent();
-                if (!transaction) return [3 /*break*/, 10];
-                return [4 /*yield*/, rollbackTransaction(transaction)];
-            case 9:
-                _a.sent();
-                _a.label = 10;
-            case 10:
-                if (db) {
-                    db.detach();
-                }
-                throw error_1;
-            case 11: return [2 /*return*/];
+var Logger_1 = require("./Logger");
+var Utilities_1 = require("./Utilities");
+var Autbobind_1 = require("./Autbobind");
+var Orm = function () {
+    var _a;
+    var _classDecorators = [(_a = Autbobind_1.Autobind).apply.bind(_a)];
+    var _classDescriptor;
+    var _classExtraInitializers = [];
+    var _classThis;
+    var Orm = _classThis = /** @class */ (function () {
+        function Orm_1() {
         }
-    });
-}); };
-var executeQueries = function (transaction, queries, params) { return __awaiter(void 0, void 0, void 0, function () {
-    var error_2, error_3;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 6, , 7]);
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 3, , 5]);
-                return [4 /*yield*/, queries.reduce(function (promiseChain, currentQuery, index) {
-                        return promiseChain.then(function () { return new Promise(function (resolve, reject) {
-                            transaction.query(currentQuery, params[index], function (err, result) {
+        Orm_1.quote = function (value) {
+            return "\"" + value + "\"";
+        };
+        Orm_1.testConnection = function (options) {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve) {
+                            Firebird.attach(options, function (err, db) {
+                                if (err) {
+                                    _this.logger.error('La connessione con il DATABASE non è andata a buon fine.');
+                                    return resolve(false);
+                                }
+                                _this.logger.info("DATABASE connesso.");
+                                if (db)
+                                    db.detach();
+                                return resolve(true);
+                            });
+                        })];
+                });
+            });
+        };
+        Orm_1.query = function (options_1, query_1) {
+            return __awaiter(this, arguments, void 0, function (options, query, parameters, logQuery) {
+                var _this = this;
+                if (parameters === void 0) { parameters = []; }
+                if (logQuery === void 0) { logQuery = false; }
+                return __generator(this, function (_a) {
+                    try {
+                        return [2 /*return*/, new Promise(function (resolve, reject) {
+                                Firebird.attach(options, function (err, db) {
+                                    if (err) {
+                                        _this.logger.error(err);
+                                        return reject(err);
+                                    }
+                                    if (logQuery)
+                                        _this.logger.info(Utilities_1.RestUtilities.printQueryWithParams(query, parameters));
+                                    db.query(query, parameters, function (error, result) {
+                                        if (error) {
+                                            _this.logger.error(error);
+                                            db.detach();
+                                            return reject(error);
+                                        }
+                                        db.detach();
+                                        return resolve(result);
+                                    });
+                                });
+                            })];
+                    }
+                    catch (error) {
+                        this.logger.error(error);
+                        throw error;
+                    }
+                    return [2 /*return*/];
+                });
+            });
+        };
+        Orm_1.execute = function (options_1, query_1) {
+            return __awaiter(this, arguments, void 0, function (options, query, parameters, logQuery) {
+                var _this = this;
+                if (parameters === void 0) { parameters = []; }
+                if (logQuery === void 0) { logQuery = false; }
+                return __generator(this, function (_a) {
+                    try {
+                        return [2 /*return*/, new Promise(function (resolve, reject) {
+                                Firebird.attach(options, function (err, db) {
+                                    if (err) {
+                                        _this.logger.error(err);
+                                        return reject(err);
+                                    }
+                                    if (logQuery)
+                                        _this.logger.info(Utilities_1.RestUtilities.printQueryWithParams(query, parameters));
+                                    db.execute(query, parameters, function (error, result) {
+                                        if (error) {
+                                            _this.logger.error(error);
+                                            db.detach();
+                                            return reject(error);
+                                        }
+                                        db.detach();
+                                        return resolve(result);
+                                    });
+                                });
+                            })];
+                    }
+                    catch (error) {
+                        this.logger.error(error);
+                        throw error;
+                    }
+                    return [2 /*return*/];
+                });
+            });
+        };
+        Orm_1.trimParam = function (param) {
+            if (typeof param === "string" || param instanceof String) {
+                return param.trim();
+            }
+            return param;
+        };
+        Orm_1.connect = function (options) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            Firebird.attach(options, function (err, db) {
                                 if (err)
                                     return reject(err);
                                 else
-                                    return resolve(result);
+                                    return resolve(db);
                             });
-                        }); });
-                    }, Promise.resolve())];
-            case 2: return [2 /*return*/, _a.sent()];
-            case 3:
-                error_2 = _a.sent();
-                return [4 /*yield*/, new Promise(function (resolve_1, reject_1) {
-                        transaction.rollback(function (rollbackErr) {
-                            if (rollbackErr) {
-                                return reject_1(rollbackErr);
+                        })];
+                });
+            });
+        };
+        Orm_1.startTransaction = function (db) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            db.transaction(Firebird.ISOLATION_READ_COMMITTED, function (err, transaction) {
+                                if (err)
+                                    return reject(err);
+                                else
+                                    return resolve(transaction);
+                            });
+                        })];
+                });
+            });
+        };
+        Orm_1.commitTransaction = function (transaction) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            transaction.commit(function (err) {
+                                if (err)
+                                    return reject(err);
+                                else
+                                    return resolve('Transaction committed successfully.');
+                            });
+                        })];
+                });
+            });
+        };
+        Orm_1.rollbackTransaction = function (transaction) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            transaction.rollback(function (err) {
+                                if (err)
+                                    return reject(err);
+                                else
+                                    return resolve('Transaction rolled back successfully.');
+                            });
+                        })];
+                });
+            });
+        };
+        Orm_1.executeMultiple = function (options, queriesWithParams) {
+            return __awaiter(this, void 0, void 0, function () {
+                var db, transaction, _loop_1, _i, queriesWithParams_1, qwp, error_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 8, , 11]);
+                            return [4 /*yield*/, Orm.connect(options)];
+                        case 1:
+                            db = _a.sent();
+                            return [4 /*yield*/, Orm.startTransaction(db)];
+                        case 2:
+                            transaction = _a.sent();
+                            _loop_1 = function (qwp) {
+                                return __generator(this, function (_b) {
+                                    switch (_b.label) {
+                                        case 0: return [4 /*yield*/, new Promise(function (resolve, reject) {
+                                                transaction.query(qwp.query, qwp.params, function (err, result) {
+                                                    if (err)
+                                                        return reject(err);
+                                                    else
+                                                        return resolve(result);
+                                                });
+                                            })];
+                                        case 1:
+                                            _b.sent();
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            };
+                            _i = 0, queriesWithParams_1 = queriesWithParams;
+                            _a.label = 3;
+                        case 3:
+                            if (!(_i < queriesWithParams_1.length)) return [3 /*break*/, 6];
+                            qwp = queriesWithParams_1[_i];
+                            return [5 /*yield**/, _loop_1(qwp)];
+                        case 4:
+                            _a.sent();
+                            _a.label = 5;
+                        case 5:
+                            _i++;
+                            return [3 /*break*/, 3];
+                        case 6: return [4 /*yield*/, Orm.commitTransaction(transaction)];
+                        case 7:
+                            _a.sent();
+                            db.detach();
+                            return [2 /*return*/, 'OK'];
+                        case 8:
+                            error_1 = _a.sent();
+                            if (!transaction) return [3 /*break*/, 10];
+                            return [4 /*yield*/, Orm.rollbackTransaction(transaction)];
+                        case 9:
+                            _a.sent();
+                            _a.label = 10;
+                        case 10:
+                            if (db) {
+                                db.detach();
                             }
-                            else {
-                                return reject_1(error_2);
-                            }
-                        });
-                    })];
-            case 4: return [2 /*return*/, _a.sent()];
-            case 5: return [3 /*break*/, 7];
-            case 6:
-                error_3 = _a.sent();
-                throw error_3;
-            case 7: return [2 /*return*/];
-        }
-    });
-}); };
-exports.Orm = {
-    quote: quote,
-    testConnection: testConnection,
-    query: query,
-    execute: execute,
-    trimParam: trimParam,
-    connect: connect,
-    startTransaction: startTransaction,
-    executeQueries: executeQueries,
-    executeMultiple: executeMultiple,
-    commitTransaction: commitTransaction,
-    rollbackTransaction: rollbackTransaction
-};
+                            throw error_1;
+                        case 11: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        Orm_1.executeQueries = function (transaction, queries, params) {
+            return __awaiter(this, void 0, void 0, function () {
+                var error_2;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 4]);
+                            return [4 /*yield*/, queries.reduce(function (promiseChain, currentQuery, index) {
+                                    return promiseChain.then(function () { return new Promise(function (resolve, reject) {
+                                        transaction.query(currentQuery, params[index], function (err, result) {
+                                            if (err)
+                                                return reject(err);
+                                            else
+                                                return resolve(result);
+                                        });
+                                    }); });
+                                }, Promise.resolve())];
+                        case 1: return [2 /*return*/, _a.sent()];
+                        case 2:
+                            error_2 = _a.sent();
+                            return [4 /*yield*/, new Promise(function (resolve, reject) {
+                                    transaction.rollback(function (rollbackErr) {
+                                        if (rollbackErr) {
+                                            return reject(rollbackErr);
+                                        }
+                                        else {
+                                            return reject(error_2);
+                                        }
+                                    });
+                                })];
+                        case 3: return [2 /*return*/, _a.sent()];
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        return Orm_1;
+    }());
+    __setFunctionName(_classThis, "Orm");
+    (function () {
+        var _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
+        __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
+        Orm = _classThis = _classDescriptor.value;
+        if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+    })();
+    _classThis.logger = new Logger_1.Logger(Orm.name);
+    (function () {
+        __runInitializers(_classThis, _classExtraInitializers);
+    })();
+    return Orm = _classThis;
+}();
+exports.Orm = Orm;

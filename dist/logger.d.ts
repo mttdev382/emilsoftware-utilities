@@ -2,6 +2,7 @@ import winston from "winston";
 export declare enum LogLevels {
     INFO = "INFO",
     ERROR = "ERROR",
+    WARNING = "WARNING",
     DEBUG = "DEBUG",
     LOG = "LOG",
     DATABASE = "DATABASE"
@@ -24,6 +25,7 @@ export declare class Logger {
     info(...data: Object[]): void;
     dbLog(...data: Object[]): void;
     debug(...data: Object[]): void;
+    warning(...data: Object[]): void;
     log(...data: Object[]): void;
     error(...data: Object[]): void;
     private print;
