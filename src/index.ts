@@ -1,8 +1,7 @@
-import { Logger } from "winston";
-import {Autobind} from "./Autbobind"
+import { Autobind } from "./Autbobind"
 import { DatabaseUpdater } from "./DatabaseUpdater";
 import { ExecutionTimeLogger } from "./ExecutionTimeLogger"
-import { LogLevels } from "./Logger";
+import { LogLevels, Logger } from "./Logger";
 import { Orm } from "./Orm";
 import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./Utilities";
 
