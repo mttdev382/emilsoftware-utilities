@@ -50,7 +50,7 @@ export class Autobind {
      * Applies `boundMethod` to all methods in the class prototype.
      */
     static boundClass(target: any) {
-        const keys = AutobindHelper.getPrototypeKeys(target.prototype);
+        const keys = Autobind.getPrototypeKeys(target.prototype);
 
         keys.forEach((key) => {
             if (key === 'constructor') return;
@@ -58,7 +58,7 @@ export class Autobind {
             const descriptor = Object.getOwnPropertyDescriptor(target.prototype, key);
 
             if (descriptor && typeof descriptor.value === 'function') {
-                Object.defineProperty(target.prototype, key, AutobindHelper.boundMethod(target, key, descriptor));
+                Object.defineProperty(target.prototype, key, Autobind.boundMethod(target, key, descriptor));
             }
         });
 
@@ -84,10 +84,10 @@ export class Autobind {
 
     public static apply(...args: any[]) {
         if (args.length === 1) {
-            return AutobindHelper.boundClass(args[0]);
+            return Autobind.boundClass(args[0]);
         }
     
-        return AutobindHelper.boundMethod(args[0], args[1], args[2]);
+        return Autobind.boundMethod(args[0], args[1], args[2]);
     }
 
 }
