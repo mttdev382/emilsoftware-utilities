@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { Options } from "es-node-firebird";
+import crypto from "crypto";
 
 
 export enum StatusCode {
@@ -192,51 +193,123 @@ export class RestUtilities {
             throw error;
         }
     }
+
+
+    public static convertKeysToCamelCase(obj: any): any {
+        if (obj !== null && obj.constructor === Object) {
+            return Object.keys(obj).reduce((acc: any, key: string) => {
+                const camelCaseKey = key.toLowerCase().replace(/_([a-z])/g, g => g[1].toUpperCase());
+                acc[camelCaseKey] = obj[key];
+                return acc;
+            }, {});
+        }
+        return obj;
+    }
+}
+
+
+export class CryptUtilities {
+
+    /**
+ * Cifra un testo in chiaro usando l'algoritmo AES-128 in modalità ECB.
+ * 
+ * @param plainText - Il testo in chiaro da cifrare.
+ * @param key - La chiave di cifratura (16 byte per AES-128).
+ * @param outputEncoding - Codifica del risultato cifrato (predefinito: "base64").
+ * @returns Il testo cifrato codificato.
+ * @throws Errore in caso di problemi durante la cifratura.
+ */
+    public static encrypt(plainData: string, key: string, outputEncoding: BufferEncoding = "base64"): string {
+        try {
+            // Crea un oggetto Cipher usando AES-128 in modalità ECB
+            const cipher = crypto.createCipheriv("aes-128-ecb", Buffer.from(key, "utf8"), null);
+
+            // Cifra il testo in chiaro e finalizza il processo
+            const encryptedBuffer = Buffer.concat([
+                cipher.update(plainData, "utf8"),
+                cipher.final(),
+            ]);
+
+            // Restituisce il risultato cifrato codificato
+            return encryptedBuffer.toString(outputEncoding);
+        } catch (error) {
+            // Gestisce eventuali errori di cifratura
+            throw new Error(`Errore durante la cifratura: ${error.message}`);
+        }
+    }
+
+    /**
+     * Decifra un testo cifrato usando l'algoritmo AES-128 in modalità ECB.
+     * 
+     * @param encryptedData - Il testo cifrato da decifrare.
+     * @param key - La chiave di decifratura (16 byte per AES-128).
+     * @returns Il testo decifrato o null in caso di errore.
+     */
+    public static decrypt(encryptedData: string, key: string): string | null {
+        try {
+            // Crea un oggetto Decipher usando AES-128 in modalità ECB
+            const decipher = crypto.createDecipheriv("aes-128-ecb", Buffer.from(key, "utf8"), null);
+            decipher.setAutoPadding(false);
+
+            // Decifra il testo cifrato
+            let decoded = decipher.update(encryptedData, "base64", "utf8");
+            decoded += decipher.final("utf8");
+
+            // Rimuove il padding manuale
+            const lastChar = decoded.charCodeAt(decoded.length - 1);
+            decoded = decoded.slice(0, decoded.length - lastChar);
+
+            return decoded;
+        } catch (error) {
+            console.error("Errore durante la decifratura:", error);
+            return null;
+        }
+    }
 }
 
 /**
  * Utility class for managing database-related configurations and operations.
  */
 export class DatabaseUtilities {
-  /**
-   * Creates a configuration object for connecting to a Firebird database.
-   *
-   * @param {string} host - The hostname or IP address of the database server.
-   * @param {number} port - The port number on which the database server is running.
-   * @param {string} database - The path or alias of the database to connect to.
-   * @param {string} [username='SYSDBA'] - The username for authentication. Defaults to 'SYSDBA'.
-   * @param {string} [password='masterkey'] - The password for authentication. Defaults to 'masterkey'.
-   * @returns {Options} - The configuration object to use for establishing a Firebird database connection.
-   *
-   * @example
-   * ```typescript
-   * const options = DatabaseUtilities.createOption(
-   *   'localhost',
-   *   3050,
-   *   '/path/to/database.fdb',
-   *   'myUsername',
-   *   'myPassword'
-   * );
-   * ```
-   */
-  static createOption(
-    host: string,
-    port: number,
-    database: string,
-    username = 'SYSDBA',
-    password = 'masterkey'
-  ): Options {
-    return {
-      host,                   // The hostname or IP address of the database server.
-      port,                   // The port number used by the database server.
-      user: username,         // The username for database authentication.
-      password,               // The password for database authentication.
-      database,               // The path or alias of the target database.
-      lowercase_keys: false,  // Determines if the keys in query results should be in lowercase. Default: false.
-      role: undefined,        // The role for the database connection. Default: undefined.
-      pageSize: 100000,       // The page size for database transactions. Default: 100,000.
-      retryConnectionInterval: 1000, // The interval (in ms) to retry a failed connection. Default: 1,000 ms.
-      blobAsText: true,       // Determines if BLOB fields should be treated as text. Default: true.
-    };
-  }
+    /**
+     * Creates a configuration object for connecting to a Firebird database.
+     *
+     * @param {string} host - The hostname or IP address of the database server.
+     * @param {number} port - The port number on which the database server is running.
+     * @param {string} database - The path or alias of the database to connect to.
+     * @param {string} [username='SYSDBA'] - The username for authentication. Defaults to 'SYSDBA'.
+     * @param {string} [password='masterkey'] - The password for authentication. Defaults to 'masterkey'.
+     * @returns {Options} - The configuration object to use for establishing a Firebird database connection.
+     *
+     * @example
+     * ```typescript
+     * const options = DatabaseUtilities.createOption(
+     *   'localhost',
+     *   3050,
+     *   '/path/to/database.fdb',
+     *   'myUsername',
+     *   'myPassword'
+     * );
+     * ```
+     */
+    static createOption(
+        host: string,
+        port: number,
+        database: string,
+        username = 'SYSDBA',
+        password = 'masterkey'
+    ): Options {
+        return {
+            host,                   // The hostname or IP address of the database server.
+            port,                   // The port number used by the database server.
+            user: username,         // The username for database authentication.
+            password,               // The password for database authentication.
+            database,               // The path or alias of the target database.
+            lowercase_keys: false,  // Determines if the keys in query results should be in lowercase. Default: false.
+            role: undefined,        // The role for the database connection. Default: undefined.
+            pageSize: 100000,       // The page size for database transactions. Default: 100,000.
+            retryConnectionInterval: 1000, // The interval (in ms) to retry a failed connection. Default: 1,000 ms.
+            blobAsText: true,       // Determines if BLOB fields should be treated as text. Default: true.
+        };
+    }
 }

@@ -2,7 +2,7 @@ import * as Firebird from "es-node-firebird";
 import { Logger } from "./Logger";
 import { Database, Options, Transaction } from "es-node-firebird";
 import { RestUtilities } from "./Utilities";
-import {autobind} from "./Autobind";
+import autobind from "autobind-decorator";
 
 @autobind
 export class Orm {
