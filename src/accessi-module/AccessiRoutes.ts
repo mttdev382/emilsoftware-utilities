@@ -1,4 +1,4 @@
-import autobind from "autobind-decorator";
+import { autobind } from "../autobind";
 import { Logger } from "../Logger";
 import { AccessiController } from "./AccessiController";
 import { Router } from "express";

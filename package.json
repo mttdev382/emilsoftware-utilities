@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/mttdev382/emilsoftware-utilities#readme",
   "dependencies": {
-    "autobind-decorator": "^2.4.0",
     "colorette": "^2.0.20",
     "crypto": "^1.0.1",
     "es-node-firebird": "^1.2.6",

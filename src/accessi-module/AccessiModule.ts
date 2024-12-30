@@ -2,10 +2,10 @@ import { Options } from "es-node-firebird";
 import { AccessiModel } from "./AccessiModel";
 import { AccessiController } from "./AccessiController";
 import { AccessiRoutes } from "./AccessiRoutes";
-import autobind from "autobind-decorator";
 import { Logger } from "../Logger";
 import { Router } from "express";
 import { JwtOptions } from "./models/JwtOptions";
+import { autobind } from "../autobind";
 
 @autobind
 export class AccessiModule {

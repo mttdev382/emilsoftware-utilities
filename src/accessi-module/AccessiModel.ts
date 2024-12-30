@@ -1,6 +1,4 @@
 import { Options } from "es-node-firebird";
-import autobind from "autobind-decorator";
-import { Logger } from "../Logger";
 import { CryptUtilities, RestUtilities } from "../Utilities";
 import { Orm } from "../Orm";
 import { LoginRequest } from "./models/DTO/LoginRequest";
@@ -9,11 +7,10 @@ import { LoginResponse } from "./models/DTO/LoginResponse";
 import { MenuAbilitazioniResult } from "./models/QueryResults/MenuAbilitazioniResult";
 import { StatoRegistrazione } from "./models/StatoRegistrazione";
 import { RegisterRequest } from "./models/DTO/RegisterRequest";
+import { autobind } from "../autobind";
 
 @autobind
 export class AccessiModel {
-    private logger: Logger = new Logger(AccessiModel.name);
-
     constructor(private databaseOptions: Options, private encryptionKey: string) { }
 
 

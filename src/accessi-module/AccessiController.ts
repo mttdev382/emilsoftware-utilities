@@ -1,4 +1,3 @@
-import autobind from "autobind-decorator";
 import { Logger } from "../Logger";
 import { RestUtilities } from "../Utilities";
 import { AccessiModel } from "./AccessiModel";
@@ -6,6 +5,7 @@ import { Response, Request } from "express";
 import { LoginRequest } from "./models/DTO/LoginRequest";
 import jwt from "jsonwebtoken";
 import { JwtOptions } from "./models/JwtOptions";
+import { autobind } from "../autobind";
 
 @autobind
 export class AccessiController {
