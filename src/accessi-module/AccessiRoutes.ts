@@ -17,6 +17,11 @@ export class AccessiRoutes {
     private initializeRoutes() {
         try {
             this.router.post(`/login`, this.accessiController.login);
+            this.router.post(`/encrypt`, this.accessiController.encrypt);
+            this.router.post(`/decrypt`, this.accessiController.decrypt);
+            this.router.post(`/set-password`, this.accessiController.setPassword);
+            this.router.post(`/set-gdpr`, this.accessiController.setGdpr);
+            this.router.post(`/reset-abilitazioni`, this.accessiController.resetAbilitazioni);
 
 
         } catch (error: any) {
