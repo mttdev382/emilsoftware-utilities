@@ -11,7 +11,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000/api', // Modifica se necessario
+      url: 'http://localhost:3000/api/accessi', // Modifica se necessario
     },
   ],
 };
@@ -19,7 +19,7 @@ const swaggerDefinition = {
 const options = {
   swaggerDefinition,
   // Specifica i file sorgenti che contengono le annotazioni Swagger
-  apis: ['./src/accessi-module/*.ts'], // Aggiungi altri file se necessario
+  apis: ['./dist/accessi-module/**/*.js'], // Aggiungi altri file se necessario
 };
 
 
@@ -27,5 +27,5 @@ const options = {
 export function serveSwaggerDocs(app: any) {
   // Crea il documento Swagger
   const swaggerSpec = swaggerJSDoc(options);
-  app.use('/api-accessi-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/swagger/accessi', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
