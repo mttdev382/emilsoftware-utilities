@@ -1,5 +1,6 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import path from 'path';
 
 // Definisci la configurazione di Swagger
 const swaggerDefinition = {
@@ -19,7 +20,7 @@ const swaggerDefinition = {
 const options = {
   swaggerDefinition,
   // Specifica i file sorgenti che contengono le annotazioni Swagger
-  apis: ['./dist/accessi-module/**/*.js'], // Aggiungi altri file se necessario
+  apis: [path.resolve(__dirname, '../../../dist/accessi-module/**/*.js')],
 };
 
 
