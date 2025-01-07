@@ -22,10 +22,10 @@ const options = {
   apis: ['./src/accessi-module/*.ts'], // Aggiungi altri file se necessario
 };
 
-// Crea il documento Swagger
-const swaggerSpec = swaggerJSDoc(options);
 
 // Funzione per esporre la documentazione Swagger tramite Express
 export function serveSwaggerDocs(app: any) {
+  // Crea il documento Swagger
+  const swaggerSpec = swaggerJSDoc(options);
   app.use('/api-accessi-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 }
