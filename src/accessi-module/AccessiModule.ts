@@ -12,6 +12,7 @@ import { Logger } from "../Logger";
 import { Router } from "express";
 import { JwtOptions } from "./models/JwtOptions";
 import { autobind } from "../autobind";
+import { serveSwaggerDocs } from "./swagger/SwaggerConfig";
 
 @autobind
 export class AccessiModule {
@@ -73,5 +74,14 @@ export class AccessiModule {
     private getAccessiController(): AccessiController {
         this.logger.warning(`ATTENZIONE: molto probabilmente non dovresti usare questo metodo (getAccessiController).`);
         return this.accessiController;
+    }
+
+
+    /**
+ * Inizializza la documentazione di swagger per gli accessi.
+ * @author mttdev382
+ */
+    public serveSwaggerDocs(app: any): void {
+        serveSwaggerDocs(app);
     }
 }
