@@ -23,7 +23,7 @@ export class AccessiController {
      * @author mttdev382
      
      */
-    constructor(private accessiModel: AccessiModel, private jwtOptions: JwtOptions) { }
+    constructor(private accessiModel: AccessiModel) { }
 
     /**
      * @swagger
@@ -65,7 +65,9 @@ export class AccessiController {
 
             if (!userData) return RestUtilities.sendErrorMessage(res, "Credenziali errate", AccessiController.name);
 
-            const token = jwt.sign({ userData }, this.jwtOptions.secret, { expiresIn: this.jwtOptions.expiresIn });
+            const jwtOptions = this.accessiModel.getOptions().jwtOptions;
+
+            const token = jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn });
 
             return RestUtilities.sendBaseResponse(res, token);
         } catch (error) {
@@ -148,7 +150,9 @@ export class AccessiController {
      */
     public async encrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
-            let encryptedData = CryptUtilities.encrypt(req.body.data, this.accessiModel.getKey());
+
+            const key = this.accessiModel.getOptions().encryptionKey;
+            let encryptedData = CryptUtilities.encrypt(req.body.data, key);
             return RestUtilities.sendBaseResponse(res, encryptedData);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
@@ -188,7 +192,8 @@ export class AccessiController {
      */
     public async decrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
-            let decryptedData = CryptUtilities.decrypt(req.body.data, this.accessiModel.getKey());
+            const key = this.accessiModel.getOptions().encryptionKey;
+            let decryptedData = CryptUtilities.decrypt(req.body.data, key);
             return RestUtilities.sendBaseResponse(res, decryptedData);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);

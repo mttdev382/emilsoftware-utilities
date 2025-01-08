@@ -8,13 +8,58 @@ import { MenuAbilitazioniResult } from "./models/QueryResults/MenuAbilitazioniRe
 import { StatoRegistrazione } from "./models/StatoRegistrazione";
 import { RegisterRequest } from "./models/DTO/RegisterRequest";
 import { autobind } from "../autobind";
+import { AccessiOptions } from "./AccessiModule";
 
 
 
 @autobind
 export class AccessiModel {
-    constructor(private databaseOptions: Options, private encryptionKey: string) { }
+    constructor(private accessiOptions: AccessiOptions) { }
 
+
+    getDemoUser(): LoginResponse {
+        return {
+            user: {
+                codiceUtente: "12345",
+                username: "jdoe",
+                flagGdpr: true,
+                dataGdpr: "2024-05-01T00:00:00Z",
+                dataInserimento: "2023-10-15T00:00:00Z",
+                dataScadenzaPassword: "2025-01-01T00:00:00Z",
+                dataLastLogin: "2025-01-07T15:45:00Z",
+                statoRegistrazione: StatoRegistrazione.CONF,
+                keyRegistrazione: "a1b2c3d4e5",
+                cognome: "Doe",
+                nome: "John",
+                avatar: "/path/to/avatar.jpg",
+                flagDueFattori: false,
+                cauMov: "MOV123",
+                codiceLingua: "IT",
+                cellulare: "+391234567890",
+                flagSuper: true,
+                flagMop: false,
+                flagPiana: true,
+                flagAddetti: false,
+                flagOspiti: false,
+                flagPianaRfid: false,
+                flagConta: true,
+                flagTintemi: true,
+                flagCubi: false,
+                flagCiclPass: false,
+                pagDef: "/home",
+                prog: 101,
+                numRep: 5,
+                idxPers: 10,
+                codiceClienteSuper: "CLI001",
+                codiceAge: "AGE001",
+                codiceClienteCol: "COL001",
+                codiceClienti: "CLI002",
+                tipoFil: "FIL001"
+            },
+            abilitazioni: []
+        }
+
+    }
 
     /**
      * @region Login Method
@@ -32,7 +77,11 @@ export class AccessiModel {
     //#region Login Method
     public async login(request: LoginRequest): Promise<LoginResponse> {
         try {
-            let password = CryptUtilities.encrypt(request.password, this.encryptionKey);
+
+            if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo" && request.password.toLowerCase() === "demo")
+                return this.getDemoUser();
+
+            let password = CryptUtilities.encrypt(request.password, this.accessiOptions.encryptionKey);
             var userQuery = `
         SELECT
             U.CODUTE       as codice_utente,
@@ -78,7 +127,7 @@ export class AccessiModel {
 
             let userParams = [request.username];
 
-            let userResult = (await Orm.query(this.databaseOptions, userQuery, userParams)) as any[];
+            let userResult = (await Orm.query(this.accessiOptions.databaseOptions, userQuery, userParams)) as any[];
             userResult = userResult.map(RestUtilities.convertKeysToCamelCase) as UserQueryResult[];
 
             if (!userResult || userResult.length == 0) throw new Error("Username o password non validi!");
@@ -102,7 +151,7 @@ export class AccessiModel {
 
             let utentiPwdQuery = ` SELECT CODUTE as codice_utente, PWD as password, FROM UTENTI_PWD WHERE CODUTE = ? `;
             let utentiPwdParams = [loggedInUser.codiceUtente]
-            let utentiPwdResult = (await Orm.query(this.databaseOptions, utentiPwdQuery, utentiPwdParams)) as any[];
+            let utentiPwdResult = (await Orm.query(this.accessiOptions.databaseOptions, utentiPwdQuery, utentiPwdParams)) as any[];
             utentiPwdResult = utentiPwdParams.map(RestUtilities.convertKeysToCamelCase) as { codiceUtente: string, password: string }[];
 
 
@@ -151,7 +200,7 @@ export class AccessiModel {
                 `;
                 abilitazioniParams = [loggedInUser.codiceUtente];
             }
-            let abilitazioni = (await Orm.query(this.databaseOptions, abilitazioniQuery, abilitazioniParams)) as any[];
+            let abilitazioni = (await Orm.query(this.accessiOptions.databaseOptions, abilitazioniQuery, abilitazioniParams)) as any[];
             abilitazioni = abilitazioni.map(RestUtilities.convertKeysToCamelCase) as MenuAbilitazioniResult[];
 
             let result: LoginResponse = {
@@ -175,8 +224,8 @@ export class AccessiModel {
      * @author mttdev382
 
      */
-    public getKey(): string {
-        return this.encryptionKey;
+    public getOptions(): AccessiOptions {
+        return this.accessiOptions;
     }
 
 
@@ -198,12 +247,12 @@ export class AccessiModel {
             let queryUtenti = ` INSERT INTO UTENTI (CODUTE,USRNAME,STAREG,KEYREG,FLGGDPR) VALUES (?,?,?,?,?) `;
             let paramsUtenti = [request.codiceUtente, request.username.toLowerCase().trim(), request.statoRegistrazione, request.chiaveRegistrazione, '0']
 
-            await Orm.execute(this.databaseOptions, queryUtenti, paramsUtenti);
+            await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 
             let queryUtentiConfig = ` INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CAUMOV,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?,?) `;
             let paramsUtentiConfig = [request.codiceUtente, request.cognome, request.nome, request.codiceCausaleMovimento, request.lingua, request.admin, request.valori];
 
-            await Orm.execute(this.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
+            await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
         } catch (error) {
             throw error;
         }
@@ -227,7 +276,7 @@ export class AccessiModel {
             var query = ` SELECT CODUTE as codice_utente FROM UTENTI WHERE LOWER(USRNAME) = ? `;
 
             let params = [username.trim().toLowerCase()];
-            let result = (await Orm.query(this.databaseOptions, query, params)) as any[];
+            let result = (await Orm.query(this.accessiOptions.databaseOptions, query, params)) as any[];
             result = result.map(RestUtilities.convertKeysToCamelCase) as { codiceUtente: string }[];
             return result[0];
         } catch (error) {
@@ -288,7 +337,7 @@ export class AccessiModel {
         ORDER BY G.COGNOME, G.NOME 
         ` ;
             let params = [];
-            let result = await Orm.query(this.databaseOptions, query, params);
+            let result = await Orm.query(this.accessiOptions.databaseOptions, query, params);
             return result.map(RestUtilities.convertKeysToCamelCase);
         } catch (error) {
             throw error;
@@ -311,7 +360,7 @@ export class AccessiModel {
         try {
             var query = " DELETE FROM ABILITAZIONI WHERE CODUTE= ? ";
             let params = [codiceUtente];
-            let result = await Orm.execute(this.databaseOptions, query, params);
+            let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {
             throw error;
@@ -336,7 +385,7 @@ export class AccessiModel {
             let query = ` UPDATE UTENTI SET STAREG = ? WHERE CODUTE = ? `;
 
             let params = [statoRegistrazione, codiceUtente];
-            let result = await Orm.execute(this.databaseOptions, query, params);
+            let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {
             throw error;
@@ -359,7 +408,7 @@ export class AccessiModel {
         try {
             let query = ` UPDATE OR INSERT UTENTI_GDPR SET CODUTE = ? `;
             let params = [codiceUtente];
-            let result = await Orm.execute(this.databaseOptions, query, params);
+            let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {
             throw error;
@@ -383,7 +432,7 @@ export class AccessiModel {
     public async addAbilitazioni(codiceUtente: string, menuAbilitazioni: any[]) {
         try {
             const deleteQuery = `DELETE FROM ABILITAZIONI WHERE CODUTE = ?`;
-            await Orm.execute(this.databaseOptions, deleteQuery, [codiceUtente]);
+            await Orm.execute(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
 
             const abilitazioniToInsert = menuAbilitazioni
                 .flatMap(menuGrp => menuGrp.menu)
@@ -393,7 +442,7 @@ export class AccessiModel {
             const insertQuery = `UPDATE OR INSERT INTO ABILITAZIONI (CODUTE, CODMNU, TIPABI) VALUES (?, ?, ?)`;
 
             for (const params of abilitazioniToInsert) {
-                await Orm.execute(this.databaseOptions, insertQuery, params);
+                await Orm.execute(this.accessiOptions.databaseOptions, insertQuery, params);
             }
         } catch (error) {
             throw error;
@@ -419,7 +468,7 @@ export class AccessiModel {
             let query = ` UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?) `;
 
             let params = [codiceUtente, nuovaPassword];
-            let result = await Orm.execute(this.databaseOptions, query, params);
+            let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {
             throw error;

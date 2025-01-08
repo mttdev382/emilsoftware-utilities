@@ -14,6 +14,13 @@ import { JwtOptions } from "./models/JwtOptions";
 import { autobind } from "../autobind";
 import { serveSwaggerDocs } from "./swagger/SwaggerConfig";
 
+export interface AccessiOptions {
+    databaseOptions: Options;
+    encryptionKey: string;
+    mockDemoUser: boolean;
+    jwtOptions: JwtOptions;
+}
+
 @autobind
 export class AccessiModule {
     private logger: Logger = new Logger(AccessiModule.name);
@@ -31,9 +38,9 @@ export class AccessiModule {
      * @author mttdev382
 
      */
-    constructor(databaseOptions: Options, encryptionKey: string, jwtOptions: JwtOptions) {
-        this.accessiModel = new AccessiModel(databaseOptions, encryptionKey);
-        this.accessiController = new AccessiController(this.accessiModel, jwtOptions);
+    constructor(accessiOptions: AccessiOptions) {
+        this.accessiModel = new AccessiModel(accessiOptions);
+        this.accessiController = new AccessiController(this.accessiModel);
         this.accessiRoutes = new AccessiRoutes(this.accessiController);
     }
 
