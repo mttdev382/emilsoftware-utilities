@@ -21,16 +21,22 @@ export abstract class DatabaseUpdater {
     table: string,
     column: string
   ): Promise<boolean> {
-    const query = `
+
+    try {
+      const query = `
       SELECT 1 
       FROM RDB$RELATION_FIELDS 
       WHERE RDB$RELATION_NAME = ? 
         AND RDB$FIELD_NAME = ?`;
-    const result = await Orm.query(options, query, [
-      table.toUpperCase(),
-      column.toUpperCase(),
-    ]);
-    return result.length > 0;
+      const result = await Orm.query(options, query, [
+        table.toUpperCase(),
+        column.toUpperCase(),
+      ]);
+      return result.length > 0;
+    } catch (error: any) {
+      this.logger.error(`Error checking column ${column} on table ${table}:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -39,13 +45,19 @@ export abstract class DatabaseUpdater {
    * @returns The current database version or null if not found.
    */
   protected static async getDatabaseVersion(options: Options): Promise<string | null> {
-    const parameters = (await Orm.query(
-      options,
-      "SELECT CODPAR, DESPAR FROM PARAMETRI WHERE CODPAR = ?",
-      ["VersioneDB"]
-    )) as any[];
 
-    return parameters.length > 0 ? parameters[0].DESPAR : null;
+    try {
+      const parameters = (await Orm.query(
+        options,
+        "SELECT CODPAR, DESPAR FROM PARAMETRI WHERE CODPAR = ?",
+        ["VersioneDB"]
+      )) as any[];
+
+      return parameters.length > 0 ? parameters[0].DESPAR : null;
+    } catch (error: any) {
+      this.logger.error(`Error getting database version:`, error);
+      throw error;
+    }
   }
 
   /**
@@ -57,10 +69,17 @@ export abstract class DatabaseUpdater {
     options: Options,
     version: string
   ): Promise<void> {
-    await Orm.query(options, "UPDATE PARAMETRI SET DESPAR = ? WHERE CODPAR = ?", [
-      version,
-      "VersioneDB",
-    ]);
+
+    try {
+
+      await Orm.query(options, "UPDATE PARAMETRI SET DESPAR = ? WHERE CODPAR = ?", [
+        version,
+        "VersioneDB",
+      ]);
+    } catch (error: any) {
+      this.logger.error(`Error setting database version:`, error);
+      throw error;
+    }
   }
   //#endregion
 
@@ -91,18 +110,21 @@ export abstract class DatabaseUpdater {
 
       await Orm.query(options, "GRANT ALL ON PARAMETRI TO PUBLIC;");
       await Orm.query(options, "GRANT SELECT ON PARAMETRI TO TABX;");
+
+      const versioneDb = await this.getDatabaseVersion(options);
+      if (versioneDb !== null && versioneDb !== undefined) return;
+
+      await Orm.query(
+        options,
+        "INSERT INTO PARAMETRI (CODPAR, DESPAR, NOTE, GRUPPO) VALUES (?,?,?,?)",
+        ["VersioneDB", "0.0a", "versione", null]
+      );
     } catch (error: any) {
       this.logger.error("Error creating table PARAMETRI:", error);
+      throw error;
     }
 
-    const versioneDb = await this.getDatabaseVersion(options);
-    if (versioneDb !== null && versioneDb !== undefined) return;
 
-    await Orm.query(
-      options,
-      "INSERT INTO PARAMETRI (CODPAR, DESPAR, NOTE, GRUPPO) VALUES (?,?,?,?)",
-      ["VersioneDB", "0.0a", "versione", null]
-    );
   }
   //#endregion
 }
