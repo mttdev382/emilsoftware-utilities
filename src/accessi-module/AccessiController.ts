@@ -25,6 +25,64 @@ export class AccessiController {
      */
     constructor(private accessiModel: AccessiModel) { }
 
+
+    /**
+ * @swagger
+ * /get-user-by-token:
+ *   post:
+ *     summary: Recupera le informazioni utente dal token JWT
+ *     description: Estrae e restituisce le informazioni utente decodificate da un token JWT valido.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *             required:
+ *               - token
+ *     responses:
+ *       200:
+ *         description: Informazioni utente recuperate con successo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userData:
+ *                   type: object
+ *       400:
+ *         description: Token non valido o assente
+ *       500:
+ *         description: Errore del server
+ */
+    public async getUserByToken(req: Request<{}, {}, { token: string }>, res: Response) {
+        try {
+            const { token } = req.body;
+
+            if (!token) {
+                return RestUtilities.sendErrorMessage(res, "Token non fornito", AccessiController.name);
+            }
+
+            const jwtOptions = this.accessiModel.getOptions().jwtOptions;
+
+            // Decodifica il token JWT
+            const decoded = jwt.verify(token, jwtOptions.secret);
+
+            if (!decoded) {
+                return RestUtilities.sendErrorMessage(res, "Token non valido", AccessiController.name);
+            }
+
+            return RestUtilities.sendBaseResponse(res, { userData: decoded });
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+        }
+    }
+
+
+
     /**
      * @swagger
      * /login:

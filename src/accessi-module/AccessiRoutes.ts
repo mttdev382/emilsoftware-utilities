@@ -16,6 +16,8 @@ export class AccessiRoutes {
 
     private initializeRoutes() {
         try {
+            this.router.post(`/get-user-by-token`, this.accessiController.getUserByToken);
+
             this.router.post(`/login`, this.accessiController.login);
             this.router.post(`/encrypt`, this.accessiController.encrypt);
             this.router.post(`/decrypt`, this.accessiController.decrypt);
