@@ -125,9 +125,13 @@ export class AccessiController {
 
             const jwtOptions = this.accessiModel.getOptions().jwtOptions;
 
-            const token = jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn });
+            userData.token = {
+                expiresIn: jwtOptions.expiresIn,
+                value: jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn }),
+                type: "Bearer"
+            }
 
-            return RestUtilities.sendBaseResponse(res, token);
+            return RestUtilities.sendBaseResponse(res, userData);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
