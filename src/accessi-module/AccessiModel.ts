@@ -115,7 +115,7 @@ export class AccessiModel {
             F.NUMREP       as num_rep,
             F.IDXPERS      as idx_pers,
             F.CODCLISUPER  as codice_cliente_super,
-            F.CODAGE       as codice_age
+            F.CODAGE       as codice_age,
             F.CODCLICOL    as codice_cliente_col, 
             F.CODCLIENTI   as codice_clienti,
             F.TIPFIL       as tipo_fil
