@@ -125,7 +125,7 @@ export class AccessiModel {
         AND C.CODUTE=U.CODUTE AND F.CODUTE=U.CODUTE 
         `;
 
-            let userParams = [request.username];
+            let userParams = [request.username.toLowerCase()];
 
             let userResult = (await Orm.query(this.accessiOptions.databaseOptions, userQuery, userParams)) as any[];
             userResult = userResult.map(RestUtilities.convertKeysToCamelCase) as UserQueryResult[];
