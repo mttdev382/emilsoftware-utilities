@@ -13,10 +13,13 @@ export interface UserQueryResult {
     nome?: string;
     avatar?: string;
     flagDueFattori?: boolean;
-    cauMov?: string;
     codiceLingua?: string;
     cellulare?: string;
     flagSuper?: boolean;
+    pagDef?: string;
+    json_metadata?: string;
+    /* VECCHI CAMPI ELIMINATI DA ACCESSI
+    cauMov?: string;
     flagMop?: boolean;
     flagPiana?: boolean;
     flagAddetti?: boolean;
@@ -26,8 +29,7 @@ export interface UserQueryResult {
     flagTintemi?: boolean;
     flagCubi?: boolean;
     flagCiclPass?: boolean;
-    pagDef?: string;
-
+    */
     prog?: number;
     numRep?: number;
     idxPers?: number;
