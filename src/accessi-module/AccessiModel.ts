@@ -142,16 +142,16 @@ export class AccessiModel {
             let utentiPwdQuery = ` SELECT CODUTE as codice_utente, PWD as password FROM UTENTI_PWD WHERE CODUTE = ? `;
             let utentiPwdParams = [loggedInUser.codiceUtente]
             let utentiPwdResult = (await Orm.query(this.accessiOptions.databaseOptions, utentiPwdQuery, utentiPwdParams)) as any[];
-            utentiPwdResult = utentiPwdParams.map(RestUtilities.convertKeysToCamelCase) as { codiceUtente: string, password: string }[];
+            utentiPwdResult = utentiPwdResult.map(RestUtilities.convertKeysToCamelCase) as { codiceUtente: string, password: string }[];
 
             if (!utentiPwdResult || utentiPwdResult.length == 0) {
-                throw new Error("Nome utente o password non corretti. " + JSON.stringify(utentiPwdResult));
+                throw new Error("Nome utente o password non corretti. ");
             }
 
             let utentePwd = utentiPwdResult[0] as { codiceUtente: string, password: string };
 
             if (password != utentePwd.password) {
-                throw new Error("Nome utente o password errata! ");
+                throw new Error("Nome utente o password errata! " + JSON.stringify(utentePwd));
             }
 
             let abilitazioniQuery = "";
