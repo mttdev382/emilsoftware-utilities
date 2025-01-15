@@ -1,6 +1,6 @@
 {
   "name": "emilsoftware-utilities",
-  "version": "1.3.29",
+  "version": "1.3.30",
   "description": "Utilities for EmilSoftware",
   "main": "dist/index.js",
   "module": "dist/index.js",
