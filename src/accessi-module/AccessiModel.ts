@@ -149,7 +149,7 @@ export class AccessiModel {
 
             if (statoRegistrazione !== StatoRegistrazione.CONF) throw new Error(`Errore generico. Lo stato di registrazione non è ${StatoRegistrazione.CONF}..`);
 
-            let utentiPwdQuery = ` SELECT CODUTE as codice_utente, PWD as password, FROM UTENTI_PWD WHERE CODUTE = ? `;
+            let utentiPwdQuery = ` SELECT CODUTE as codice_utente, PWD as password FROM UTENTI_PWD WHERE CODUTE = ? `;
             let utentiPwdParams = [loggedInUser.codiceUtente]
             let utentiPwdResult = (await Orm.query(this.accessiOptions.databaseOptions, utentiPwdQuery, utentiPwdParams)) as any[];
             utentiPwdResult = utentiPwdParams.map(RestUtilities.convertKeysToCamelCase) as { codiceUtente: string, password: string }[];
