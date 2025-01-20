@@ -16,6 +16,39 @@ import { AccessiOptions } from "./AccessiModule";
 export class AccessiModel {
     constructor(private accessiOptions: AccessiOptions) { }
 
+    getAdminUser(): LoginResponse {
+        return {
+            user: {
+                codiceUtente: "6789",
+                username: "admin",
+                flagGdpr: true,
+                dataGdpr: "2024-05-01T00:00:00Z",
+                dataInserimento: "2023-10-15T00:00:00Z",
+                dataScadenzaPassword: "2025-01-01T00:00:00Z",
+                dataLastLogin: "2025-01-07T15:45:00Z",
+                statoRegistrazione: StatoRegistrazione.CONF,
+                keyRegistrazione: "a1b2c3d4e5",
+                cognome: "Admin",
+                nome: "Admin",
+                avatar: "/path/to/avatar.jpg",
+                flagDueFattori: false,
+                codiceLingua: "IT",
+                cellulare: "+391234567890",
+                flagSuper: true,
+                pagDef: "/home",
+                prog: 101,
+                numRep: 5,
+                idxPers: 10,
+                codiceClienteSuper: "CLI001",
+                codiceAge: "AGE001",
+                codiceClienteCol: "COL001",
+                codiceClienti: "CLI002",
+                tipoFil: "FIL001"
+            },
+            abilitazioni: []
+        }
+
+    }
 
     getDemoUser(): LoginResponse {
         return {
@@ -37,16 +70,6 @@ export class AccessiModel {
                 cellulare: "+391234567890",
                 flagSuper: true,
                 pagDef: "/home",
-                //cauMov: "MOV123",
-                //flagMop: false,
-                //flagPiana: true,
-                //flagAddetti: false,
-                //flagOspiti: false,
-                //flagPianaRfid: false,
-                //flagConta: true,
-                //flagTintemi: true,
-                //flagCubi: false,
-                //flagCiclPass: false,
                 prog: 101,
                 numRep: 5,
                 idxPers: 10,
@@ -81,6 +104,9 @@ export class AccessiModel {
             if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo" && request.password.toLowerCase() === "demo")
                 return this.getDemoUser();
 
+            if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "admin" && request.password.toLowerCase() === "admin")
+                return this.getDemoUser();
+            
             let password = CryptUtilities.encrypt(request.password, this.accessiOptions.encryptionKey);
             var userQuery = `
         SELECT

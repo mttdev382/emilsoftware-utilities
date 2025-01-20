@@ -72,7 +72,7 @@ export class AccessiController {
             const decoded = jwt.verify(token, jwtOptions.secret);
 
             if (!decoded) {
-                return RestUtilities.sendErrorMessage(res, "Token non valido", AccessiController.name);
+                return RestUtilities.sendUnauthorized(res);
             }
 
             return RestUtilities.sendBaseResponse(res, { userData: decoded });
@@ -121,7 +121,8 @@ export class AccessiController {
             let request = req.body;
             const userData = await this.accessiModel.login(request);
 
-            if (!userData) return RestUtilities.sendErrorMessage(res, "Credenziali errate", AccessiController.name);
+            if (!userData) return RestUtilities.sendInvalidCredentials(res);
+
 
             const jwtOptions = this.accessiModel.getOptions().jwtOptions;
 
@@ -133,7 +134,7 @@ export class AccessiController {
 
             return RestUtilities.sendBaseResponse(res, userData);
         } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+            return RestUtilities.sendInvalidCredentials(res);
         }
     }
 

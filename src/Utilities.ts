@@ -129,6 +129,23 @@ export class RestUtilities {
         });
     }
 
+
+    static sendUnauthorized(res: Response): Response {
+        return res.status(401).send({
+            severity: "error",
+            statusCode: StatusCode.Error,
+            message: "Non sei autorizzato",
+        });
+    }
+
+    static sendInvalidCredentials(res: Response): Response {
+        return res.status(401).send({
+            severity: "error",
+            statusCode: StatusCode.Error,
+            message: "Credenziali non valide"
+        });
+    }
+
     /**
      * Sends a base response with a payload.
      * @param res - Express Response object.
