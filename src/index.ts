@@ -8,4 +8,4 @@ import { autobind } from "./autobind";
 
 export {AccessiModule, LoginRequest, LoginResponse, RegisterRequest} from "./accessi-module";
 export * from "es-node-firebird";
-export { autobind,ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode };
+export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode };

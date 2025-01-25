@@ -8,7 +8,6 @@ export interface UserQueryResult {
     dataLastLogin?: string;
     statoRegistrazione?: number;
     keyRegistrazione?: string;
-
     cognome?: string;
     nome?: string;
     avatar?: string;
@@ -17,19 +16,7 @@ export interface UserQueryResult {
     cellulare?: string;
     flagSuper?: boolean;
     pagDef?: string;
-    json_metadata?: string;
-    /* VECCHI CAMPI ELIMINATI DA ACCESSI
-    cauMov?: string;
-    flagMop?: boolean;
-    flagPiana?: boolean;
-    flagAddetti?: boolean;
-    flagOspiti?: boolean;
-    flagPianaRfid?: boolean;
-    flagConta?: boolean;
-    flagTintemi?: boolean;
-    flagCubi?: boolean;
-    flagCiclPass?: boolean;
-    */
+    jsonMetadata?: string;
     prog?: number;
     numRep?: number;
     idxPers?: number;

@@ -310,8 +310,8 @@ export class AccessiModel {
      * @author mttdev382
 
      */
-    //#region getProfiloLista Method
-    public async getProfiloLista() {
+    //#region getUsers Method
+    public async getUsers() {
         try {
             var query = ` 
         SELECT  

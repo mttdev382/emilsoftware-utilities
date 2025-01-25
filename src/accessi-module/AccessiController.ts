@@ -138,6 +138,45 @@ export class AccessiController {
         }
     }
 
+    /**
+     * @swagger
+     * /users:
+     *   get:
+     *     summary: Recupera la lista degli utenti
+     *     description: Restituisce una lista di utenti dal sistema.
+     *     responses:
+     *       200:
+     *         description: Lista degli utenti recuperata con successo
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: array
+     *               items:
+     *                 type: object
+     *                 properties:
+     *                   id:
+     *                     type: string
+     *                     description: ID univoco dell'utente
+     *                   name:
+     *                     type: string
+     *                     description: Nome dell'utente
+     *                   email:
+     *                     type: string
+     *                     description: Email dell'utente
+     *       400:
+     *         description: Richiesta non valida
+     *       500:
+     *         description: Errore del server
+     */
+    public async getUsers(req: Request, res: Response) {
+        try {
+            const users = await this.accessiModel.getUsers();
+            return RestUtilities.sendBaseResponse(res, users);
+        } catch (error) {
+            return RestUtilities.sendInvalidCredentials(res);
+        }
+    }
+
 
     /**
      * @swagger
