@@ -342,7 +342,7 @@ export class AccessiModel {
         
         FROM UTENTI U, UTENTI_CONFIG G, FILTRI F 
         WHERE U.CODUTE = G.CODUTE AND F.CODUTE = U.CODUTE 
-        ORDER BY G.COGNOME, G.NOME 
+        ORDER BY U.CODUTE
         ` ;
             let params = [];
             let result = await Orm.query(this.accessiOptions.databaseOptions, query, params);
