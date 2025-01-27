@@ -261,7 +261,7 @@ export class AccessiModel {
     public async register(request: UserQueryResult): Promise<any> {
         try {
             let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?) `;
-            let paramsUtenti = [request.username, request.statoRegistrazione, request.keyRegistrazione, '0']
+            let paramsUtenti = [request.username, request.statoRegistrazione, request.keyRegistrazione, false]
 
             let codiceUtente = await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 
