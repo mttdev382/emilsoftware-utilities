@@ -265,7 +265,7 @@ export class AccessiModel {
 
             let codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODICE_UTENTE;
 
-            console.log("CODICE UTENTE: ", codiceUtente);
+            console.log("CODICE UTENTEXX: ", codiceUtente);
             let queryUtentiConfig = ` INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?) `;
             let paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua, request.flagSuper];
 
