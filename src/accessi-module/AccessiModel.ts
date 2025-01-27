@@ -260,10 +260,10 @@ export class AccessiModel {
 
     public async register(request: UserQueryResult): Promise<any> {
         try {
-            let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?) `;
+            let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?) RETURNING CODUTE as codice_utente`;
             let paramsUtenti = [request.username, request.statoRegistrazione, request.keyRegistrazione, false]
 
-            let codiceUtente = await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
+            let codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODICE_UTENTE;
 
             console.log("CODICE UTENTE: ", codiceUtente);
             let queryUtentiConfig = ` INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?) `;

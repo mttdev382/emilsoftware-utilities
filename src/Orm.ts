@@ -61,7 +61,7 @@ export class Orm {
                     }
 
                     if(logQuery) this.logger.info(RestUtilities.printQueryWithParams(query, parameters));
-                    db.execute(query, parameters, (error, result: any): void => {
+                    db.execute(query, parameters, (error: any, result: any) => {
                         if (error) {
                             this.logger.error(error);
                             db.detach();
