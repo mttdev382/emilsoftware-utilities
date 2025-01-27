@@ -106,7 +106,7 @@ export class AccessiModel {
 
             if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "admin" && request.password.toLowerCase() === "admin")
                 return this.getDemoUser();
-            
+
             let password = CryptUtilities.encrypt(request.password, this.accessiOptions.encryptionKey);
             var userQuery = `
         SELECT
@@ -483,6 +483,33 @@ export class AccessiModel {
         }
     }
     //#endregion
+
+
+    public async updateUtente(user: UserQueryResult): Promise<void> {
+        try {
+
+            if (!user.codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
+
+            let query = `
+            UPDATE UTENTI 
+            SET usrname = ?, flggdpr = ?, datgdpr=?, datins=?, datscapwd=?, stareg=? 
+            WHERE codiceUtente = ?`;
+
+            let params = [user.username, user.flagGdpr, user.dataGdpr, user.dataInserimento, user.dataScadenzaPassword, user.statoRegistrazione, user.codiceUtente];
+            await Orm.execute(this.accessiOptions.databaseOptions, query, params);
+
+
+            query = `
+            UPDATE UTENTI_CONFIG 
+            SET cognome = ?, nome = ?, avatar=?, flg2fatt=?, codlingua=?, cellulare=?, flgsuper=?, pagdef=?, json_metadata=? 
+            WHERE codiceUtente = ?`;
+
+            params = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.pagDef, user.jsonMetadata, user.codiceUtente];
+            await Orm.execute(this.accessiOptions.databaseOptions, query, params);
+        } catch (error) {
+            throw error;
+        }
+    }
 
 
     /**

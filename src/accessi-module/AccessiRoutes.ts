@@ -23,6 +23,7 @@ export class AccessiRoutes {
             this.router.post(`/encrypt`, this.accessiController.encrypt);
             this.router.post(`/decrypt`, this.accessiController.decrypt);
             this.router.post(`/set-password`, this.accessiController.setPassword);
+            this.router.post(`/update-utente`, this.accessiController.updateUtente);
             this.router.post(`/set-gdpr`, this.accessiController.setGdpr);
             this.router.post(`/reset-abilitazioni`, this.accessiController.resetAbilitazioni);
 
