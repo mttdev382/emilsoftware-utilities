@@ -209,7 +209,7 @@ export class AccessiController {
      *       500:
      *         description: Errore del server
      */
-    public async register(req: Request<{}, {}, RegisterRequest>, res: Response) {
+    public async register(req: Request, res: Response) {
         try {
             let request = req.body;
             await this.accessiModel.register(request);
@@ -377,65 +377,65 @@ export class AccessiController {
 
 
 
-/**
- * @swagger
- * /update-utente:
- *   post:
- *     summary: Aggiorna un utente esistente.
- *     description: Questo endpoint permette di aggiornare i dati di un utente esistente.
- *     tags:
- *       - Utenti
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               codiceUtente:
- *                 type: string
- *                 description: Il codice identificativo dell'utente.
- *                 example: "U12345"
- *               campo1:
- *                 type: string
- *                 description: Primo campo fittizio dell'utente da aggiornare.
- *                 example: "NuovoValore1"
- *               campo2:
- *                 type: string
- *                 description: Secondo campo fittizio dell'utente da aggiornare.
- *                 example: "NuovoValore2"
- *     responses:
- *       200:
- *         description: Utente aggiornato con successo.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Utente U12345 aggiornato con successo."
- *       400:
- *         description: Errore di validazione o richiesta non valida.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Impossibile aggiornare senza codice utente."
- *       500:
- *         description: Errore interno del server.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: "Errore interno del server."
- */
+    /**
+     * @swagger
+     * /update-utente:
+     *   post:
+     *     summary: Aggiorna un utente esistente.
+     *     description: Questo endpoint permette di aggiornare i dati di un utente esistente.
+     *     tags:
+     *       - Utenti
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               codiceUtente:
+     *                 type: string
+     *                 description: Il codice identificativo dell'utente.
+     *                 example: "U12345"
+     *               campo1:
+     *                 type: string
+     *                 description: Primo campo fittizio dell'utente da aggiornare.
+     *                 example: "NuovoValore1"
+     *               campo2:
+     *                 type: string
+     *                 description: Secondo campo fittizio dell'utente da aggiornare.
+     *                 example: "NuovoValore2"
+     *     responses:
+     *       200:
+     *         description: Utente aggiornato con successo.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: "Utente U12345 aggiornato con successo."
+     *       400:
+     *         description: Errore di validazione o richiesta non valida.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: "Impossibile aggiornare senza codice utente."
+     *       500:
+     *         description: Errore interno del server.
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 error:
+     *                   type: string
+     *                   example: "Errore interno del server."
+     */
 
     public async updateUtente(req: Request, res: Response) {
         try {

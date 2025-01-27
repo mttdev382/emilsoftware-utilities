@@ -257,15 +257,17 @@ export class AccessiModel {
      */
 
     //#region Register Method
-    public async register(request: RegisterRequest): Promise<any> {
+
+    public async register(request: UserQueryResult): Promise<any> {
         try {
-            let queryUtenti = ` INSERT INTO UTENTI (CODUTE,USRNAME,STAREG,KEYREG,FLGGDPR) VALUES (?,?,?,?,?) `;
-            let paramsUtenti = [request.codiceUtente, request.username.toLowerCase().trim(), request.statoRegistrazione, request.chiaveRegistrazione, '0']
+            let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?,?) `;
+            let paramsUtenti = [request.username, request.statoRegistrazione, request.keyRegistrazione, '0']
 
-            await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
+            let codiceUtente = await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 
+            console.log("CODICE UTENTE: ", codiceUtente);
             let queryUtentiConfig = ` INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?) `;
-            let paramsUtentiConfig = [request.codiceUtente, request.cognome, request.nome, request.codiceCausaleMovimento, request.lingua, request.admin, request.valori];
+            let paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua, request.flagSuper];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
         } catch (error) {
