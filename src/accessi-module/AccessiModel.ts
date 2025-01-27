@@ -493,7 +493,7 @@ export class AccessiModel {
             let query = `
             UPDATE UTENTI 
             SET usrname = ?, flggdpr = ?, datgdpr=?, datins=?, datscapwd=?, stareg=? 
-            WHERE codiceUtente = ?`;
+            WHERE CODUTE = ?`;
 
             let params = [user.username, user.flagGdpr, user.dataGdpr, user.dataInserimento, user.dataScadenzaPassword, user.statoRegistrazione, user.codiceUtente];
             await Orm.execute(this.accessiOptions.databaseOptions, query, params);
@@ -502,7 +502,7 @@ export class AccessiModel {
             query = `
             UPDATE UTENTI_CONFIG 
             SET cognome = ?, nome = ?, avatar=?, flg2fatt=?, codlingua=?, cellulare=?, flgsuper=?, pagdef=?, json_metadata=? 
-            WHERE codiceUtente = ?`;
+            WHERE CODUTE = ?`;
 
             params = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.pagDef, user.jsonMetadata, user.codiceUtente];
             await Orm.execute(this.accessiOptions.databaseOptions, query, params);
