@@ -179,6 +179,46 @@ export class AccessiController {
 
 
     /**
+ * @swagger
+ * /users/{id}:
+ *   delete:
+ *     summary: Elimina un utente
+ *     description: Elimina un utente dal sistema utilizzando il suo ID univoco.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID univoco dell'utente da eliminare
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Utente eliminato con successo
+ *       400:
+ *         description: Richiesta non valida
+ *       404:
+ *         description: Utente non trovato
+ *       500:
+ *         description: Errore del server
+ */
+    public async deleteUser(req: Request, res: Response) {
+        try {
+            const { codiceUtente } = req.body; 
+
+            if (!codiceUtente) {
+                throw new Error('CODUTE mancante');
+            }
+
+            await this.accessiModel.deleteUser(codiceUtente);
+            return RestUtilities.sendOKMessage(res, 'Utente eliminato con successo');
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error);
+        }
+    }
+
+
+
+    /**
      * @swagger
      * /register:
      *   post:

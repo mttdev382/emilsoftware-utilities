@@ -349,6 +349,35 @@ export class AccessiModel {
 
 
     /**
+ * Elimina un utente da tutte le tabelle correlate utilizzando il codice cliente.
+ *
+ * @param {string} codiceCliente - Il codice cliente dell'utente da eliminare.
+ * @returns {Promise<void>} - Restituisce una Promise che si risolve se l'eliminazione ha successo.
+ * @throws {Error} - Lancia un errore in caso di problemi con la query o la connessione al database.
+ * @author mttdev382
+ */
+    //#region deleteUser Method
+    public async deleteUser(codiceCliente: string): Promise<void> {
+        try {
+            const params = [codiceCliente];
+
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM UTENTI WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM UTENTI_CONFIG WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM ABILITAZIONI WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM FILTRI WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM UTENTI_GDPR WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM UTENTI_OLDPWD WHERE CODUTE = ?", params);
+            await Orm.query(this.accessiOptions.databaseOptions, "DELETE FROM UTENTI_PWD WHERE CODUTE = ?", params);
+
+        } catch (error) {
+            throw error;
+        }
+    }
+    //#endregion
+
+
+
+    /**
      * Resetta le abilitazioni di un utente eliminando tutte le sue abilitazioni.
      * 
      * @param {string} codiceUtente - Il codice utente per cui resettare le abilitazioni.
