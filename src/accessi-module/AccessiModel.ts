@@ -260,7 +260,7 @@ export class AccessiModel {
 
     public async register(request: UserQueryResult): Promise<any> {
         try {
-            let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?) RETURNING CODUTE`;
+            let queryUtenti = ` INSERT INTO UTENTI (USRNAME, STAREG, KEYREG, FLGGDPR) VALUES (?,?,?,?) RETURNING CODUTE `;
             let paramsUtenti = [request.username, request.statoRegistrazione, request.keyRegistrazione, false]
 
             let codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
@@ -333,17 +333,9 @@ export class AccessiModel {
             G.CELLULARE as cellulare,
             G.FLGSUPER as flag_super, 
             G.PAGDEF as pagina_default,
-            G.JSON_METADATA as json_metadata,
-            F.NUMREP as numero_reparto, 
-            F.IDXPERS as idx_personale, 
-            F.CODCLISUPER as codice_cliente_super, 
-            F.CODAGE as codice_agente, 
-            F.CODCLICOL as codice_cliente_collegato, 
-            F.CODCLIENTI as codice_clienti, 
-            F.TIPFIL as tipo_filtro
+            G.JSON_METADATA as json_metadata
         
-        FROM UTENTI U, UTENTI_CONFIG G, FILTRI F 
-        WHERE U.CODUTE = G.CODUTE AND F.CODUTE = U.CODUTE 
+        FROM UTENTI U INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE  
         ORDER BY U.CODUTE
         ` ;
             let params = [];
