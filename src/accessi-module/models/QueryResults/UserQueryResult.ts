@@ -1,3 +1,5 @@
+import { StatoRegistrazione } from "../StatoRegistrazione";
+
 export interface UserQueryResult {
     codiceUtente: string;
     username: string;
