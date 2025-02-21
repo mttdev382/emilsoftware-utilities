@@ -23,7 +23,7 @@ export class AccessiController implements AccessiControllerBase {
         @inject("IAuthService") private authService: IAuthService
     ) { }
 
-    public async getUserByToken(req: Request<{}, {}, { token: string }>, res: Response): Promise<Response> {
+    public async getUserByToken(req: Request<{}, {}, { token: string }>, res: Response) {
         try {
             const { token } = req.body;
 
@@ -48,7 +48,7 @@ export class AccessiController implements AccessiControllerBase {
 
 
 
-    public async login(req: Request, res: Response): Promise<Response> {
+    public async login(req: Request, res: Response){
         try {
             let request = req.body;
             const userData = await this.authService.login(request);
@@ -71,7 +71,7 @@ export class AccessiController implements AccessiControllerBase {
         }
     }
 
-    public async getUsers(req: Request, res: Response): Promise<Response> {
+    public async getUsers(req: Request, res: Response) {
         try {
             const users = await this.userService.getUsers();
             return RestUtilities.sendBaseResponse(res, users);
@@ -81,7 +81,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async deleteUser(req: Request, res: Response): Promise<Response> {
+    public async deleteUser(req: Request, res: Response) {
         try {
             const { codiceUtente } = req.body;
 
@@ -97,7 +97,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async register(req: Request, res: Response): Promise<Response> {
+    public async register(req: Request, res: Response) {
         try {
             let request = req.body;
             await this.userService.register(request);
@@ -109,7 +109,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async encrypt(req: Request<{}, {}, { data: string }>, res: Response): Promise<Response> {
+    public async encrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
 
             const key = this.authService.getOptions().encryptionKey;
@@ -121,7 +121,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async decrypt(req: Request<{}, {}, { data: string }>, res: Response): Promise<Response> {
+    public async decrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
             const key = this.authService.getOptions().encryptionKey;
             let decryptedData = CryptUtilities.decrypt(req.body.data, key);
@@ -132,7 +132,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response): Promise<Response> {
+    public async resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
         try {
             await this.permissionService.resetAbilitazioni(req.body.codiceUtente);
             return RestUtilities.sendOKMessage(res, `Abilitazioni resettate con successo per l'utente ${req.body.codiceUtente}`);
@@ -142,7 +142,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response): Promise<Response> {
+    public async setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response) {
         try {
             await this.authService.setPassword(req.body.codiceUtente, req.body.nuovaPassword);
             return RestUtilities.sendOKMessage(res, `Password impostata con successo per l'utente ${req.body.codiceUtente}`);
@@ -152,7 +152,7 @@ export class AccessiController implements AccessiControllerBase {
     }
 
 
-    public async updateUtente(req: Request, res: Response): Promise<Response> {
+    public async updateUtente(req: Request, res: Response) {
         try {
             let user = req.body;
             await this.userService.updateUser(user);
@@ -162,7 +162,7 @@ export class AccessiController implements AccessiControllerBase {
         }
     }
 
-    public async setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response): Promise<Response> {
+    public async setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
         try {
             await this.userService.setGdpr(req.body.codiceUtente);
             return RestUtilities.sendOKMessage(res, `GDPR accettato con successo per l'utente ${req.body.codiceUtente}`);

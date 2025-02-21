@@ -1,13 +1,12 @@
 import { inject } from "inversify";
 import { Logger } from "../Logger";
 import { AccessiController } from "./AccessiController";
-import { Router } from "express";
-
+import { Router, Request, Response } from "express";
 export class AccessiRoutes {
     private logger: Logger = new Logger(AccessiRoutes.name);
 
     public router: Router;
-    constructor(@inject(AccessiController) private accessiController: AccessiController) {
+    constructor(@inject("AccessiControllerBase") private accessiController: AccessiController) {
         this.router = Router();
         this.initializeRoutes();
     }
@@ -15,17 +14,17 @@ export class AccessiRoutes {
 
     private initializeRoutes() {
         try {
-            this.router.post(`/get-user-by-token`, this.accessiController.getUserByToken);
-            this.router.post(`/login`, this.accessiController.login);
-            this.router.post(`/get-users`, this.accessiController.getUsers);
-            this.router.post(`/encrypt`, this.accessiController.encrypt);
-            this.router.post(`/decrypt`, this.accessiController.decrypt);
-            this.router.post(`/set-password`, this.accessiController.setPassword);
-            this.router.post(`/update-utente`, this.accessiController.updateUtente);
-            this.router.post(`/delete-utente`, this.accessiController.deleteUser);
-            this.router.post(`/register`, this.accessiController.register);
-            this.router.post(`/set-gdpr`, this.accessiController.setGdpr);
-            this.router.post(`/reset-abilitazioni`, this.accessiController.resetAbilitazioni);
+            this.router.post(`/get-user-by-token`, this.accessiController.getUserByToken.bind(this.accessiController));
+            this.router.post(`/login`, this.accessiController.login.bind(this.accessiController));
+            this.router.post(`/get-users`, this.accessiController.getUsers.bind(this.accessiController));
+            this.router.post(`/encrypt`, this.accessiController.encrypt.bind(this.accessiController));
+            this.router.post(`/decrypt`, this.accessiController.decrypt.bind(this.accessiController));
+            this.router.post(`/set-password`, this.accessiController.setPassword.bind(this.accessiController));
+            this.router.post(`/update-utente`, this.accessiController.updateUtente.bind(this.accessiController));
+            this.router.post(`/delete-utente`, this.accessiController.deleteUser.bind(this.accessiController));
+            this.router.post(`/register`, this.accessiController.register.bind(this.accessiController));
+            this.router.post(`/set-gdpr`, this.accessiController.setGdpr.bind(this.accessiController));
+            this.router.post(`/reset-abilitazioni`, this.accessiController.resetAbilitazioni.bind(this.accessiController));
 
 
         } catch (error: any) {

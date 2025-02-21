@@ -10,6 +10,7 @@ import { EmailService } from "./Services/EmailService/EmailService";
 import { AccessiController } from "./AccessiController";
 import { AccessiOptions, AccessiModule } from "./AccessiModule";
 import { AccessiRoutes } from "./AccessiRoutes";
+import { AccessiControllerBase } from "./AccessiControllerBase";
 
 
 const container = new Container({ defaultScope: "Singleton" });
@@ -34,7 +35,7 @@ container.bind<IUserService>("IUserService").to(UserService);
 container.bind<IAuthService>("IAuthService").to(AuthService);
 container.bind<IPermissionService>("IPermissionService").to(PermissionService);
 container.bind<IEmailService>("IEmailService").to(EmailService);
-container.bind<AccessiController>(AccessiController).toSelf();
+container.bind<AccessiControllerBase>("AccessiControllerBase").to(AccessiController);
 container.bind<AccessiRoutes>(AccessiRoutes).toSelf();
 container.bind<AccessiModule>(AccessiModule).toSelf();
 

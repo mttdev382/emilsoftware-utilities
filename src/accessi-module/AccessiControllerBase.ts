@@ -44,7 +44,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract getUserByToken(req: Request<{}, {}, { token: string }>, res: Response): Promise<Response>;
+    public abstract getUserByToken(req: Request<{}, {}, { token: string }>, res: Response)
 
     //#region login SwaggerDoc
     /**
@@ -81,7 +81,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract login(req: Request, res: Response): Promise<Response>
+    public abstract login(req: Request, res: Response)
 
     //#region getUsers SwaggerDoc
     /**
@@ -115,7 +115,7 @@ export abstract class AccessiControllerBase {
       *         description: Errore del server
       */
     //#endregion
-    public abstract getUsers(req: Request, res: Response): Promise<Response>
+    public abstract getUsers(req: Request, res: Response)
 
     //#region deleteUser SwaggerDoc
     /**
@@ -142,7 +142,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract deleteUser(req: Request, res: Response): Promise<Response>
+    public abstract deleteUser(req: Request, res: Response)
 
     //#region register SwaggerDoc
     /**
@@ -177,7 +177,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract register(req: Request, res: Response): Promise<Response>
+    public abstract register(req: Request, res: Response)
 
     //#region encrypt SwaggerDoc
     /**
@@ -211,7 +211,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract encrypt(req: Request<{}, {}, { data: string }>, res: Response): Promise<Response>
+    public abstract encrypt(req: Request<{}, {}, { data: string }>, res: Response)
 
     //#region decrypt SwaggerDoc
     /**
@@ -245,7 +245,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract decrypt(req: Request<{}, {}, { data: string }>, res: Response): Promise<Response>
+    public abstract decrypt(req: Request<{}, {}, { data: string }>, res: Response)
 
     //#region resetAbilitazioni SwaggerDoc
     /**
@@ -274,7 +274,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response): Promise<Response>
+    public abstract resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response)
 
     //#region setPassword SwaggerDoc
     /**
@@ -306,7 +306,7 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response): Promise<Response>
+    public abstract setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response)
 
     //#region updateUtente SwaggerDoc
     /**
@@ -369,7 +369,7 @@ export abstract class AccessiControllerBase {
      *                   example: "Errore interno del server."
      */
     //#endregion
-    public abstract updateUtente(req: Request, res: Response): Promise<Response>
+    public abstract updateUtente(req: Request, res: Response)
 
     //#region setGdpr SwaggerDoc
     /**
@@ -398,6 +398,6 @@ export abstract class AccessiControllerBase {
      *         description: Errore del server
      */
     //#endregion
-    public abstract setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response): Promise<Response>
+    public abstract setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response)
 
 }
