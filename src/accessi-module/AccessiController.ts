@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { autobind } from "../autobind";
 import { CryptUtilities, RestUtilities } from "../Utilities";
 import { IAuthService } from "./Services/AuthService/IAuthService";
@@ -58,9 +58,10 @@ export class AccessiController implements AccessiControllerBase {
 
             const jwtOptions = this.authService.getOptions().jwtOptions;
 
+
             userData.token = {
                 expiresIn: jwtOptions.expiresIn,
-                value: jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn }),
+                value: jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn as any }),
                 type: "Bearer"
             }
 
