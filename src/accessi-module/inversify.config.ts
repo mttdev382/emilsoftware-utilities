@@ -19,7 +19,15 @@ container.bind<AccessiOptions>("AccessiOptions").toConstantValue({
     mockDemoUser: false,
     encryptionKey: "",
     jwtOptions: { secret: "", expiresIn: "1h" },
-    emailOptions: {}
+    emailOptions: {
+        auth: {
+            user: "",
+            pass: ""
+        },
+        host: "",
+        port: 0,
+        secure: false
+    }
 });
 
 container.bind<IUserService>("IUserService").to(UserService);
