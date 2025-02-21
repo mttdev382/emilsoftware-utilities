@@ -8,6 +8,7 @@ import { inject, injectable } from 'inversify';
 import { IAuthService } from '../AuthService/IAuthService';
 import { IPermissionService } from '../PermissionService/IPermissionService';
 import { IUserService } from '../UserService/IUserService';
+import { access } from 'fs';
 
 
 @injectable()
@@ -27,15 +28,7 @@ export class EmailService implements IEmailService {
         throw new Error('Method not implemented.');
     }
 
-    private transporter = nodemailer.createTransport({
-        host: 'smtp.example.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: 'tuo@email.com',
-            pass: 'tuaPassword'
-        }
-    });
+    private transporter = nodemailer.createTransport(this.accessiOptions.emailOptions);
 
     async sendVerificationEmail(email: string, codiceUtente: string, baseUrl: string) {
         try {
