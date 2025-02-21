@@ -6,7 +6,7 @@ import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./U
 import { autobind } from "./autobind";
 
 
-export { AccessiModule, StatoRegistrazione } from "./accessi-module";
+export { AccessiModule, StatoRegistrazione, ILoginResult } from "./accessi-module";
 
 export * from "es-node-firebird";
 export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode };
