@@ -1,5 +1,5 @@
-import { UserQueryResult } from "../models/QueryResults/UserQueryResult";
-import { StatoRegistrazione } from "../models/StatoRegistrazione";
+import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
+import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { TipoAbilitazione } from "../PermissionService/IPermissionService";
 
 export interface IAbilitazioneMenu {
@@ -47,6 +47,15 @@ export interface IUserService {
    * @throws {Error} Se l'inserimento fallisce per qualsiasi motivo.
    */
   register(request: UserQueryResult): Promise<void>;
+
+  /**
+   * Recupera un utente in base al suo username.
+   * 
+   * @param {string} username - Lo username dell'utente da cercare.
+   * @returns {Promise<IUser | null>} Una Promise che restituisce l'utente trovato o `null` se non esiste.
+   * @throws {Error} Se la query fallisce o si verifica un problema durante l'esecuzione.
+   */
+  getUserByUsername(username: string): Promise<IUser | null>;
 
   /**
    * Recupera una lista di utenti con informazioni dettagliate.
@@ -100,11 +109,14 @@ export interface IUserService {
      */
   setStatoRegistrazione(statoRegistrazione: StatoRegistrazione, codiceUtente: string): Promise<void>;
 
+
   /**
-* Funzione per inviare email di verifica e aggiornare la chiave di registrazione nel database.
-* @param email - Email del destinatario
-* @param codute - Codice utente per il database
-* @param baseUrl - URL base per il link di verifica
-*/
-  sendVerificationEmail(email: string, codiceUtente: string, baseUrl: string);
+ * Recupera i filtri associati a un utente specifico.
+ * 
+ * @param {string} codiceUtente - Il codice univoco dell'utente.
+ * @returns {Promise<IFiltriUtente[]>} Una Promise che restituisce un array di filtri dell'utente.
+ * @throws {Error} Se la query fallisce o si verifica un problema durante l'esecuzione.
+ */
+  getUserFilters(codiceUtente: string): Promise<IFiltriUtente[]>;
+
 }

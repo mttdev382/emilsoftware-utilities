@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { autobind } from "../autobind";
-import { Logger } from "../Logger";
 import { CryptUtilities, RestUtilities } from "../Utilities";
-import { AuthService } from "./AuthService/AuthService";
-import { PermissionService } from "./PermissionService/PermissionService";
-import { UserService } from "./UserService/UserService";
+import { IAuthService } from "./Services/AuthService/IAuthService";
+import { IEmailService } from "./Services/EmailService/IEmailService";
+import { IPermissionService } from "./Services/PermissionService/IPermissionService";
+import { IUserService } from "./Services/UserService/IUserService";
+import { inject } from "inversify";
 
 /**
  * Controller per la gestione degli accessi e delle operazioni correlate.
@@ -13,16 +14,14 @@ import { UserService } from "./UserService/UserService";
  */
 @autobind
 export class AccessiController {
-    private logger: Logger = new Logger(AccessiController.name);
 
-    /**
-     * Costruttore del controller.
-     * @param accessiModel Istanza del modello di gestione degli accessi.
-     * @param jwtOptions Opzioni di configurazione per la generazione dei token JWT.
-     * @author mttdev382
-     
-     */
-    constructor(private userService: UserService, private permissionService: PermissionService, private authService: AuthService) { }
+    constructor(
+        @inject("IUserService") private userService: IUserService,
+        @inject("IPermissionService") private permissionService: IPermissionService,
+        @inject("IEmailService") private emailService: IEmailService,
+        @inject("IAuthService") private authService: IAuthService
+    ) {}
+
 
 //#region getUserByToken SwaggerDoc
     /**

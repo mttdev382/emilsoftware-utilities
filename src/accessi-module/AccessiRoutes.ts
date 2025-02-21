@@ -1,14 +1,13 @@
-import { autobind } from "../autobind";
+import { inject } from "inversify";
 import { Logger } from "../Logger";
 import { AccessiController } from "./AccessiController";
 import { Router } from "express";
 
-@autobind
 export class AccessiRoutes {
     private logger: Logger = new Logger(AccessiRoutes.name);
 
     public router: Router;
-    constructor(private accessiController: AccessiController) {
+    constructor(@inject(AccessiController) private accessiController: AccessiController) {
         this.router = Router();
         this.initializeRoutes();
     }

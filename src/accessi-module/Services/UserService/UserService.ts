@@ -1,20 +1,25 @@
-import { autobind } from "../../autobind";
-import { Orm } from "../../Orm";
-import { RestUtilities } from "../../Utilities";
-import { AccessiOptions } from "../AccessiModule";
-import { UserQueryResult } from "../models/QueryResults/UserQueryResult";
-import { StatoRegistrazione } from "../models/StatoRegistrazione";
+import { inject, injectable } from "inversify";
+import { autobind } from "../../../autobind";
+import { Orm } from "../../../Orm";
+import { RestUtilities } from "../../../Utilities";
+import { AccessiOptions } from "../../AccessiModule";
+import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
+import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IFiltriUtente, IUser, IUserService } from "./IUserService";
-import nodemailer from 'nodemailer';
+import { IAuthService } from "../AuthService/IAuthService";
+import { IEmailService } from "../EmailService/IEmailService";
+import { IPermissionService } from "../PermissionService/IPermissionService";
 
 @autobind
 export class UserService implements IUserService {
 
-
-
-
-    constructor(private accessiOptions: AccessiOptions) { }
-
+    constructor(
+        @inject("IUserService") private userService: IUserService,
+        @inject("IPermissionService") private permissionService: IPermissionService,
+        @inject("IEmailService") private emailService: IEmailService,
+        @inject("IAuthService") private authService: IAuthService,
+        @inject("AccessiOptions") private accessiOptions: AccessiOptions
+    ) {}
     async getUsers(): Promise<UserQueryResult[]> {
         try {
             const query = ` 
@@ -82,14 +87,6 @@ export class UserService implements IUserService {
         return utenti.length > 0 ? utenti[0] : null;
     }
 
-    async verifyPassword(codiceUtente: string, passwordCifrata: string): Promise<boolean> {
-        const query = `SELECT PWD AS password FROM UTENTI_PWD WHERE CODUTE = ?`;
-        const result = await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as { password: string }[];
-
-        return result.length > 0 && result[0].password === passwordCifrata;
-    }
-
     async getUserFilters(codiceUtente: string): Promise<IFiltriUtente[]> {
         const query = `
             SELECT 
@@ -118,42 +115,11 @@ export class UserService implements IUserService {
             const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?)`;
             const paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua, request.flagSuper];
 
-            await this.sendVerificationEmail(request.username, codiceUtente, "");
+            //await this.sendVerificationEmail(request.username, codiceUtente, "");
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
         } catch (error) {
             throw error;
         }
-    }
-
-    async sendVerificationEmail(email: string, codiceUtente: string, baseUrl: string) {
-
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.example.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: 'tuo@email.com',
-                pass: 'tuaPassword'
-            }
-        });
-        const userKey = uuidv4();
-
-        await Orm.query(this.accessiOptions.databaseOptions, "UPDATE UTENTI SET KEYREG = ? WHERE CODUTE = ?", [userKey, codiceUtente]);
-
-        // Creazione dell'URL di verifica
-        const verificationUrl = `${baseUrl}/${userKey}`;
-
-        // Configurazione dell'email
-        const mailOptions = {
-            from: '"Supporto" <noreply@example.com>', // Cambia con il tuo indirizzo email
-            to: email,
-            subject: 'Verifica la tua email',
-            text: `Clicca sul seguente link per verificare il tuo account: ${verificationUrl}`,
-            html: `<p>Clicca sul seguente link per verificare il tuo account:</p><a href="${verificationUrl}">${verificationUrl}</a>`
-        };
-
-        // Invio dell'email
-        await transporter.sendMail(mailOptions);
     }
 
     async setRegistrazioneConfermata(userKey: string): Promise<void> {
@@ -231,8 +197,5 @@ export class UserService implements IUserService {
             throw error;
         }
     }
-}
-function uuidv4() {
-    throw new Error("Function not implemented.");
 }
 

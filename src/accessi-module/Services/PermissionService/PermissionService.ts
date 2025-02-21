@@ -1,12 +1,24 @@
-import { Orm } from "../../Orm";
-import { RestUtilities } from "../../Utilities";
-import { AccessiOptions } from "../AccessiModule";
-import { IAbilitazioneMenu } from "../UserService/IUserService";
-import { IAbilitazione, IRoleWithMenus } from "./IPermissionService";
 
+import { inject, injectable } from "inversify";
+import { Orm } from "../../../Orm";
+import { RestUtilities } from "../../../Utilities";
+import { AccessiOptions } from "../../AccessiModule";
+import { IAbilitazioneMenu, IUserService } from "../UserService/IUserService";
+import { IAbilitazione, IPermissionService, IRoleWithMenus } from "./IPermissionService";
+import { autobind } from "../../../autobind";
+import { IAuthService } from "../AuthService/IAuthService";
+import { IEmailService } from "../EmailService/IEmailService";
 
-export class PermissionService {
-    constructor(private accessiOptions: AccessiOptions) {}
+@injectable()
+export class PermissionService implements IPermissionService {
+    constructor(
+        @inject("IUserService") private userService: IUserService,
+        @inject("IPermissionService") private permissionService: IPermissionService,
+        @inject("IEmailService") private emailService: IEmailService,
+        @inject("IAuthService") private authService: IAuthService,
+        @inject("AccessiOptions") private accessiOptions: AccessiOptions
+    ) {}
+
 
     public async addAbilitazioni(codiceUtente: string, menuAbilitazioni: any[]): Promise<void> {
         try {
@@ -80,7 +92,7 @@ export class PermissionService {
     }
 
 
-    public async getAbilitazioniUtente(codiceUtente: string, isSuperAdmin: boolean): Promise<IAbilitazioneMenu[]> {
+    public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<IAbilitazioneMenu[]> {
         const query = isSuperAdmin
             ? `SELECT 
                     M.CODMNU AS codice_menu, 

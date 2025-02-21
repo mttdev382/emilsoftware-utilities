@@ -1,6 +1,7 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
+import { Application } from 'express';
 
 // Definisci la configurazione di Swagger
 const swaggerDefinition = {
@@ -25,7 +26,7 @@ const options = {
 
 
 // Funzione per esporre la documentazione Swagger tramite Express
-export function serveSwaggerDocs(app: any) {
+export function serveSwaggerDocs(app: Application) {
   // Crea il documento Swagger
   const swaggerSpec = swaggerJSDoc(options);
   app.use('/swagger/accessi', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

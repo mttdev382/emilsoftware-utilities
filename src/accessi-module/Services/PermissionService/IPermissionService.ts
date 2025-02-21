@@ -1,3 +1,5 @@
+import { IAbilitazioneMenu } from "../UserService/IUserService";
+
 export enum TipoAbilitazione {
   Uno,
   Due,
@@ -51,7 +53,7 @@ export interface IPermissionService {
    * @returns {Promise<IAbilitazione[]>} - Una promessa che restituisce un array di oggetti contenenti le abilitazioni.
    * @throws {Error} - Lancia un errore in caso di problemi con la query o la connessione al database.
    */
-  getAbilitazioni(codiceUtente: string): Promise<IAbilitazione[]>;
+  getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<IAbilitazioneMenu[]>
 
   /**
    * Recupera tutti i ruoli disponibili con i menu associati a ciascun ruolo.

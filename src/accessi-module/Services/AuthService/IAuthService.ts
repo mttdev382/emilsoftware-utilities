@@ -1,5 +1,5 @@
-import { AccessiOptions } from "../AccessiModule";
-import { StatoRegistrazione } from "../models/StatoRegistrazione";
+import { AccessiOptions } from "../../AccessiModule";
+import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { TipoAbilitazione } from "../PermissionService/IPermissionService";
 import { IAbilitazioneMenu, IFiltriUtente, IUser } from "../UserService/IUserService";
 
@@ -63,4 +63,15 @@ export interface IAuthService {
 * @throws {Error} - Lancia un errore in caso di problemi con la query o la connessione al database.
 */
   setPassword(codiceUtente: string, nuovaPassword: string): Promise<void>;
+
+  /**
+ * Verifica se la password fornita corrisponde a quella memorizzata per l'utente.
+ * 
+ * @param {string} codiceUtente - Il codice univoco dell'utente.
+ * @param {string} passwordCifrata - La password cifrata da verificare.
+ * @returns {Promise<boolean>} Una Promise che restituisce `true` se la password è corretta, altrimenti `false`.
+ * @throws {Error} Se la query fallisce o si verifica un problema durante l'esecuzione.
+ */
+  verifyPassword(codiceUtente: string, passwordCifrata: string): Promise<boolean>;
+
 }
