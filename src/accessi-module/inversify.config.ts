@@ -30,7 +30,6 @@ if (
   !PermissionService ||
   !EmailService ||
   !AccessiController ||
-  !AccessiModule ||
   !AccessiRoutes ||
   !AccessiControllerBase
 ) {
@@ -76,9 +75,6 @@ container.bind<AccessiControllerBase>(AccessiControllerBase).to(AccessiControlle
 
 console.log("Binding AccessiRoutes...");
 container.bind<AccessiRoutes>(AccessiRoutes).toSelf();
-
-console.log("Binding AccessiModule...");
-container.bind<AccessiModule>(AccessiModule).toSelf();
 
 console.log("Tutte le dipendenze sono state registrate correttamente!");
 
