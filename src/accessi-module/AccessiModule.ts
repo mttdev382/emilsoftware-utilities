@@ -5,7 +5,6 @@
  * @author mttdev382
  */
 import { Options } from "es-node-firebird";
-import { AccessiRoutes } from "./AccessiRoutes";
 import { Logger } from "../Logger";
 import { Application, Router } from "express";
 import { serveSwaggerDocs } from "./swagger/SwaggerConfig";
@@ -53,9 +52,11 @@ export class AccessiModule {
     constructor(private options: AccessiOptions) {
         // Configura le opzioni di AccessiModule dentro il container DI
         container.bind<AccessiOptions>("AccessiOptions").toConstantValue(this.options);
-        this.accessiRoutes = container.get<IAccessiRoutes>("IAccessiRoutes");
     }
 
+    public initialize() {
+        this.accessiRoutes = container.get<IAccessiRoutes>("IAccessiRoutes");
+    }
 
 
     /**
