@@ -4,6 +4,7 @@ import { LogLevels, Logger } from "./Logger";
 import { Orm } from "./Orm";
 import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./Utilities";
 import { autobind } from "./autobind";
+import { DocumentGenerator } from "./ContractGenerator";
 
 
 export { AccessiModule, StatoRegistrazione, ILoginResult } from "./accessi-module";
