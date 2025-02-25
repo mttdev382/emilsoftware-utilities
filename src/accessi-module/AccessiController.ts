@@ -86,11 +86,11 @@ export class AccessiController implements AccessiControllerBase {
             const { codiceUtente } = req.body;
 
             if (!codiceUtente) {
-                throw new Error('CODUTE mancante');
+                throw new Error('Il campo "Codice Utente" è obbligatorio.');
             }
 
             await this.userService.deleteUser(codiceUtente);
-            return RestUtilities.sendOKMessage(res, 'Utente eliminato con successo');
+            return RestUtilities.sendOKMessage(res, "L'utente è stato eliminato con successo.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error);
         }
@@ -102,7 +102,7 @@ export class AccessiController implements AccessiControllerBase {
             let request = req.body;
             await this.userService.register(request);
 
-            return RestUtilities.sendOKMessage(res, "Utente registrato con successo");
+            return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
@@ -135,7 +135,7 @@ export class AccessiController implements AccessiControllerBase {
     public async resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
         try {
             await this.permissionService.resetAbilitazioni(req.body.codiceUtente);
-            return RestUtilities.sendOKMessage(res, `Abilitazioni resettate con successo per l'utente ${req.body.codiceUtente}`);
+            return RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${req.body.codiceUtente} sono state resettate con successo.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
@@ -145,7 +145,7 @@ export class AccessiController implements AccessiControllerBase {
     public async setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response) {
         try {
             await this.authService.setPassword(req.body.codiceUtente, req.body.nuovaPassword);
-            return RestUtilities.sendOKMessage(res, `Password impostata con successo per l'utente ${req.body.codiceUtente}`);
+            return RestUtilities.sendOKMessage(res, `La password dell'utente ${req.body.codiceUtente} è stata impostata correttamente.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
@@ -156,7 +156,7 @@ export class AccessiController implements AccessiControllerBase {
         try {
             let user = req.body;
             await this.userService.updateUser(user);
-            return RestUtilities.sendOKMessage(res, `Utente ${req.body.codiceUtente} aggiornato con successo.`);
+            return RestUtilities.sendOKMessage(res, `L'utente ${req.body.codiceUtente} è stato aggiornato con successo.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
@@ -165,7 +165,7 @@ export class AccessiController implements AccessiControllerBase {
     public async setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
         try {
             await this.userService.setGdpr(req.body.codiceUtente);
-            return RestUtilities.sendOKMessage(res, `GDPR accettato con successo per l'utente ${req.body.codiceUtente}`);
+            return RestUtilities.sendOKMessage(res, `L'utente ${req.body.codiceUtente} ha accettato il GDRP.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }
