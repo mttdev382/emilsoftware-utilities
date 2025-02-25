@@ -8,20 +8,18 @@ import { PermissionService } from "./Services/PermissionService/PermissionServic
 import { IEmailService } from "./Services/EmailService/IEmailService";
 import { EmailService } from "./Services/EmailService/EmailService";
 import { AccessiController } from "./AccessiController";
-import { AccessiOptions, AccessiModule } from "./AccessiModule";
+import { AccessiOptions } from "./AccessiModule";
 import { AccessiRoutes } from "./AccessiRoutes";
 import { AccessiControllerBase } from "./AccessiControllerBase";
 import { IAccessiRoutes } from "./IAccessiRoutes";
 
 const container = new Container({ defaultScope: "Singleton" });
 
-console.log("🔍 Verifica delle importazioni:");
 console.log("UserService:", UserService);
 console.log("AuthService:", AuthService);
 console.log("PermissionService:", PermissionService);
 console.log("EmailService:", EmailService);
 console.log("AccessiController:", AccessiController);
-console.log("AccessiModule:", AccessiModule);
 console.log("AccessiControllerBase:", AccessiControllerBase);
 
 if (
@@ -36,7 +34,6 @@ if (
   throw new Error("ERRORE: Una o più dipendenze non sono state importate correttamente!");
 }
 
-// Definizione delle opzioni per AccessiModule
 const accessiOptions: AccessiOptions = {
   databaseOptions: {},
   mockDemoUser: false,
@@ -71,7 +68,7 @@ console.log("Binding IEmailService...");
 container.bind<IEmailService>("IEmailService").to(EmailService);
 
 console.log("Binding AccessiControllerBase...");
-container.bind<AccessiControllerBase>(AccessiControllerBase).to(AccessiController);
+container.bind<AccessiControllerBase>("AccessiControllerBase").to(AccessiController);
 
 console.log("Binding AccessiRoutes...");
 container.bind<IAccessiRoutes>("IAccessiRoutes").to(AccessiRoutes);
