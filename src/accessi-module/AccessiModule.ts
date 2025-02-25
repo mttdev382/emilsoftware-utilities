@@ -52,12 +52,9 @@ export class AccessiModule {
     constructor(private options: AccessiOptions) {
         // Configura le opzioni di AccessiModule dentro il container DI
         container.bind<AccessiOptions>("AccessiOptions").toConstantValue(this.options);
-    }
-
-    public initialize() {
         this.accessiRoutes = container.get<IAccessiRoutes>("IAccessiRoutes");
-    }
 
+    }
 
     /**
      * Ottiene il router delle rotte per gestire gli accessi.

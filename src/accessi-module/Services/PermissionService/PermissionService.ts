@@ -3,19 +3,12 @@ import { inject, injectable } from "inversify";
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
-import { IAbilitazioneMenu, IUserService } from "../UserService/IUserService";
-import { IAbilitazione, IPermissionService, IRoleWithMenus } from "./IPermissionService";
-import { autobind } from "../../../autobind";
-import { IAuthService } from "../AuthService/IAuthService";
-import { IEmailService } from "../EmailService/IEmailService";
+import { IAbilitazioneMenu } from "../UserService/IUserService";
+import { IPermissionService, IRoleWithMenus } from "./IPermissionService";
 
 @injectable()
 export class PermissionService implements IPermissionService {
     constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IEmailService") private emailService: IEmailService,
-        @inject("IAuthService") private authService: IAuthService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
 

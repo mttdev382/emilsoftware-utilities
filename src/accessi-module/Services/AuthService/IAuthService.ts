@@ -1,6 +1,4 @@
 import { AccessiOptions } from "../../AccessiModule";
-import { StatoRegistrazione } from "../../models/StatoRegistrazione";
-import { TipoAbilitazione } from "../PermissionService/IPermissionService";
 import { IAbilitazioneMenu, IFiltriUtente, IUser } from "../UserService/IUserService";
 
 

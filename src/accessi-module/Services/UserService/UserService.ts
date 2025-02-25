@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { autobind } from "../../../autobind";
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
@@ -6,18 +6,11 @@ import { AccessiOptions } from "../../AccessiModule";
 import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
 import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IFiltriUtente, IUser, IUserService } from "./IUserService";
-import { IAuthService } from "../AuthService/IAuthService";
-import { IEmailService } from "../EmailService/IEmailService";
-import { IPermissionService } from "../PermissionService/IPermissionService";
 
 @autobind
 export class UserService implements IUserService {
 
     constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IEmailService") private emailService: IEmailService,
-        @inject("IAuthService") private authService: IAuthService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
     async getUsers(): Promise<UserQueryResult[]> {

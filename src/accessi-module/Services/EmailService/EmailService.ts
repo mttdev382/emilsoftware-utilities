@@ -3,12 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
 import { IEmailService } from './IEmailService';
-import { autobind } from '../../../autobind';
 import { inject, injectable } from 'inversify';
 import { IAuthService } from '../AuthService/IAuthService';
 import { IPermissionService } from '../PermissionService/IPermissionService';
 import { IUserService } from '../UserService/IUserService';
-import { access } from 'fs';
 
 
 @injectable()

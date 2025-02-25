@@ -14,7 +14,6 @@ export class AuthService implements IAuthService {
     constructor(
         @inject("IUserService") private userService: IUserService,
         @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IEmailService") private emailService: IEmailService,
         @inject("IAuthService") private authService: IAuthService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
