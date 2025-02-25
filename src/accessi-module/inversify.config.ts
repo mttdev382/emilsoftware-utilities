@@ -11,6 +11,7 @@ import { AccessiController } from "./AccessiController";
 import { AccessiOptions, AccessiModule } from "./AccessiModule";
 import { AccessiRoutes } from "./AccessiRoutes";
 import { AccessiControllerBase } from "./AccessiControllerBase";
+import { IAccessiRoutes } from "./IAccessiRoutes";
 
 const container = new Container({ defaultScope: "Singleton" });
 
@@ -21,7 +22,6 @@ console.log("PermissionService:", PermissionService);
 console.log("EmailService:", EmailService);
 console.log("AccessiController:", AccessiController);
 console.log("AccessiModule:", AccessiModule);
-console.log("AccessiRoutes:", AccessiRoutes);
 console.log("AccessiControllerBase:", AccessiControllerBase);
 
 if (
@@ -74,7 +74,7 @@ console.log("Binding AccessiControllerBase...");
 container.bind<AccessiControllerBase>(AccessiControllerBase).to(AccessiController);
 
 console.log("Binding AccessiRoutes...");
-container.bind<AccessiRoutes>(AccessiRoutes).toSelf();
+container.bind<IAccessiRoutes>("IAccessiRoutes").to(AccessiRoutes);
 
 console.log("Tutte le dipendenze sono state registrate correttamente!");
 

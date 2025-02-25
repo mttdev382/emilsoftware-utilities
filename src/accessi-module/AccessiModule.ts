@@ -10,6 +10,7 @@ import { Logger } from "../Logger";
 import { Application, Router } from "express";
 import { serveSwaggerDocs } from "./swagger/SwaggerConfig";
 import { container } from "./inversify.config";
+import { IAccessiRoutes } from "./IAccessiRoutes";
 
 export interface JwtOptions {
     secret: string
@@ -37,7 +38,7 @@ export interface AccessiOptions {
 
 export class AccessiModule {
     private logger: Logger = new Logger(AccessiModule.name);
-    private accessiRoutes: AccessiRoutes;
+    private accessiRoutes: IAccessiRoutes;
 
 
     /**
@@ -52,7 +53,7 @@ export class AccessiModule {
     constructor(private options: AccessiOptions) {
         // Configura le opzioni di AccessiModule dentro il container DI
         container.bind<AccessiOptions>("AccessiOptions").toConstantValue(this.options);
-        this.accessiRoutes = container.get<AccessiRoutes>(AccessiRoutes);
+        this.accessiRoutes = container.get<IAccessiRoutes>("IAccessiRoutes");
     }
 
 

@@ -2,7 +2,8 @@ import { inject } from "inversify";
 import { Logger } from "../Logger";
 import { AccessiController } from "./AccessiController";
 import { Router, Request, Response } from "express";
-export class AccessiRoutes {
+import { IAccessiRoutes } from "./IAccessiRoutes";
+export class AccessiRoutes implements IAccessiRoutes {
     private logger: Logger = new Logger(AccessiRoutes.name);
 
     public router: Router;
@@ -12,7 +13,7 @@ export class AccessiRoutes {
     }
 
 
-    private initializeRoutes() {
+    initializeRoutes() {
         try {
             this.router.post(`/get-user-by-token`, this.accessiController.getUserByToken.bind(this.accessiController));
             this.router.post(`/login`, this.accessiController.login.bind(this.accessiController));
