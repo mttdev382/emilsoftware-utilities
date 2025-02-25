@@ -15,7 +15,7 @@ import { AccessiControllerBase } from "./AccessiControllerBase";
 
 const container = new Container({ defaultScope: "Singleton" });
 
-container.bind<AccessiOptions>("AccessiOptions").toConstantValue({
+const accessiOptions: AccessiOptions = {
     databaseOptions: {},
     mockDemoUser: false,
     encryptionKey: "",
@@ -29,7 +29,11 @@ container.bind<AccessiOptions>("AccessiOptions").toConstantValue({
         port: 0,
         secure: false
     }
-});
+};
+
+console.log("AccessiOptions:", accessiOptions);
+container.bind<AccessiOptions>("AccessiOptions").toConstantValue(accessiOptions);
+
 
 container.bind<IUserService>("IUserService").to(UserService);
 container.bind<IAuthService>("IAuthService").to(AuthService);
