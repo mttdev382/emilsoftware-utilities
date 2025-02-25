@@ -45,9 +45,9 @@ export class AccessiModule {
      */
     constructor(accessiOptions: AccessiOptions) {
 
-        this.authService = new AuthService(accessiOptions);
         this.userService = new UserService(accessiOptions);
         this.permissionService = new PermissionService(accessiOptions);
+        this.authService = new AuthService(accessiOptions, this.userService, this.permissionService);
 
         this.accessiController = new AccessiController(this.userService, this.permissionService, this.authService);
         this.accessiRoutes = new AccessiRoutes(this.accessiController);

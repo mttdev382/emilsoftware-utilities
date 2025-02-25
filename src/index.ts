@@ -6,9 +6,10 @@ import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./U
 import { AccessiModule, StatoRegistrazione } from "./accessi-module";
 import { AccessiModel } from "./accessi-module/AccessiModel";
 import { autobind } from "./autobind";
+import { DocumentGenerator } from "./ContractGenerator";
 
 
-export { AccessiModule, StatoRegistrazione, LoginRequest, LoginResponse } from "./accessi-module";
+export { AccessiModule, StatoRegistrazione } from "./accessi-module";
 
 export * from "es-node-firebird";
-export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode };
+export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode, DocumentGenerator };
