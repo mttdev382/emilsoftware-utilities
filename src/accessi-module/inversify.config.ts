@@ -51,7 +51,7 @@ const accessiOptions: AccessiOptions = {
 };
 
 console.log("AccessiOptions inizializzato correttamente:", accessiOptions);
-container.bind<AccessiOptions>("AccessiOptions").toConstantValue(accessiOptions);
+container.rebind<AccessiOptions>("AccessiOptions").toConstantValue(accessiOptions);
 
 console.log("Registrazione delle dipendenze...");
 
