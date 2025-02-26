@@ -6,7 +6,6 @@ import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IAuthService, ILoginResult, LoginRequest } from "./IAuthService";
 import { IUserService } from "../UserService/IUserService";
 import { IPermissionService } from "../PermissionService/IPermissionService";
-import { IEmailService } from "../EmailService/IEmailService";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -14,7 +13,6 @@ export class AuthService implements IAuthService {
     constructor(
         @inject("IUserService") private userService: IUserService,
         @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IAuthService") private authService: IAuthService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
     public getOptions(): AccessiOptions {
@@ -47,7 +45,7 @@ export class AuthService implements IAuthService {
         }
 
         // Verifica la password
-        const isPasswordValid = await this.authService.verifyPassword(utente.codiceUtente, passwordCifrata);
+        const isPasswordValid = await this.verifyPassword(utente.codiceUtente, passwordCifrata);
         if (!isPasswordValid) throw new Error("Nome utente o password errata!");
 
         // Recupera le abilitazioni
