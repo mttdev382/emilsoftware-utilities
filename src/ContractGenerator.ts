@@ -3,47 +3,28 @@ import autotable from "jspdf-autotable";
 import { promises as fs } from 'fs';
 import path from 'path';
 
-/**
- * Interface representing the contract parties.
- */
 export interface IPartiContratto {
-    fornitore: {
-        denominazione: string;
-        codiceFiscale: string;
-        indirizzoCompleto: string;
-    };
-    cliente: {
-        denominazione: string;
-        codiceFiscale: string;
-        indirizzoCompleto: string;
-    };
+    fornitore: { denominazione: string; codiceFiscale: string; indirizzoCompleto: string; };
+    cliente: { denominazione: string; codiceFiscale: string; indirizzoCompleto: string; };
 }
 
-/**
- * Parameters passed by the user when generating a document.
- */
 export interface DocumentParams {
     parti: IPartiContratto;
-    tipOutput?: 'f' | 'd' | 'u'; // f: open in a new window, d: download, u: return ArrayBuffer
+    tipOutput?: 'f' | 'd' | 'u';
     dynamicFields?: { [key: string]: string };
     dynamicElements?: { [placeholder: string]: DynamicElement };
 }
 
-/**
- * DynamicElement supports different types, currently "table".
- */
 export type DynamicElement = {
     type: 'table';
     config: {
         head: string[];
         body: string[][];
         options?: any;
+        styles?: any;
     };
 };
 
-/**
- * A simplified type for the configuration file.
- */
 interface DocumentConfig {
     fontTitolo: { nome: string; dimensione: number; colore: string; installPath?: string; };
     fontSottotitolo: { nome: string; dimensione: number; colore: string; installPath?: string; };
@@ -59,13 +40,9 @@ interface DocumentConfig {
     };
     immagini: Array<{ path: string; posizione: [number, number]; dimensioni: [number, number]; coeffDim?: number; }>;
     box: { backgrund: string; raggio: number; };
+    tableStyle?: { lineColor?: string; lineWidth?: number; font?: string; fontSize?: number; cellPadding?: number; fillColor?: string; };
 }
 
-/**
- * Reads an image file from the filesystem and returns a Base64-encoded data URL.
- * @param imagePath - Path to the image file.
- * @returns The Base64-encoded data URL of the image.
- */
 async function loadImageAsBase64(imagePath: string): Promise<string> {
     const absolutePath = path.resolve(imagePath);
     const buffer = await fs.readFile(absolutePath);
@@ -74,11 +51,6 @@ async function loadImageAsBase64(imagePath: string): Promise<string> {
     return `data:image/${ext};base64,${base64}`;
 }
 
-/**
- * DocumentGenerator encapsulates the PDF generation logic.
- * It handles text wrapping, dynamic placeholders, image insertion, custom font installation,
- * and rendering text inside a rounded rectangle box or as bold text.
- */
 export class DocumentGenerator {
     private config!: DocumentConfig;
     private doc!: jsPDF;
@@ -86,51 +58,29 @@ export class DocumentGenerator {
     private curY: number = 0;
     private configLoaded: boolean = false;
 
-    /**
-     * Constructor for DocumentGenerator.
-     * @param configPath - Optional path to the JSON configuration file.
-     */
     constructor(private configPath?: string) {}
 
-    /**
-     * Sets the configuration directly.
-     * @param config - The DocumentConfig object.
-     */
     public setConfig(config: DocumentConfig) {
         this.config = config;
         this.configLoaded = true;
     }
 
-    /**
-     * Applies dynamic text templating by replacing markers like $KEY$ with their values.
-     * @param template - The template string containing markers.
-     * @param dynamicFields - An object mapping marker keys to replacement values.
-     * @returns The processed string with replacements.
-     */
     private applyTemplate(template: string, dynamicFields?: { [key: string]: string }): string {
         if (!dynamicFields) return template;
-        return template.replace(/\$(\w+)\$/g, (match, key) => dynamicFields[key] !== undefined ? dynamicFields[key] : match);
+        return template.replace(/\$(\w+)\$/g, (match, key) =>
+            dynamicFields[key] !== undefined ? dynamicFields[key] : match
+        );
     }
 
-    /**
-     * Replaces party-specific placeholders (e.g., $cliente:denominazione$) with corresponding values.
-     * @param text - The text containing party placeholders.
-     * @param parti - The contract parties.
-     * @returns The processed string with party-specific values.
-     */
     private applyPartiPlaceholders(text: string, parti: IPartiContratto): string {
-        return text.replace(/\$(fornitore|cliente):(\w+)\$/g, (match, party, field) => {
-            return (parti[party] && (parti[party] as any)[field]) ? (parti[party] as any)[field] : match;
-        });
+        return text.replace(/\$(fornitore|cliente):(\w+)\$/g, (match, party, field) =>
+            (parti[party] && (parti[party] as any)[field]) ? (parti[party] as any)[field] : match
+        );
     }
 
-    /**
-     * Loads the configuration JSON from the local filesystem.
-     * @throws Error if the configuration file cannot be read.
-     */
     private async loadConfig(): Promise<void> {
         if (this.configLoaded) return;
-        if (!this.configPath) throw new Error("No configuration provided. Set a configPath or use setConfig().");
+        if (!this.configPath) throw new Error("No configuration provided.");
         try {
             const data = await fs.readFile(this.configPath, 'utf8');
             this.config = JSON.parse(data) as DocumentConfig;
@@ -140,9 +90,6 @@ export class DocumentGenerator {
         }
     }
 
-    /**
-     * Initializes the jsPDF document and sets the cursor to the top-left margin.
-     */
     private initDoc(): void {
         this.doc = new jsPDF();
         const margins = this.config.margini;
@@ -150,21 +97,11 @@ export class DocumentGenerator {
         this.curY = margins.alto;
     }
 
-    /**
-     * Extracts a dynamic element placeholder from text if it is in the form "$PLACEHOLDER$".
-     * @param text - The text to check.
-     * @returns The placeholder key or null if not found.
-     */
     private extractPlaceholder(text: string): string | null {
         const match = text.match(/^\$(\w+)\$$/);
         return match ? match[1] : null;
     }
 
-    /**
-     * Installs a custom font into jsPDF by reading the font file and adding it to the Virtual File System.
-     * @param fontPath - Path to the TTF font file.
-     * @param fontName - Name of the font to be used in jsPDF.
-     */
     private async installFont(fontPath: string, fontName: string): Promise<void> {
         const absolutePath = path.resolve(fontPath);
         const buffer = await fs.readFile(absolutePath);
@@ -175,19 +112,7 @@ export class DocumentGenerator {
         this.doc.setFont(fontName);
     }
 
-    /**
-     * Core method to write wrapped text with a specified font.
-     * Handles text splitting and page-breaks.
-     * @param fontName - The name of the font to use.
-     * @param fontSize - The font size in points.
-     * @param color - The text color.
-     * @param text - The text to write.
-     * @param x - The X coordinate.
-     * @param y - The starting Y coordinate.
-     * @param maxWidth - Maximum width for text wrapping.
-     * @param lineSpacingFactor - Factor for line spacing.
-     * @returns The updated Y position after writing the text.
-     */
+    // Writes wrapped text, handling inline bold segments.
     private async writeWrappedTextCore(
         fontName: string,
         fontSize: number,
@@ -208,22 +133,54 @@ export class DocumentGenerator {
                 this.doc.addPage();
                 y = this.config.margini.alto;
             }
-            this.doc.text(line, x, y);
-            y += lineHeight;
+            // If the line contains inline bold markers, process them.
+            if (line.includes("**")) {
+                y = await this.writeLineWithInlineBold(line, x, y, fontName, fontSize, color, maxWidth, lineSpacingFactor);
+            } else {
+                this.doc.text(line, x, y);
+                y += lineHeight;
+            }
         }
         return y;
     }
 
-    /**
-     * Writes wrapped text using a custom font.
-     * Ensures the font is installed before writing.
-     * @param fontConf - Font configuration object.
-     * @param text - The text to write.
-     * @param x - The X coordinate.
-     * @param y - The starting Y coordinate.
-     * @param maxWidth - Maximum width for text wrapping.
-     * @param lineSpacingFactor - Factor for line spacing.
-     */
+    // Writes a single line with inline bold processing.
+    private async writeLineWithInlineBold(
+        line: string,
+        x: number,
+        y: number,
+        normalFont: string,
+        fontSize: number,
+        color: string,
+        maxWidth: number,
+        lineSpacingFactor: number = 1.15
+    ): Promise<number> {
+        let currentX = x;
+        // Split the line by bold segments. The regex keeps the markers.
+        const segments = line.split(/(\*\*.*?\*\*)/);
+        const lineHeight = (fontSize * lineSpacingFactor / 72) * 25.4;
+        for (const seg of segments) {
+            let segText = seg;
+            let useBold = false;
+            if (seg.startsWith("**") && seg.endsWith("**")) {
+                useBold = true;
+                segText = seg.substring(2, seg.length - 2);
+            }
+            if (useBold) {
+                this.doc.setFont("Montserrat-Bold");
+            } else {
+                this.doc.setFont(normalFont);
+            }
+            this.doc.setFontSize(fontSize);
+            this.doc.setTextColor(color);
+            const segWidth = this.doc.getTextWidth(segText);
+            // Write segment
+            this.doc.text(segText, currentX, y);
+            currentX += segWidth;
+        }
+        return y + lineHeight;
+    }
+
     private async writeWrappedTextWithFont(
         fontConf: { nome: string; dimensione: number; colore: string; installPath?: string },
         text: string,
@@ -242,17 +199,7 @@ export class DocumentGenerator {
         this.curY = await this.writeWrappedTextCore(fontConf.nome, fontConf.dimensione, fontConf.colore, text, x, y, maxWidth, lineSpacingFactor);
     }
 
-    /**
-     * Renders text inside a rounded rectangle box.
-     * This method is invoked when text is wrapped in '^' markers.
-     * @param text - The text to render (without '^' markers).
-     * @param fontConf - Font configuration for the text.
-     * @param padding - Padding inside the box.
-     * @param borderRadius - Corner radius of the box.
-     * @param borderWidth - Border thickness.
-     * @param boxColor - Optional background color.
-     */
-    public async scriveTestoBox(
+    public async writeBoxedText(
         text: string,
         fontConf: { nome: string; dimensione: number; colore: string; installPath?: string },
         padding: number = 5,
@@ -280,60 +227,47 @@ export class DocumentGenerator {
         const boxHeight = textHeight + 2 * padding;
         if (boxColor) {
             this.doc.setFillColor(boxColor);
-            this.doc.roundedRect(boxX, boxY, boxWidth, boxHeight, borderRadius, borderRadius, 'F');
+            this.doc.roundedRect(boxX, boxY, boxWidth, boxHeight, borderRadius, borderRadius, "F");
         }
         this.doc.setLineWidth(borderWidth);
         this.doc.roundedRect(boxX, boxY, boxWidth, boxHeight, borderRadius, borderRadius);
         const textX = boxX + padding;
         let textY = boxY + padding + lineHeight;
         for (const line of lines) {
-            this.doc.text(line, textX, textY);
-            textY += lineHeight;
+            if (line.includes("**")) {
+                textY = await this.writeLineWithInlineBold(line, textX, textY, fontConf.nome, fontConf.dimensione, fontConf.colore, maxTextWidth, 1.15);
+            } else {
+                this.doc.text(line, textX, textY);
+                textY += lineHeight;
+            }
         }
         this.curY = boxY + boxHeight + this.config.staccoriga;
     }
 
-    /**
-     * Checks if a given text is wrapped in '^' markers, indicating it should be rendered in a box.
-     * @param text - The text to check.
-     * @returns True if text is boxed.
-     */
+
+    // Checks if text is wrapped in '^' markers for boxed text.
     private isBoxedText(text: string): boolean {
         return text.startsWith('^') && text.endsWith('^');
     }
 
-    /**
-     * Removes the '^' markers from the text.
-     * @param text - The boxed text.
-     * @returns The text without '^' markers.
-     */
+    // Removes '^' markers.
     private stripBoxMarkers(text: string): string {
         return text.substring(1, text.length - 1);
     }
 
-    /**
-     * Checks if a given text is wrapped in '**' markers, indicating bold formatting.
-     * @param text - The text to check.
-     * @returns True if text is marked as bold.
-     */
+    // Checks if text is entirely wrapped in '**' markers (not inline).
+    // (This function is kept for backward compatibility.)
     private isBoldText(text: string): boolean {
         return text.startsWith('**') && text.endsWith('**');
     }
 
-    /**
-     * Removes the '**' markers from bold text.
-     * @param text - The bold text.
-     * @returns The text without '**' markers.
-     */
+    // Removes '**' markers.
     private stripBoldMarkers(text: string): string {
         return text.substring(2, text.length - 2);
     }
 
-    /**
-     * Inserts images as defined in the configuration.
-     * Uses the current cursor position for placement.
-     */
-    private async inserisciImmagini(): Promise<void> {
+    // Inserts images using the current cursor position.
+    private async insertLogo(): Promise<void> {
         if (this.config.immagini && this.config.immagini.length > 0) {
             const startX = this.curX;
             for (const imgConf of this.config.immagini) {
@@ -351,32 +285,24 @@ export class DocumentGenerator {
         }
     }
 
-    /**
-     * Generates the PDF document based on provided parameters.
-     * Processes dynamic fields, images, tables, and text (with optional boxed or bold formatting).
-     * Returns the file name if saved or an ArrayBuffer.
-     * @param params - The DocumentParams object.
-     */
+    // Generates the PDF document by processing images, dynamic fields, tables, and text.
+    // Supports inline bold formatting and boxed text.
     public async generateDocument(params: DocumentParams): Promise<string | ArrayBuffer> {
         await this.loadConfig();
         this.initDoc();
-
-        await this.inserisciImmagini();
+        await this.insertLogo();
         const dynamicFields = params.dynamicFields || {};
         const dynamicElements = params.dynamicElements || {};
         const pageWidth = this.doc.internal.pageSize.getWidth();
         const maxWidth = pageWidth - (this.config.margini.sx + this.config.margini.dx);
-
         let titolo = this.applyTemplate(this.config.testi.titolo, dynamicFields);
         titolo = this.applyPartiPlaceholders(titolo, params.parti);
         await this.writeWrappedTextWithFont(this.config.fontTitolo, titolo, this.curX, this.curY, maxWidth);
         this.curY += this.config.staccoriga;
-
         let premessa = this.applyTemplate(this.config.testi.premessa, dynamicFields);
         premessa = this.applyPartiPlaceholders(premessa, params.parti);
         await this.writeWrappedTextWithFont(this.config.fontTesto, premessa, this.curX, this.curY, maxWidth);
         this.curY += this.config.staccoriga;
-
         for (const punto of this.config.testi.Punti) {
             let puntoTitolo = this.applyTemplate(punto.titolo, dynamicFields);
             puntoTitolo = this.applyPartiPlaceholders(puntoTitolo, params.parti);
@@ -384,9 +310,17 @@ export class DocumentGenerator {
             this.curY += this.config.staccoriga;
             for (const sub of punto.Sottopunti) {
                 const placeholder = this.extractPlaceholder(sub.titolo);
-                if (placeholder && dynamicElements[placeholder] && dynamicElements[placeholder].type === 'table') {
-                    const tableConfig = dynamicElements[placeholder].config;
-                    autotable(this.doc, { startY: this.curY, head: [tableConfig.head], body: tableConfig.body, ...tableConfig.options });
+                if (placeholder && dynamicElements[placeholder] && dynamicElements[placeholder].type === 'table' && dynamicElements[placeholder].config) {
+                    const tableConfig = dynamicElements[placeholder].config!;
+                    const defaultTableOptions = this.config.tableStyle || {};
+                    autotable(this.doc, {
+                        startY: this.curY,
+                        head: [tableConfig.head],
+                        body: tableConfig.body,
+                        ...defaultTableOptions,
+                        ...tableConfig.options,
+                        ...tableConfig.styles
+                    });
                     this.curY = (this.doc as any).lastAutoTable.finalY + this.config.staccoriga;
                 } else {
                     if (sub.titolo) {
@@ -394,10 +328,11 @@ export class DocumentGenerator {
                         titleText = this.applyPartiPlaceholders(titleText, params.parti);
                         if (this.isBoxedText(titleText)) {
                             const boxText = this.stripBoxMarkers(titleText);
-                            await this.scriveTestoBox(boxText, this.config.fontSottotitolo);
+                            await this.writeBoxedText(boxText, this.config.fontSottotitolo);
                         } else if (this.isBoldText(titleText)) {
                             const boldText = this.stripBoldMarkers(titleText);
-                            await this.writeWrappedTextWithFont({ ...this.config.fontSottotitolo, nome: "Montserrat-Bold" }, boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
+                            await this.writeWrappedTextWithFont({ ...this.config.fontSottotitolo, nome: "Montserrat-Bold" },
+                                boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                         } else {
                             await this.writeWrappedTextWithFont(this.config.fontSottotitolo, titleText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                         }
@@ -405,19 +340,28 @@ export class DocumentGenerator {
                     }
                 }
                 const contentPlaceholder = this.extractPlaceholder(sub.contenuto);
-                if (contentPlaceholder && dynamicElements[contentPlaceholder] && dynamicElements[contentPlaceholder].type === 'table') {
-                    const tableConfig = dynamicElements[contentPlaceholder].config;
-                    autotable(this.doc, { startY: this.curY, head: [tableConfig.head], body: tableConfig.body, ...tableConfig.options });
+                if (contentPlaceholder && dynamicElements[contentPlaceholder] && dynamicElements[contentPlaceholder].type === 'table' && dynamicElements[contentPlaceholder].config) {
+                    const tableConfig = dynamicElements[contentPlaceholder].config!;
+                    const defaultTableOptions = this.config.tableStyle || {};
+                    autotable(this.doc, {
+                        startY: this.curY,
+                        head: [tableConfig.head],
+                        body: tableConfig.body,
+                        ...defaultTableOptions,
+                        ...tableConfig.options,
+                        ...tableConfig.styles
+                    });
                     this.curY = (this.doc as any).lastAutoTable.finalY + this.config.staccoriga;
                 } else if (sub.contenuto) {
                     let contenuto = this.applyTemplate(sub.contenuto, dynamicFields);
                     contenuto = this.applyPartiPlaceholders(contenuto, params.parti);
                     if (this.isBoxedText(contenuto)) {
                         const boxText = this.stripBoxMarkers(contenuto);
-                        await this.scriveTestoBox(boxText, this.config.fontTesto);
+                        await this.writeBoxedText(boxText, this.config.fontTesto);
                     } else if (this.isBoldText(contenuto)) {
                         const boldText = this.stripBoldMarkers(contenuto);
-                        await this.writeWrappedTextWithFont({ ...this.config.fontTesto, nome: "Montserrat-Bold" }, boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
+                        await this.writeWrappedTextWithFont({ ...this.config.fontTesto, nome: "Montserrat-Bold" },
+                            boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                     } else {
                         await this.writeWrappedTextWithFont(this.config.fontTesto, contenuto, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                     }
