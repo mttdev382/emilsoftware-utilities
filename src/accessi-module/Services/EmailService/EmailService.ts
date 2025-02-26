@@ -13,12 +13,9 @@ import { IUserService } from '../UserService/IUserService';
 export class EmailService implements IEmailService {
     
     constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IEmailService") private emailService: IEmailService,
-        @inject("IAuthService") private authService: IAuthService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
+    
     sendPasswordResetEmail(email: string, resetToken: string, baseUrl: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
