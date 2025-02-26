@@ -4,9 +4,6 @@ import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
 import { IEmailService } from './IEmailService';
 import { inject, injectable } from 'inversify';
-import { IAuthService } from '../AuthService/IAuthService';
-import { IPermissionService } from '../PermissionService/IPermissionService';
-import { IUserService } from '../UserService/IUserService';
 
 
 @injectable()
@@ -15,7 +12,7 @@ export class EmailService implements IEmailService {
     constructor(
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
-    
+
     sendPasswordResetEmail(email: string, resetToken: string, baseUrl: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
