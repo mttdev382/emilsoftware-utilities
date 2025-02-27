@@ -64,7 +64,7 @@ export class AccessiModule {
      * Ottiene il router delle rotte per gestire gli accessi.
      * 
      * **Consiglio:** È consigliabile utilizzare questo router nel primo livello della tua applicazione (es. /api/accessi).
-     * 
+     * @deprecated A breve questo metodo sparirà, la libreria viene importata automaticamente.
      * @returns {Router} Il router con le rotte degli accessi.
      * @author mttdev382
      */
@@ -76,6 +76,7 @@ export class AccessiModule {
 
     /**
  * Inizializza la documentazione di swagger per gli accessi.
+ * @deprecated A breve questo metodo sparirà, la libreria servirà swagger autonomamente.
  * @author mttdev382
  */
     public serveSwaggerDocs(app: Application): void {
