@@ -30,6 +30,16 @@ async function testDocumentGenerator() {
                     ],
                     options: {
                         theme: 'striped'
+                    },
+                    styles: {
+                        headStyles: {
+                            fillColor: "#03fc0b"
+                        },
+                        columnStyles: {
+                            0: {
+                                fontStyle: 'bold'
+                            }
+                        }
                     }
                 }
             }
