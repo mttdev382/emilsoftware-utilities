@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { autobind } from "../autobind";
-import { CryptUtilities, RestUtilities } from "../Utilities";
-import { IAuthService } from "./Services/AuthService/IAuthService";
-import { IEmailService } from "./Services/EmailService/IEmailService";
-import { IPermissionService } from "./Services/PermissionService/IPermissionService";
-import { IUserService } from "./Services/UserService/IUserService";
+import { autobind } from "../../autobind";
+import { CryptUtilities, RestUtilities } from "../../Utilities";
+import { IAuthService } from "../Services/AuthService/IAuthService";
+import { IEmailService } from "../Services/EmailService/IEmailService";
+import { IPermissionService } from "../Services/PermissionService/IPermissionService";
+import { IUserService } from "../Services/UserService/IUserService";
 import { inject } from "inversify";
 import { AccessiControllerBase } from "./AccessiControllerBase";
+import { AccessiOptions } from "../AccessiModule";
 
 /**
  * Controller per la gestione degli accessi e delle operazioni correlate.
@@ -19,8 +20,10 @@ export class AccessiController implements AccessiControllerBase {
     constructor(
         @inject("IUserService") private userService: IUserService,
         @inject("IPermissionService") private permissionService: IPermissionService,
+        @inject("IAuthService") private authService: IAuthService,
         @inject("IEmailService") private emailService: IEmailService,
-        @inject("IAuthService") private authService: IAuthService
+
+        @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) { }
 
     public async getUserByToken(req: Request<{}, {}, { token: string }>, res: Response) {
@@ -31,10 +34,8 @@ export class AccessiController implements AccessiControllerBase {
                 return RestUtilities.sendErrorMessage(res, "Token non fornito", AccessiController.name);
             }
 
-            const jwtOptions = this.authService.getOptions().jwtOptions;
-
             // Decodifica il token JWT
-            const decoded = jwt.verify(token, jwtOptions.secret);
+            const decoded = jwt.verify(token, this.accessiOptions.jwtOptions.secret);
 
             if (!decoded) {
                 return RestUtilities.sendUnauthorized(res);
@@ -48,7 +49,7 @@ export class AccessiController implements AccessiControllerBase {
 
 
 
-    public async login(req: Request, res: Response){
+    public async login(req: Request, res: Response) {
         try {
             let request = req.body;
             const userData = await this.authService.login(request);
@@ -56,12 +57,10 @@ export class AccessiController implements AccessiControllerBase {
             if (!userData) return RestUtilities.sendInvalidCredentials(res);
 
 
-            const jwtOptions = this.authService.getOptions().jwtOptions;
-
 
             userData.token = {
-                expiresIn: jwtOptions.expiresIn,
-                value: jwt.sign({ userData }, jwtOptions.secret, { expiresIn: jwtOptions.expiresIn as any }),
+                expiresIn: this.accessiOptions.jwtOptions.expiresIn,
+                value: jwt.sign({ userData }, this.accessiOptions.jwtOptions.secret, { expiresIn: this.accessiOptions.jwtOptions.expiresIn as any }),
                 type: "Bearer"
             }
 
@@ -112,7 +111,7 @@ export class AccessiController implements AccessiControllerBase {
     public async encrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
 
-            const key = this.authService.getOptions().encryptionKey;
+            const key = this.accessiOptions.encryptionKey;
             let encryptedData = CryptUtilities.encrypt(req.body.data, key);
             return RestUtilities.sendBaseResponse(res, encryptedData);
         } catch (error) {
@@ -123,7 +122,7 @@ export class AccessiController implements AccessiControllerBase {
 
     public async decrypt(req: Request<{}, {}, { data: string }>, res: Response) {
         try {
-            const key = this.authService.getOptions().encryptionKey;
+            const key = this.accessiOptions.encryptionKey;
             let decryptedData = CryptUtilities.decrypt(req.body.data, key);
             return RestUtilities.sendBaseResponse(res, decryptedData);
         } catch (error) {
@@ -166,6 +165,37 @@ export class AccessiController implements AccessiControllerBase {
         try {
             await this.userService.setGdpr(req.body.codiceUtente);
             return RestUtilities.sendOKMessage(res, `L'utente ${req.body.codiceUtente} ha accettato il GDRP.`);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+        }
+    }
+
+
+    public async verifyEmail(req: Request<{ token: string }>, res: Response) {
+        try {
+            await this.userService.verifyEmail(req.params.token);
+
+            return RestUtilities.sendOKMessage(res, "Email verificata con successo!");
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+        }
+    }
+
+    public async requestPasswordReset(req: Request, res: Response) {
+        try {
+            await this.emailService.sendPasswordResetEmail(req.body.email, req.headers.origin as string);
+            return RestUtilities.sendOKMessage(res, "Email di reset inviata!");
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+        }
+    }
+
+    public async resetPassword(req: Request<{ token: string }, {}, { newPassword: string }>, res: Response) {
+        try {
+
+            await this.authService.resetPassword(req.params.token, req.body.newPassword);
+
+            return RestUtilities.sendOKMessage(res, "Password aggiornata con successo!");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }

@@ -1,8 +1,8 @@
 import { inject } from "inversify";
-import { Logger } from "../Logger";
-import { AccessiController } from "./AccessiController";
+import { Logger } from "../../Logger";
+import { AccessiController } from "../Controllers/AccessiController";
 import { Router, Request, Response } from "express";
-import { IAccessiRoutes } from "./IAccessiRoutes";
+import { IAccessiRoutes } from "../IAccessiRoutes";
 export class AccessiRoutes implements IAccessiRoutes {
     private logger: Logger = new Logger(AccessiRoutes.name);
 
@@ -25,6 +25,11 @@ export class AccessiRoutes implements IAccessiRoutes {
             this.router.post(`/register`, this.accessiController.register.bind(this.accessiController));
             this.router.post(`/set-gdpr`, this.accessiController.setGdpr.bind(this.accessiController));
             this.router.post(`/reset-abilitazioni`, this.accessiController.resetAbilitazioni.bind(this.accessiController));
+
+
+            this.router.get('/verify-email/:token', this.accessiController.verifyEmail.bind(this.accessiController));
+            this.router.post('/reset-password', this.accessiController.requestPasswordReset.bind(this.accessiController));
+            this.router.post('/reset-password/:token', this.accessiController.resetPassword.bind(this.accessiController));
 
 
         } catch (error: any) {

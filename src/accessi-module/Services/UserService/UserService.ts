@@ -190,5 +190,31 @@ export class UserService implements IUserService {
             throw error;
         }
     }
+
+
+    public async verifyEmail(token: string): Promise<void> {
+        try {
+            // Controlliamo se il token esiste
+            const result = await Orm.query(
+                {},
+                "SELECT CODUTE FROM UTENTI WHERE KEYREG = ?",
+                [token]
+            );
+
+            if (result.length === 0) {
+                throw new Error("Token non valido o già usato.");
+            }
+
+            // Attiviamo l'account e rimuoviamo il token
+            await Orm.query(
+                {},
+                "UPDATE UTENTI SET STAREG = ?, KEYREG = NULL WHERE CODUTE = ?",
+                [StatoRegistrazione.CONF, result[0].CODUTE]
+            );
+        } catch (error) {
+            console.error("Errore nella verifica email:", error);
+            throw new Error("Errore durante la verifica dell'email.");
+        }
+    }
 }
 

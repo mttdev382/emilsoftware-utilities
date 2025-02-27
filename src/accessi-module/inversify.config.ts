@@ -7,10 +7,10 @@ import { IPermissionService } from "./Services/PermissionService/IPermissionServ
 import { PermissionService } from "./Services/PermissionService/PermissionService";
 import { IEmailService } from "./Services/EmailService/IEmailService";
 import { EmailService } from "./Services/EmailService/EmailService";
-import { AccessiController } from "./AccessiController";
+import { AccessiController } from "./Controllers/AccessiController";
 import { AccessiOptions } from "./AccessiModule";
-import { AccessiRoutes } from "./AccessiRoutes";
-import { AccessiControllerBase } from "./AccessiControllerBase";
+import { AccessiRoutes } from "./Routes/AccessiRoutes";
+import { AccessiControllerBase } from "./Controllers/AccessiControllerBase";
 import { IAccessiRoutes } from "./IAccessiRoutes";
 
 const container = new Container({ defaultScope: "Singleton" });
@@ -44,6 +44,7 @@ const accessiOptions: AccessiOptions = {
       user: "",
       pass: ""
     },
+    from: "",
     host: "",
     port: 0,
     secure: false

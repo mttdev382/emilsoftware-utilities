@@ -6,6 +6,7 @@ import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IAuthService, ILoginResult, LoginRequest } from "./IAuthService";
 import { IUserService } from "../UserService/IUserService";
 import { IPermissionService } from "../PermissionService/IPermissionService";
+import { randomUUID } from "crypto";
 
 @injectable()
 export class AuthService implements IAuthService {
@@ -15,9 +16,6 @@ export class AuthService implements IAuthService {
         @inject("IPermissionService") private permissionService: IPermissionService,
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
     ) {}
-    public getOptions(): AccessiOptions {
-        return this.accessiOptions;
-    }
 
     async login(request: LoginRequest): Promise<ILoginResult> {
         if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo") return this.getDemoUser();
@@ -56,8 +54,6 @@ export class AuthService implements IAuthService {
 
         return { utente, filtri, abilitazioni };
     }
-
-
 
     public async setPassword(codiceUtente: string, nuovaPassword: string) {
         try {
@@ -117,5 +113,34 @@ export class AuthService implements IAuthService {
             filtri: null,
             abilitazioni: []
         };
+    }
+
+
+    public async resetPassword(token: string, newPassword: string): Promise<void> {
+        try {
+            // Controlliamo se il token esiste
+            const result = await Orm.query(
+                {},
+                "SELECT CODUTE FROM UTENTI WHERE KEYREG = ?",
+                [token]
+            );
+
+            if (result.length === 0) {
+                throw new Error("Token non valido o già usato.");
+            }
+
+            // Hashiamo la nuova password
+            const hashedPassword = CryptUtilities.encrypt(newPassword, this.accessiOptions.encryptionKey);
+
+            // Aggiorniamo la password e rimuoviamo il token di reset
+            await Orm.query(
+                {},
+                "UPDATE UTENTI SET PASSWORD = ?, KEYREG = NULL WHERE CODUTE = ?",
+                [hashedPassword, result[0].CODUTE]
+            );
+        } catch (error) {
+            console.error("Errore nel reset della password:", error);
+            throw new Error("Errore durante il reset della password.");
+        }
     }
 }

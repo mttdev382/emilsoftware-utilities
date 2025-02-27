@@ -8,19 +8,50 @@ import { inject, injectable } from 'inversify';
 
 @injectable()
 export class EmailService implements IEmailService {
-    
+
     constructor(
         @inject("AccessiOptions") private accessiOptions: AccessiOptions
-    ) {}
+    ) { }
 
-    sendPasswordResetEmail(email: string, resetToken: string, baseUrl: string): Promise<void> {
-        throw new Error('Method not implemented.');
-    }
     sendAccountUpdateEmail(email: string, message: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
 
     private transporter = nodemailer.createTransport(this.accessiOptions.emailOptions);
+
+
+    public async sendPasswordResetEmail(email: string, baseUrl: string): Promise<void> {
+        try {
+            const resetToken = uuidv4(); // Generiamo un nuovo token unico
+
+            // Aggiorna il campo keyReg nel database
+            const result = await Orm.query(
+                {},
+                "UPDATE UTENTI SET KEYREG = ? WHERE USRNAME = ? RETURNING CODUTE",
+                [resetToken, email]
+            );
+
+            if (result.length === 0) {
+                throw new Error("Email non trovata.");
+            }
+
+            const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+
+            const mailOptions = {
+                from: this.accessiOptions.emailOptions.from,
+                to: email,
+                subject: "Reset della tua password",
+                text: `Clicca sul seguente link per resettare la tua password: ${resetUrl}`,
+                html: `<p>Clicca sul seguente link per resettare la tua password:</p><a href="${resetUrl}">${resetUrl}</a>`,
+            };
+
+            await this.transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error("Errore nell'invio dell'email di reset password:", error);
+            throw new Error("Errore durante l'invio dell'email di reset password.");
+        }
+    }
+
 
     async sendVerificationEmail(email: string, codiceUtente: string, baseUrl: string) {
         try {

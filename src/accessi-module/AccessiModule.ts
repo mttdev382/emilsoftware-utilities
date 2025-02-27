@@ -20,6 +20,7 @@ export interface EmailOptions {
     host: string,
     port: number,
     secure: boolean,
+    from: string
     auth: {
         user: string,
         pass: string
@@ -49,11 +50,14 @@ export class AccessiModule {
      * @author mttdev382
 
      */
-    constructor(private options: AccessiOptions) {
+    constructor(app: Application, private options: AccessiOptions) {
         // Configura le opzioni di AccessiModule dentro il container DI
         container.rebind<AccessiOptions>("AccessiOptions").toConstantValue(this.options);
         this.accessiRoutes = container.get<IAccessiRoutes>("IAccessiRoutes");
 
+        app.use("/api/accessi", this.getAccessiRouter());
+        this.logger.info("Serving accessi router under /api/accessi...");
+        serveSwaggerDocs(app);
     }
 
     /**

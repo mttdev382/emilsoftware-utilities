@@ -119,4 +119,13 @@ export interface IUserService {
  */
   getUserFilters(codiceUtente: string): Promise<IFiltriUtente[]>;
 
+
+  /**
+ * Verifica l'email di un utente utilizzando un token univoco.
+ * 
+ * @param {string} token - Il token di verifica (`keyReg`) ricevuto via email.
+ * @returns {Promise<void>} - Nessun valore di ritorno se la verifica ha successo.
+ * @throws {Error} - Se il token è invalido o già usato, o se si verifica un errore nel database.
+ */
+  verifyEmail(token: string): Promise<void>;
 }

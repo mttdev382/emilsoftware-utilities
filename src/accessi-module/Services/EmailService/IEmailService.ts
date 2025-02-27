@@ -19,7 +19,7 @@ export interface IEmailService {
      * @returns {Promise<void>} Una Promise che si risolve al completamento dell'invio.
      * @throws {Error} Se l'invio dell'email fallisce.
      */
-    sendPasswordResetEmail(email: string, resetToken: string, baseUrl: string): Promise<void>;
+    sendPasswordResetEmail(email: string, baseUrl: string): Promise<void>;
   
     /**
      * Invia un'email di conferma per la modifica dell'account o di altri dettagli.
