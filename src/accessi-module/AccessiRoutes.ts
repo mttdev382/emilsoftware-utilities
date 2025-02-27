@@ -12,7 +12,6 @@ export class AccessiRoutes implements IAccessiRoutes {
         this.initializeRoutes();
     }
 
-
     initializeRoutes() {
         try {
             this.router.post(`/get-user-by-token`, this.accessiController.getUserByToken.bind(this.accessiController));
