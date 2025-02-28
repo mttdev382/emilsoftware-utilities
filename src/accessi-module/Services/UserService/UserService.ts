@@ -1,4 +1,4 @@
-import { inject } from "inversify";
+import { Inject, Injectable } from "@nestjs/common";
 import { autobind } from "../../../autobind";
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
@@ -8,10 +8,11 @@ import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IFiltriUtente, IUser, IUserService } from "./IUserService";
 
 @autobind
+@Injectable()
 export class UserService implements IUserService {
 
     constructor(
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) {}
     async getUsers(): Promise<UserQueryResult[]> {
         try {

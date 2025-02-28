@@ -1,21 +1,20 @@
-import { inject, injectable } from "inversify";
 import { Orm } from "../../../Orm";
 import { CryptUtilities, RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IAuthService, ILoginResult, LoginRequest } from "./IAuthService";
-import { IUserService } from "../UserService/IUserService";
-import { IPermissionService } from "../PermissionService/IPermissionService";
-import { randomUUID } from "crypto";
+import { Inject, Injectable } from "@nestjs/common";
+import { UserService } from "../UserService/UserService";
+import { PermissionService } from "../PermissionService/PermissionService";
 
-@injectable()
+@Injectable()
 export class AuthService implements IAuthService {
 
     constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
-    ) {}
+        private userService: UserService,
+        private permissionService: PermissionService,
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
+    ) { }
 
     async login(request: LoginRequest): Promise<ILoginResult> {
         if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo") return this.getDemoUser();

@@ -45,13 +45,17 @@ export class AccessiModule {
       module: AccessiModule,
       controllers: [AccessiController],
       providers: [
-        { provide: 'AccessiOptions', useValue: options },
+        {
+          provide: 'ACCESSI_OPTIONS',
+          useValue: options,
+        },
         UserService,
         AuthService,
         EmailService,
         PermissionService,
       ],
-      exports: ['AccessiOptions'],
+      exports: ['ACCESSI_OPTIONS', AuthService, UserService, EmailService, PermissionService], // Esportiamo AuthService per altri moduli
     };
   }
 }
+

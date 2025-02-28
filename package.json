@@ -31,7 +31,6 @@
     "class-validator": "^0.14.1",
     "colorette": "^2.0.20",
     "es-node-firebird": "^1.2.6",
-    "inversify": "^6.2.2",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.0",
     "jspdf-autotable": "^5.0.2",

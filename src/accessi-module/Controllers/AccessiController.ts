@@ -7,6 +7,8 @@ import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
 import { PermissionService } from '../Services/PermissionService/PermissionService';
 import { UserService } from '../Services/UserService/UserService';
+import { EmailService } from '../Services/EmailService/EmailService';
+
 
 @ApiTags('Accessi')
 @Controller('accessi')
@@ -14,8 +16,9 @@ export class AccessiController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly emailService: EmailService,
     private readonly permissionService: PermissionService,
-    @Inject('AccessiOptions') private readonly options: AccessiOptions,
+    @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
   ) {}
 
   @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })

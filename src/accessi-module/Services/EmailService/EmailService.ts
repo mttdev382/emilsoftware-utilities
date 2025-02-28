@@ -3,14 +3,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
 import { IEmailService } from './IEmailService';
-import { inject, injectable } from 'inversify';
+import { Inject, Injectable } from '@nestjs/common';
 
 
-@injectable()
+@Injectable()
 export class EmailService implements IEmailService {
 
     constructor(
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) { }
 
     sendAccountUpdateEmail(email: string, message: string): Promise<void> {
