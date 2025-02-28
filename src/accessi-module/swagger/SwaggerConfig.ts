@@ -1,33 +1,16 @@
-import swaggerJSDoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
-import path from 'path';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Application } from 'express';
+import { INestApplication } from '@nestjs/common';
 
-// Definisci la configurazione di Swagger
-const swaggerDefinition = {
-  openapi: '3.0.0',
-  info: {
-    title: 'Accessi API',
-    version: '1.0.0',
-    description: 'Documentazione delle API per la gestione degli accessi',
-  },
-  servers: [
-    {
-      url: 'http://localhost:3000/api/accessi', // Modifica se necessario
-    },
-  ],
-};
+export function serveSwaggerDocs(app: INestApplication | Application) {
+  const config = new DocumentBuilder()
+    .setTitle('Accessi API')
+    .setDescription('Documentazione delle API per la gestione degli accessi')
+    .setVersion('1.0')
+    .addServer('http://localhost:3000/api/accessi') // Cambia se necessario
+    .build();
 
-const options = {
-  swaggerDefinition,
-  // Specifica i file sorgenti che contengono le annotazioni Swagger
-  apis: [path.resolve(__dirname, '../../../dist/accessi-module/**/*.js')],
-};
-
-
-// Funzione per esporre la documentazione Swagger tramite Express
-export function serveSwaggerDocs(app: Application) {
-  // Crea il documento Swagger
-  const swaggerSpec = swaggerJSDoc(options);
-  app.use('/swagger/accessi', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  const document = SwaggerModule.createDocument(app as INestApplication, config);
+  
+  SwaggerModule.setup('/swagger/accessi', app as INestApplication, document);
 }

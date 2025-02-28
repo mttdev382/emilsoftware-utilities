@@ -1,204 +1,150 @@
-import { Request, Response } from "express";
-import jwt, { SignOptions } from "jsonwebtoken";
-import { autobind } from "../../autobind";
-import { CryptUtilities, RestUtilities } from "../../Utilities";
-import { IAuthService } from "../Services/AuthService/IAuthService";
-import { IEmailService } from "../Services/EmailService/IEmailService";
-import { IPermissionService } from "../Services/PermissionService/IPermissionService";
-import { IUserService } from "../Services/UserService/IUserService";
-import { inject } from "inversify";
-import { AccessiControllerBase } from "./AccessiControllerBase";
-import { AccessiOptions } from "../AccessiModule";
+import { Controller, Get, Post, Body, Inject, Res } from '@nestjs/common';
+import { Response } from 'express';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import * as jwt from 'jsonwebtoken';
+import { RestUtilities, CryptUtilities } from '../../Utilities';
+import { AccessiOptions } from '../AccessiModule';
+import { AuthService } from '../Services/AuthService/AuthService';
+import { PermissionService } from '../Services/PermissionService/PermissionService';
+import { UserService } from '../Services/UserService/UserService';
 
-/**
- * Controller per la gestione degli accessi e delle operazioni correlate.
- * Fornisce metodi per login, registrazione, crittografia, decrittografia e gestione delle autorizzazioni utente.
- */
-@autobind
-export class AccessiController implements AccessiControllerBase {
+@ApiTags('Accessi')
+@Controller('accessi')
+export class AccessiController {
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+    private readonly permissionService: PermissionService,
+    @Inject('AccessiOptions') private readonly options: AccessiOptions,
+  ) {}
 
-    constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("IAuthService") private authService: IAuthService,
-        @inject("IEmailService") private emailService: IEmailService,
-
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
-    ) { }
-
-    public async getUserByToken(req: Request<{}, {}, { token: string }>, res: Response) {
-        try {
-            const { token } = req.body;
-
-            if (!token) {
-                return RestUtilities.sendErrorMessage(res, "Token non fornito", AccessiController.name);
-            }
-
-            // Decodifica il token JWT
-            const decoded = jwt.verify(token, this.accessiOptions.jwtOptions.secret);
-
-            if (!decoded) {
-                return RestUtilities.sendUnauthorized(res);
-            }
-
-            return RestUtilities.sendBaseResponse(res, { userData: decoded });
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })
+  @Post('get-user-by-token')
+  async getUserByToken(@Body('token') token: string, @Res() res: Response) {
+    try {
+      if (!token) return RestUtilities.sendErrorMessage(res, 'Token non fornito', AccessiController.name);
+      const decoded = jwt.verify(token, this.options.jwtOptions.secret);
+      if (!decoded) return RestUtilities.sendUnauthorized(res);
+      return RestUtilities.sendBaseResponse(res, { userData: decoded });
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-
-    public async login(req: Request, res: Response) {
-        try {
-            let request = req.body;
-            const userData = await this.authService.login(request);
-
-            if (!userData) return RestUtilities.sendInvalidCredentials(res);
-
-
-
-            userData.token = {
-                expiresIn: this.accessiOptions.jwtOptions.expiresIn,
-                value: jwt.sign({ userData }, this.accessiOptions.jwtOptions.secret, { expiresIn: this.accessiOptions.jwtOptions.expiresIn as any }),
-                type: "Bearer"
-            }
-
-            return RestUtilities.sendBaseResponse(res, userData);
-        } catch (error) {
-            return RestUtilities.sendInvalidCredentials(res);
-        }
+  @ApiOperation({ summary: 'Effettua il login' })
+  @Post('login')
+  async login(@Body() loginDto: { username: string; password: string }, @Res() res: Response) {
+    try {
+      const userData = await this.authService.login(loginDto);
+      if (!userData) return RestUtilities.sendInvalidCredentials(res);
+      userData.token = {
+        expiresIn: this.options.jwtOptions.expiresIn,
+        value: jwt.sign({ userData }, this.options.jwtOptions.secret, { expiresIn: this.options.jwtOptions.expiresIn as any }),
+        type: 'Bearer',
+      };
+      return RestUtilities.sendBaseResponse(res, userData);
+    } catch (error) {
+      return RestUtilities.sendInvalidCredentials(res);
     }
+  }
 
-    public async getUsers(req: Request, res: Response) {
-        try {
-            const users = await this.userService.getUsers();
-            return RestUtilities.sendBaseResponse(res, users);
-        } catch (error) {
-            return RestUtilities.sendInvalidCredentials(res);
-        }
+  @ApiOperation({ summary: 'Recupera la lista degli utenti' })
+  @Get('users')
+  async getUsers(@Res() res: Response) {
+    try {
+      const users = await this.userService.getUsers();
+      return RestUtilities.sendBaseResponse(res, users);
+    } catch (error) {
+      return RestUtilities.sendInvalidCredentials(res);
     }
+  }
 
-
-    public async deleteUser(req: Request, res: Response) {
-        try {
-            const { codiceUtente } = req.body;
-
-            if (!codiceUtente) {
-                throw new Error('Il campo "Codice Utente" è obbligatorio.');
-            }
-
-            await this.userService.deleteUser(codiceUtente);
-            return RestUtilities.sendOKMessage(res, "L'utente è stato eliminato con successo.");
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error);
-        }
+  @ApiOperation({ summary: 'Elimina un utente' })
+  @Post('delete-user')
+  async deleteUser(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    try {
+      if (!codiceUtente) throw new Error('Il campo "Codice Utente" è obbligatorio.');
+      await this.userService.deleteUser(codiceUtente);
+      return RestUtilities.sendOKMessage(res, 'L\'utente è stato eliminato con successo.');
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error);
     }
+  }
 
-
-    public async register(req: Request, res: Response) {
-        try {
-            let request = req.body;
-            await this.userService.register(request);
-
-            return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo.");
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Registra un nuovo utente' })
+  @Post('register')
+  async register(@Body() request: any, @Res() res: Response) {
+    try {
+      await this.userService.register(request);
+      return RestUtilities.sendOKMessage(res, 'L\'utente è stato registrato con successo.');
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-    public async encrypt(req: Request<{}, {}, { data: string }>, res: Response) {
-        try {
-
-            const key = this.accessiOptions.encryptionKey;
-            let encryptedData = CryptUtilities.encrypt(req.body.data, key);
-            return RestUtilities.sendBaseResponse(res, encryptedData);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Crittografa i dati' })
+  @Post('encrypt')
+  async encrypt(@Body('data') data: string, @Res() res: Response) {
+    try {
+      const encryptedData = CryptUtilities.encrypt(data, this.options.encryptionKey);
+      return RestUtilities.sendBaseResponse(res, encryptedData);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-    public async decrypt(req: Request<{}, {}, { data: string }>, res: Response) {
-        try {
-            const key = this.accessiOptions.encryptionKey;
-            let decryptedData = CryptUtilities.decrypt(req.body.data, key);
-            return RestUtilities.sendBaseResponse(res, decryptedData);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Decrittografa i dati' })
+  @Post('decrypt')
+  async decrypt(@Body('data') data: string, @Res() res: Response) {
+    try {
+      const decryptedData = CryptUtilities.decrypt(data, this.options.encryptionKey);
+      return RestUtilities.sendBaseResponse(res, decryptedData);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-    public async resetAbilitazioni(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
-        try {
-            await this.permissionService.resetAbilitazioni(req.body.codiceUtente);
-            return RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${req.body.codiceUtente} sono state resettate con successo.`);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Resetta le abilitazioni di un utente' })
+  @Post('reset-abilitazioni')
+  async resetAbilitazioni(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    try {
+      await this.permissionService.resetAbilitazioni(codiceUtente);
+      return RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${codiceUtente} sono state resettate con successo.`);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-    public async setPassword(req: Request<{}, {}, { codiceUtente: string, nuovaPassword: string }>, res: Response) {
-        try {
-            await this.authService.setPassword(req.body.codiceUtente, req.body.nuovaPassword);
-            return RestUtilities.sendOKMessage(res, `La password dell'utente ${req.body.codiceUtente} è stata impostata correttamente.`);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Imposta una nuova password' })
+  @Post('set-password')
+  async setPassword(@Body() request: { codiceUtente: string; nuovaPassword: string }, @Res() res: Response) {
+    try {
+      await this.authService.setPassword(request.codiceUtente, request.nuovaPassword);
+      return RestUtilities.sendOKMessage(res, `La password dell'utente ${request.codiceUtente} è stata impostata correttamente.`);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-
-    public async updateUtente(req: Request, res: Response) {
-        try {
-            let user = req.body;
-            await this.userService.updateUser(user);
-            return RestUtilities.sendOKMessage(res, `L'utente ${req.body.codiceUtente} è stato aggiornato con successo.`);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Aggiorna un utente esistente' })
+  @Post('update-utente')
+  async updateUtente(@Body() user: any, @Res() res: Response) {
+    try {
+      await this.userService.updateUser(user);
+      return RestUtilities.sendOKMessage(res, `L'utente ${user.codiceUtente} è stato aggiornato con successo.`);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
+  }
 
-    public async setGdpr(req: Request<{}, {}, { codiceUtente: string }>, res: Response) {
-        try {
-            await this.userService.setGdpr(req.body.codiceUtente);
-            return RestUtilities.sendOKMessage(res, `L'utente ${req.body.codiceUtente} ha accettato il GDRP.`);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
+  @ApiOperation({ summary: 'Imposta il consenso GDPR' })
+  @Post('set-gdpr')
+  async setGdpr(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    try {
+      await this.userService.setGdpr(codiceUtente);
+      return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} ha accettato il GDPR.`);
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
     }
-
-
-    public async verifyEmail(req: Request<{ token: string }>, res: Response) {
-        try {
-            await this.userService.verifyEmail(req.params.token);
-
-            return RestUtilities.sendOKMessage(res, "Email verificata con successo!");
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
-    }
-
-    public async requestPasswordReset(req: Request, res: Response) {
-        try {
-            await this.emailService.sendPasswordResetEmail(req.body.email, req.headers.origin as string);
-            return RestUtilities.sendOKMessage(res, "Email di reset inviata!");
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
-    }
-
-    public async resetPassword(req: Request<{ token: string }, {}, { newPassword: string }>, res: Response) {
-        try {
-
-            await this.authService.resetPassword(req.params.token, req.body.newPassword);
-
-            return RestUtilities.sendOKMessage(res, "Password aggiornata con successo!");
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
-    }
-
+  }
 }
