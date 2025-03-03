@@ -38,20 +38,24 @@ export interface AccessiOptions {
 
 
 @Global()
-@Module({})
+@Module({
+  controllers: [AccessiController],
+  providers: [AuthService, UserService, EmailService, PermissionService],
+  exports: [AuthService, UserService, EmailService, PermissionService],
+})
 export class AccessiModule {
   static forRoot(options: AccessiOptions): DynamicModule {
-    console.log("AccessiModule inizializzato con opzioni:", options);
+    console.log("✅ AccessiModule inizializzato con opzioni:", options);
+    
     return {
       module: AccessiModule,
-      controllers: [AccessiController],
       providers: [
         {
           provide: 'ACCESSI_OPTIONS',
           useValue: options,
         },
-        UserService,
         AuthService,
+        UserService,
         EmailService,
         PermissionService,
       ],

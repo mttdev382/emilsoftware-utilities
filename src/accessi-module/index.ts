@@ -8,27 +8,23 @@ import { AccessiModule } from "./AccessiModule";
 
 export async function initializeAccessiModule(app: Application, options: any) {
     try {
-        // ATTACCA NestJS DIRETTAMENTE ALLA TUA `app` EXPRESS ESISTENTE
-        const expressAdapter = new ExpressAdapter(app);
+        const expressAdapter = new ExpressAdapter(app); // 🔥 Usiamo la tua app Express esistente!
 
-        // Crea un'istanza NestJS usando l'Express esistente
         const nestApp = await NestFactory.create(AccessiModule.forRoot(options), expressAdapter, {
             bufferLogs: true
         });
 
         nestApp.enableCors();
-        nestApp.setGlobalPrefix('api/accessi'); // Assicura che tutte le API di NestJS vadano sotto `/api/accessi`
+        nestApp.setGlobalPrefix('api/accessi'); // 🔥 Prefisso API per NestJS
 
-        await nestApp.init(); // ATTACCA NESTJS DIRETTAMENTE AD EXPRESS!
+        await nestApp.init(); // 🚀 Ora NestJS è attaccato a Express!
 
-        // Serviamo Swagger (ora sarà visibile su `/swagger/accessi`)
         serveSwaggerDocs(nestApp);
 
-        console.log('NestJS AccessiModule inizializzato e attaccato a Express!');
-
+        console.log('✅ NestJS AccessiModule inizializzato con successo!');
     } catch (error) {
-        console.error("Errore in initializeAccessiModule:", error);
-        throw error; 
+        console.error("❌ Errore in initializeAccessiModule:", error);
+        throw error;
     }
 }
 
