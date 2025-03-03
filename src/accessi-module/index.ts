@@ -9,25 +9,30 @@ export { AccessiModule } from "./AccessiModule";
 export { ILoginResult } from "./Services/AuthService/IAuthService"
 
 export async function initializeAccessiModule(app: Application, options: any) {
-    // Creiamo una nuova istanza di Express dedicata a NestJS per evitare cicli
-    const nestExpressInstance = express();
-
-    // Creiamo un ExpressAdapter basato sulla nuova istanza
+    const nestExpressInstance = express(); // Istanza separata di Express per NestJS
     const expressAdapter = new ExpressAdapter(nestExpressInstance);
 
-    // Creiamo un'app NestJS con l'adapter Express
+    // Creiamo l'app NestJS con l'adapter corretto
     const nestApp = await NestFactory.create(AccessiModule.forRoot(options), expressAdapter, { bufferLogs: true });
 
-    // Abilitiamo CORS solo su questa istanza
+    // Abilitiamo CORS per evitare problemi con richieste da browser
     nestApp.enableCors();
 
-    // Avviamo NestJS senza avviare un nuovo server
+    // Inizializziamo NestJS
     await nestApp.init();
 
-    // Montiamo NestJS SOLO su /api/accessi, evitando cicli
+    // 🛠️ Importante: Usa `nestExpressInstance` per montare le API su /api/accessi
     app.use('/api/accessi', nestExpressInstance);
 
     // Serviamo Swagger
     serveSwaggerDocs(nestApp);
+
+    // Debug: Verifica se le rotte di NestJS sono registrate
+    console.log(
+      'NestJS Routes:',
+      nestApp.getHttpServer()._events.request._router.stack
+        .map((r: any) => r.route?.path)
+        .filter(Boolean)
+    );
 }
 
