@@ -74,7 +74,7 @@ export class AccessiController {
     }
 
     @ApiOperation({ summary: 'Recupera la lista degli utenti' })
-    @Get('users')
+    @Post('get-users')
     async getUsers(@Res() res: Response) {
         try {
             const users = await this.userService.getUsers();
@@ -103,7 +103,7 @@ export class AccessiController {
 
             let protocol = request["protocol"];
             let host = request.headers["host"];
-            
+
             if(!protocol || !host ){
                 return RestUtilities.sendErrorMessage(res, "Impossibile procedere: protocollo e host non impostati negli header della richiesta.", AccessiController.name);
             }

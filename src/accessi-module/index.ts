@@ -93,7 +93,7 @@ async function start() {
     });
 }
 
-// start();
+ start();
 
 export { AccessiModule } from "./AccessiModule";
 export { StatoRegistrazione } from "./models/StatoRegistrazione";
