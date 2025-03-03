@@ -27,9 +27,8 @@ export async function initializeAccessiModule(app: Application, options: any) {
         serveSwaggerDocs(nestApp);
 
         console.log('Verifica API NestJS registrate:');
-        const expressInstance = nestApp.getHttpAdapter().getInstance();
-
-        const router = expressInstance.router;
+        const server = nestApp.getHttpAdapter().getInstance();
+        const router = server.router;
 
         const availableRoutes: [] = router.stack
             .map(layer => {
