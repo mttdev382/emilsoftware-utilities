@@ -9,14 +9,7 @@ export function serveSwaggerDocs(app: INestApplication) {
     .addServer('/')
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-
-  SwaggerModule.setup('swagger/accessi', app, document, {
-    customSiteTitle: 'Documentazione Accessi',
-    swaggerOptions: {
-      url: '/swagger/accessi-json'
-    },
-  });
-
-  console.log('✅ Swagger UI disponibile su http://localhost:3000/swagger/accessi');
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('swagger/accessi', app, document);
+    console.log('Swagger UI disponibile su http://localhost:3000/swagger/accessi');
 }
