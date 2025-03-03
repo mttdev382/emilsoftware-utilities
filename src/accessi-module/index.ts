@@ -6,6 +6,7 @@ import { AccessiModule } from "./AccessiModule";
 
 
 
+
 export async function initializeAccessiModule(app: Application, options: any) {
     try {
         // Creiamo un'istanza Express separata per NestJS
@@ -19,7 +20,7 @@ export async function initializeAccessiModule(app: Application, options: any) {
         nestApp.enableCors();
 
         nestApp.setGlobalPrefix('api', {
-            exclude: ['/swagger', '/swagger/(.*)'], // Escludiamo Swagger
+            exclude: ['/swagger', '/swagger/(.*)']
         });
 
         await nestApp.init();
