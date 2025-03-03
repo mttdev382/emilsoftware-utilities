@@ -9,30 +9,33 @@ export { AccessiModule } from "./AccessiModule";
 export { ILoginResult } from "./Services/AuthService/IAuthService"
 
 export async function initializeAccessiModule(app: Application, options: any) {
-    const nestExpressInstance = express(); // Istanza separata di Express per NestJS
-    const expressAdapter = new ExpressAdapter(nestExpressInstance);
+    try {
+        const nestExpressInstance = express(); // Istanza separata di Express
+        const expressAdapter = new ExpressAdapter(nestExpressInstance);
 
-    // Creiamo l'app NestJS con l'adapter corretto
-    const nestApp = await NestFactory.create(AccessiModule.forRoot(options), expressAdapter, { bufferLogs: true });
+        const nestApp = await NestFactory.create(AccessiModule.forRoot(options), expressAdapter, { bufferLogs: true });
 
-    // Abilitiamo CORS per evitare problemi con richieste da browser
-    nestApp.enableCors();
+        nestApp.enableCors();
+        await nestApp.init();
 
-    // Inizializziamo NestJS
-    await nestApp.init();
+        // 🛠️ Montiamo NestJS su /api/accessi
+        app.use('/api/accessi', nestExpressInstance);
 
-    // 🛠️ Importante: Usa `nestExpressInstance` per montare le API su /api/accessi
-    app.use('/api/accessi', nestExpressInstance);
+        // Serviamo Swagger
+        serveSwaggerDocs(nestApp);
 
-    // Serviamo Swagger
-    serveSwaggerDocs(nestApp);
+        // Debug: Controlla se Nest sta registrando le rotte
+        console.log(
+            'NestJS Routes:',
+            nestApp.getHttpServer()._events.request._router.stack
+                .map((r: any) => r.route?.path)
+                .filter(Boolean)
+        );
 
-    // Debug: Verifica se le rotte di NestJS sono registrate
-    console.log(
-      'NestJS Routes:',
-      nestApp.getHttpServer()._events.request._router.stack
-        .map((r: any) => r.route?.path)
-        .filter(Boolean)
-    );
+    } catch (error) {
+        console.error("Error occurred in initializeAccessiModule:", error);
+        throw error; // Rilancia l'errore per vedere lo stack completo
+    }
 }
+
 

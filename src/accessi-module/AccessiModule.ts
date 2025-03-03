@@ -41,6 +41,7 @@ export interface AccessiOptions {
 @Module({})
 export class AccessiModule {
   static forRoot(options: AccessiOptions): DynamicModule {
+    console.log("AccessiModule inizializzato con opzioni:", options);
     return {
       module: AccessiModule,
       controllers: [AccessiController],
@@ -54,7 +55,7 @@ export class AccessiModule {
         EmailService,
         PermissionService,
       ],
-      exports: ['ACCESSI_OPTIONS', AuthService, UserService, EmailService, PermissionService], // Esportiamo AuthService per altri moduli
+      exports: ['ACCESSI_OPTIONS', AuthService, UserService, EmailService, PermissionService],
     };
   }
 }
