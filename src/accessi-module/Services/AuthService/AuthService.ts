@@ -57,7 +57,9 @@ export class AuthService implements IAuthService {
     public async setPassword(codiceUtente: string, nuovaPassword: string) {
         try {
             const query = `UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)`;
-            return await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente, nuovaPassword]);
+            const hashedPassword = CryptUtilities.encrypt(nuovaPassword, this.accessiOptions.encryptionKey);
+
+            return await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente, hashedPassword]);
         } catch (error) {
             throw error;
         }
@@ -119,7 +121,7 @@ export class AuthService implements IAuthService {
         try {
             // Controlliamo se il token esiste
             const result = await Orm.query(
-                {},
+                this.accessiOptions.databaseOptions,
                 "SELECT CODUTE FROM UTENTI WHERE KEYREG = ?",
                 [token]
             );
@@ -133,13 +135,18 @@ export class AuthService implements IAuthService {
 
             // Aggiorniamo la password e rimuoviamo il token di reset
             await Orm.query(
-                {},
-                "UPDATE UTENTI SET PASSWORD = ?, KEYREG = NULL WHERE CODUTE = ?",
-                [hashedPassword, result[0].CODUTE]
+                this.accessiOptions.databaseOptions,
+                "UPDATE UTENTI SET KEYREG = NULL, STAREG = ? WHERE CODUTE = ?",
+                [StatoRegistrazione.CONF, result[0].CODUTE]
+            );
+
+            await Orm.query(
+                this.accessiOptions.databaseOptions,
+                "UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)",
+                [result[0].CODUTE, hashedPassword]
             );
         } catch (error) {
-            console.error("Errore nel reset della password:", error);
-            throw new Error("Errore durante il reset della password.");
+            throw error;
         }
     }
 }

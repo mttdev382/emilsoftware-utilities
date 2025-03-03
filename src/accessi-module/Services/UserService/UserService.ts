@@ -6,14 +6,15 @@ import { AccessiOptions } from "../../AccessiModule";
 import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
 import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IFiltriUtente, IUser, IUserService } from "./IUserService";
+import { EmailService } from "../EmailService/EmailService";
 
 @autobind
 @Injectable()
 export class UserService implements IUserService {
 
     constructor(
-        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
-    ) {}
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService
+    ) { }
     async getUsers(): Promise<UserQueryResult[]> {
         try {
             const query = ` 
@@ -100,17 +101,30 @@ export class UserService implements IUserService {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IFiltriUtente[];
     }
 
-    async register(request: IUser): Promise<void> {
+    async register(request: IUser, confirmationEmailPrefix: string): Promise<void> {
         try {
-            const queryUtenti = `INSERT INTO UTENTI (USRNAME, STAREG, FLGGDPR) VALUES (?,?,?,?) RETURNING CODUTE`;
-            const paramsUtenti = [request.username, request.statoRegistrazione, false];
+            const existingUser = await Orm.query(
+                this.accessiOptions.databaseOptions,
+                "SELECT CODUTE FROM UTENTI WHERE USRNAME = ?",
+                [request.username]
+            );
+    
+            if (existingUser.length > 0) {
+                throw new Error("Utente già esistente!");
+            }
+
+
+            const queryUtenti = `INSERT INTO UTENTI (USRNAME, STAREG) VALUES (?,?) RETURNING CODUTE`;
+            const paramsUtenti = [request.username, StatoRegistrazione.INVIO];
 
             const codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
-            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA,FLGSUPER) VALUES (?,?,?,?,?)`;
-            const paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua, request.flagSuper];
 
-            //await this.sendVerificationEmail(request.username, codiceUtente, "");
+            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA) VALUES (?,?,?,?)`;
+            const paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
+
+            await this.emailService.sendPasswordResetEmail(request.username, confirmationEmailPrefix);
+
         } catch (error) {
             throw error;
         }

@@ -45,7 +45,6 @@ export interface AccessiOptions {
 })
 export class AccessiModule {
   static forRoot(options: AccessiOptions): DynamicModule {
-    console.log("✅ AccessiModule inizializzato con opzioni:", options);
     
     return {
       module: AccessiModule,

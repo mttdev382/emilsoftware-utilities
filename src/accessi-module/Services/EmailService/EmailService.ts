@@ -26,7 +26,7 @@ export class EmailService implements IEmailService {
 
             // Aggiorna il campo keyReg nel database
             const result = await Orm.query(
-                {},
+                this.accessiOptions.databaseOptions,
                 "UPDATE UTENTI SET KEYREG = ? WHERE USRNAME = ? RETURNING CODUTE",
                 [resetToken, email]
             );
@@ -35,7 +35,7 @@ export class EmailService implements IEmailService {
                 throw new Error("Email non trovata.");
             }
 
-            const resetUrl = `${baseUrl}/reset-password/${resetToken}`;
+            const resetUrl = `${baseUrl}/api/accessi/reset-password/${resetToken}`;
 
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,
@@ -49,33 +49,6 @@ export class EmailService implements IEmailService {
         } catch (error) {
             console.error("Errore nell'invio dell'email di reset password:", error);
             throw new Error("Errore durante l'invio dell'email di reset password.");
-        }
-    }
-
-
-    async sendVerificationEmail(email: string, codiceUtente: string, baseUrl: string) {
-        try {
-            const userKey = uuidv4();
-            await Orm.query(
-                this.accessiOptions.databaseOptions,
-                "UPDATE UTENTI SET KEYREG = ? WHERE CODUTE = ?",
-                [userKey, codiceUtente]
-            );
-
-            const verificationUrl = `${baseUrl}/${userKey}`;
-
-            const mailOptions = {
-                from: '"Supporto" <noreply@example.com>',
-                to: email,
-                subject: 'Verifica la tua email',
-                text: `Clicca sul seguente link per verificare il tuo account: ${verificationUrl}`,
-                html: `<p>Clicca sul seguente link per verificare il tuo account:</p><a href="${verificationUrl}">${verificationUrl}</a>`
-            };
-
-            await this.transporter.sendMail(mailOptions);
-        } catch (error) {
-            console.error("Errore nell'invio dell'email di verifica:", error);
-            throw new Error("Errore durante l'invio dell'email di verifica.");
         }
     }
 }

@@ -46,7 +46,7 @@ export interface IUserService {
    * @returns {Promise<void>} Una Promise che si risolve al completamento dell'operazione.
    * @throws {Error} Se l'inserimento fallisce per qualsiasi motivo.
    */
-  register(request: UserQueryResult): Promise<void>;
+  register(request: UserQueryResult, confirmationEmailPrefix: string): Promise<void>;
 
   /**
    * Recupera un utente in base al suo username.
