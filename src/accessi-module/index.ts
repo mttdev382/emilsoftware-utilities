@@ -18,6 +18,9 @@ export async function initializeAccessiModule(app: Application, options: any) {
 
         nestApp.enableCors();
 
+        nestApp.setGlobalPrefix('api', {
+            exclude: ['/swagger', '/swagger/(.*)'], // 🔥 Escludiamo Swagger
+        });
 
         await nestApp.init();
 
