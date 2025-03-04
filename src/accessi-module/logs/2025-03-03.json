@@ -1,0 +1,6 @@
+{"timestamp":"2025-03-03T10:39:47.878Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: I/O error for file \"db_path\", Error while trying to open file","time":"2025-03-03T10:39:47.877Z"}
+{"timestamp":"2025-03-03T10:40:57.130Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: I/O error for file \"C:/Dati/Autoclub/ACCESSI.GDB\", Error while trying to open file","time":"2025-03-03T10:40:57.129Z"}
+{"timestamp":"2025-03-03T10:42:54.817Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: Dynamic SQL Error, SQL error code = -804, Count of read - write columns does not equal count of values","time":"2025-03-03T10:42:54.817Z"}
+{"timestamp":"2025-03-03T10:54:20.090Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: Multiple rows in singleton select","time":"2025-03-03T10:54:20.089Z"}
+{"timestamp":"2025-03-03T11:04:19.470Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: Dynamic SQL Error, SQL error code = -206, Column unknown, PASSWORD, At line 1, column 19","time":"2025-03-03T11:04:19.469Z"}
+{"timestamp":"2025-03-03T11:07:15.824Z","tag":"Orm","file":"Orm","level":"ERROR","message":"Error: Dynamic SQL Error, SQL error code = -206, Column unknown, PASSWORD, At line 1, column 43","time":"2025-03-03T11:07:15.823Z"}

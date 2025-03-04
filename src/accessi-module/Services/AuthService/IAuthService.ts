@@ -24,14 +24,7 @@ export interface LoginRequest {
  * Interfaccia per la gestione dell'autenticazione.
  */
 export interface IAuthService {
-
-  /**
- * Restituisce la configurazione delle opzioni di accesso.
- * 
- * @returns {AccessiOptions} - Oggetto contenente le opzioni di configurazione per l'autenticazione.
- */
-  getOptions(): AccessiOptions;
-
+  
   /**
    * Effettua il login dell'utente.
    * @param {LoginRequest} request - Richiesta contenente username e password.
@@ -71,5 +64,16 @@ export interface IAuthService {
  * @throws {Error} Se la query fallisce o si verifica un problema durante l'esecuzione.
  */
   verifyPassword(codiceUtente: string, passwordCifrata: string): Promise<boolean>;
+
+
+  /**
+ * Resetta la password di un utente utilizzando un token univoco.
+ *  
+ * @param {string} token - Il token di reset ricevuto via email.
+ * @param {string} newPassword - La nuova password scelta dall'utente.
+ * @returns {Promise<void>} - Nessun valore di ritorno se il reset ha successo.
+ * @throws {Error} - Se il token è invalido o già usato, o se si verifica un errore nel database.
+ */
+  resetPassword(token: string, newPassword: string): Promise<void>;
 
 }

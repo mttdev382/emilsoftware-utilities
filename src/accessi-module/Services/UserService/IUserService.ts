@@ -46,7 +46,7 @@ export interface IUserService {
    * @returns {Promise<void>} Una Promise che si risolve al completamento dell'operazione.
    * @throws {Error} Se l'inserimento fallisce per qualsiasi motivo.
    */
-  register(request: UserQueryResult): Promise<void>;
+  register(request: UserQueryResult, confirmationEmailPrefix: string): Promise<void>;
 
   /**
    * Recupera un utente in base al suo username.
@@ -119,4 +119,13 @@ export interface IUserService {
  */
   getUserFilters(codiceUtente: string): Promise<IFiltriUtente[]>;
 
+
+  /**
+ * Verifica l'email di un utente utilizzando un token univoco.
+ * 
+ * @param {string} token - Il token di verifica (`keyReg`) ricevuto via email.
+ * @returns {Promise<void>} - Nessun valore di ritorno se la verifica ha successo.
+ * @throws {Error} - Se il token è invalido o già usato, o se si verifica un errore nel database.
+ */
+  verifyEmail(token: string): Promise<void>;
 }

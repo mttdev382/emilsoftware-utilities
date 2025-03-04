@@ -1,23 +1,20 @@
-import { inject, injectable } from "inversify";
 import { Orm } from "../../../Orm";
 import { CryptUtilities, RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { StatoRegistrazione } from "../../models/StatoRegistrazione";
 import { IAuthService, ILoginResult, LoginRequest } from "./IAuthService";
-import { IUserService } from "../UserService/IUserService";
-import { IPermissionService } from "../PermissionService/IPermissionService";
+import { Inject, Injectable } from "@nestjs/common";
+import { UserService } from "../UserService/UserService";
+import { PermissionService } from "../PermissionService/PermissionService";
 
-@injectable()
+@Injectable()
 export class AuthService implements IAuthService {
 
     constructor(
-        @inject("IUserService") private userService: IUserService,
-        @inject("IPermissionService") private permissionService: IPermissionService,
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
-    ) {}
-    public getOptions(): AccessiOptions {
-        return this.accessiOptions;
-    }
+        private userService: UserService,
+        private permissionService: PermissionService,
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
+    ) { }
 
     async login(request: LoginRequest): Promise<ILoginResult> {
         if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo") return this.getDemoUser();
@@ -57,12 +54,12 @@ export class AuthService implements IAuthService {
         return { utente, filtri, abilitazioni };
     }
 
-
-
     public async setPassword(codiceUtente: string, nuovaPassword: string) {
         try {
             const query = `UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)`;
-            return await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente, nuovaPassword]);
+            const hashedPassword = CryptUtilities.encrypt(nuovaPassword, this.accessiOptions.encryptionKey);
+
+            return await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente, hashedPassword]);
         } catch (error) {
             throw error;
         }
@@ -117,5 +114,39 @@ export class AuthService implements IAuthService {
             filtri: null,
             abilitazioni: []
         };
+    }
+
+
+    public async resetPassword(token: string, newPassword: string): Promise<void> {
+        try {
+            // Controlliamo se il token esiste
+            const result = await Orm.query(
+                this.accessiOptions.databaseOptions,
+                "SELECT CODUTE FROM UTENTI WHERE KEYREG = ?",
+                [token]
+            );
+
+            if (result.length === 0) {
+                throw new Error("Token non valido o già usato.");
+            }
+
+            // Hashiamo la nuova password
+            const hashedPassword = CryptUtilities.encrypt(newPassword, this.accessiOptions.encryptionKey);
+
+            // Aggiorniamo la password e rimuoviamo il token di reset
+            await Orm.query(
+                this.accessiOptions.databaseOptions,
+                "UPDATE UTENTI SET KEYREG = NULL, STAREG = ? WHERE CODUTE = ?",
+                [StatoRegistrazione.CONF, result[0].CODUTE]
+            );
+
+            await Orm.query(
+                this.accessiOptions.databaseOptions,
+                "UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)",
+                [result[0].CODUTE, hashedPassword]
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 }

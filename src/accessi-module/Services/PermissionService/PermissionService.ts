@@ -1,15 +1,15 @@
 
-import { inject, injectable } from "inversify";
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { IAbilitazioneMenu } from "../UserService/IUserService";
 import { IPermissionService, IRoleWithMenus } from "./IPermissionService";
+import { Inject, Injectable } from "@nestjs/common";
 
-@injectable()
+@Injectable()
 export class PermissionService implements IPermissionService {
     constructor(
-        @inject("AccessiOptions") private accessiOptions: AccessiOptions
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) {}
 
 
