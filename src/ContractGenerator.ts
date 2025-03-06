@@ -29,6 +29,7 @@ interface DocumentConfig {
     fontTitolo: { nome: string; dimensione: number; colore: string; installPath?: string; };
     fontSottotitolo: { nome: string; dimensione: number; colore: string; installPath?: string; };
     fontTesto: { nome: string; dimensione: number; colore: string; installPath?: string; };
+    fontBold: { nome: string; dimensione: number; colore: string; installPath?: string; };
     margini: { sx: number; dx: number; alto: number; basso: number; };
     staccoriga: number;
     rientro: number;
@@ -167,7 +168,7 @@ export class DocumentGenerator {
                 segText = seg.substring(2, seg.length - 2);
             }
             if (useBold) {
-                this.doc.setFont("Montserrat-Bold");
+                this.doc.setFont(this.config.fontBold.nome);
             } else {
                 this.doc.setFont(normalFont);
             }
@@ -331,7 +332,8 @@ export class DocumentGenerator {
                             await this.writeBoxedText(boxText, this.config.fontSottotitolo);
                         } else if (this.isBoldText(titleText)) {
                             const boldText = this.stripBoldMarkers(titleText);
-                            await this.writeWrappedTextWithFont({ ...this.config.fontSottotitolo, nome: "Montserrat-Bold" },
+
+                            await this.writeWrappedTextWithFont({ ...this.config.fontSottotitolo, nome: this.config.fontSottotitolo.nome },
                                 boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                         } else {
                             await this.writeWrappedTextWithFont(this.config.fontSottotitolo, titleText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
@@ -360,7 +362,7 @@ export class DocumentGenerator {
                         await this.writeBoxedText(boxText, this.config.fontTesto);
                     } else if (this.isBoldText(contenuto)) {
                         const boldText = this.stripBoldMarkers(contenuto);
-                        await this.writeWrappedTextWithFont({ ...this.config.fontTesto, nome: "Montserrat-Bold" },
+                        await this.writeWrappedTextWithFont({ ...this.config.fontTesto, nome: this.config.fontTesto.nome },
                             boldText, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
                     } else {
                         await this.writeWrappedTextWithFont(this.config.fontTesto, contenuto, this.curX + this.config.rientro, this.curY, maxWidth - this.config.rientro);
