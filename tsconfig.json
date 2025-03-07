@@ -11,9 +11,7 @@
     "emitDecoratorMetadata": true
   },
   "include": [
-    "src/index.ts",
-    "src/**/*.ts",
-    "src/**/*.html"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
