@@ -15,10 +15,10 @@ export class AuthController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @Post('reset-password/:token')
+    @Post('confirm-reset-password/:token')
     async resetPassword(@Res() res: Response, @Param('token') token: string, @Body("newPassword") newPassword: string) {
         try {
-            await this.authService.resetPassword(token, newPassword);
+            await this.authService.confirmResetPassword(token, newPassword);
             return RestUtilities.sendOKMessage(res, 'Password aggiornata con successo!');
 
         } catch (error) {

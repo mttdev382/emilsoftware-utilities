@@ -1,8 +1,8 @@
 import { Application } from "express";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
-import { serveSwaggerDocs } from "./swagger/SwaggerConfig";
 import { AccessiModule, AccessiOptions } from "./AccessiModule";
+import { setupSwagger } from "./swagger/SwaggerConfig";
 
 
 export async function initializeAccessiModule(app: Application, options: AccessiOptions) {
@@ -21,9 +21,8 @@ export async function initializeAccessiModule(app: Application, options: Accessi
             exclude: ['/swagger', '/swagger/(.*)']
         });
 
+        setupSwagger(nestApp);
         await nestApp.init();
-
-        serveSwaggerDocs(nestApp);
 
         console.log('Verifica API NestJS registrate:');
         const server = nestApp.getHttpAdapter().getInstance();

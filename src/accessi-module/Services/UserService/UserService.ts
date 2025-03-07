@@ -37,9 +37,10 @@ export class UserService implements IUserService {
                 G.PAGDEF as pagina_default,
                 G.JSON_METADATA as json_metadata
             FROM UTENTI U INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE  
+            WHERE STAREG <> ?
             ORDER BY U.CODUTE`;
 
-            const result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
+            const result = await Orm.query(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE]);
             return result.map(RestUtilities.convertKeysToCamelCase);
         } catch (error) {
             throw error;
@@ -173,8 +174,8 @@ export class UserService implements IUserService {
 
     async deleteUser(codiceCliente: string): Promise<void> {
         try {
-            const query = `DELETE FROM UTENTI WHERE CODUTE = ?`;
-            await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceCliente]);
+            const query = `UPDATE UTENTI SET STAREG = ? WHERE CODUTE = ?`;
+            await Orm.execute(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE, codiceCliente]);
         } catch (error) {
             throw error;
         }
@@ -182,8 +183,8 @@ export class UserService implements IUserService {
 
     public async setGdpr(codiceUtente: string) {
         try {
-            let query = ` UPDATE OR INSERT UTENTI_GDPR SET CODUTE = ? `;
-            let params = [codiceUtente];
+            let query = ` UPDATE OR INSERT UTENTI_GDPR SET CODUTE = ?, GDPR = ? `;
+            let params = [codiceUtente, true];
             let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {
@@ -204,30 +205,5 @@ export class UserService implements IUserService {
         }
     }
 
-
-    public async verifyEmail(token: string): Promise<void> {
-        try {
-            // Controlliamo se il token esiste
-            const result = await Orm.query(
-                {},
-                "SELECT CODUTE FROM UTENTI WHERE KEYREG = ?",
-                [token]
-            );
-
-            if (result.length === 0) {
-                throw new Error("Token non valido o già usato.");
-            }
-
-            // Attiviamo l'account e rimuoviamo il token
-            await Orm.query(
-                {},
-                "UPDATE UTENTI SET STAREG = ?, KEYREG = NULL WHERE CODUTE = ?",
-                [StatoRegistrazione.CONF, result[0].CODUTE]
-            );
-        } catch (error) {
-            console.error("Errore nella verifica email:", error);
-            throw new Error("Errore durante la verifica dell'email.");
-        }
-    }
 }
 

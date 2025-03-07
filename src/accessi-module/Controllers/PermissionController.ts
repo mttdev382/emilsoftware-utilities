@@ -1,12 +1,9 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import * as jwt from 'jsonwebtoken';
-import { join } from 'path';
-import { CryptUtilities, RestUtilities } from '../../Utilities';
+import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { PermissionService } from '../Services/PermissionService/PermissionService';
-import { IUser } from '../Services/UserService/IUserService';
 
 
 @ApiTags('Permission')

@@ -74,6 +74,6 @@ export interface IAuthService {
  * @returns {Promise<void>} - Nessun valore di ritorno se il reset ha successo.
  * @throws {Error} - Se il token è invalido o già usato, o se si verifica un errore nel database.
  */
-  resetPassword(token: string, newPassword: string): Promise<void>;
+  confirmResetPassword(token: string, newPassword: string): Promise<void>;
 
 }

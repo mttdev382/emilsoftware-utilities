@@ -284,11 +284,9 @@ export class CryptUtilities {
     }
 }
 
-export function Deprecated(message: string) {
-    return function (target: any, key?: string, descriptor?: PropertyDescriptor) {
-      console.warn(`⚠️ [DEPRECATED] ${message}`);
-    };
-  }
+
+
+
 
 /**
  * Utility class for managing database-related configurations and operations.
@@ -315,7 +313,7 @@ export class DatabaseUtilities {
      * );
      * ```
      */
-    static createOption(
+    public static createOption(
         host: string,
         port: number,
         database: string,
@@ -336,3 +334,9 @@ export class DatabaseUtilities {
         };
     }
 }
+
+export function Deprecated(message: string) {
+    return function (target: any, key?: string, descriptor?: PropertyDescriptor) {
+      console.warn(`⚠️ [DEPRECATED] ${message}`);
+    };
+  }

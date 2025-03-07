@@ -32,7 +32,7 @@ export class AccessiController {
     @Post('reset-password/:token')
     async resetPassword(@Res() res: Response, @Param('token') token: string, @Body("newPassword") newPassword: string) {
         try {
-            await this.authService.resetPassword(token, newPassword);
+            await this.authService.confirmResetPassword(token, newPassword);
             return RestUtilities.sendOKMessage(res, 'Password aggiornata con successo!');
 
         } catch (error) {

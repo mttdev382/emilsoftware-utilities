@@ -1,16 +1,16 @@
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
+export function setupSwagger(app: INestApplication) {
+    const config = new DocumentBuilder()
+        .setTitle("Accessi API")
+        .setDescription("API per la gestione degli accessi utenti")
+        .setVersion("1.0")
+        .addBearerAuth() // Per abilitare l'autenticazione JWT
+        .build();
 
-export function serveSwaggerDocs(app: INestApplication) {
-  const config = new DocumentBuilder()
-    .setTitle('Accessi API')
-    .setDescription('Documentazione delle API per la gestione degli accessi')
-    .setVersion('1.0')
-    .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup("swagger", app, document);
 
-    const documentFactory = () => SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, documentFactory);
-
-  console.log('Swagger UI disponibile su http://localhost:3000/swagger/accessi');
+    console.log("✅ Swagger disponibile su: http://localhost:3000/swagger");
 }

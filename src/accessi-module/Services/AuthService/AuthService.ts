@@ -117,7 +117,7 @@ export class AuthService implements IAuthService {
     }
 
 
-    public async resetPassword(token: string, newPassword: string): Promise<void> {
+    public async confirmResetPassword(token: string, newPassword: string): Promise<void> {
         try {
             // Controlliamo se il token esiste
             const result = await Orm.query(

@@ -8,7 +8,7 @@ import { EmailService } from '../Services/EmailService/EmailService';
 import { AccessiController } from './AccessiController';
 
 
-@ApiTags('Auth')
+@ApiTags('Email')
 @Controller('accessi/email')
 export class EmailController {
     constructor(
@@ -18,14 +18,14 @@ export class EmailController {
 
 
     @ApiOperation({ summary: 'Serve una pagina per il reset della password' })
-    @Get('reset-password/:token')
+    @Get('reset-password-page/:token')
     async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string) {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
     }
 
 
-    @ApiOperation({ summary: 'Registra un nuovo utente' })
-    @Post('send-reset-password')
+    @ApiOperation({ summary: 'Invia una e-mail per il reset della password' })
+    @Post('send-reset-password-email')
     async sendPasswordResetEmail(@Req() request: Request, @Body() sendResetPasswordData: { email: string }, @Res() res: Response) {
         try {
 

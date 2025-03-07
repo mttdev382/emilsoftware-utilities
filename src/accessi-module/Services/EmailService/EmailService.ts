@@ -4,6 +4,7 @@ import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
 import { IEmailService } from './IEmailService';
 import { Inject, Injectable } from '@nestjs/common';
+import { StatoRegistrazione } from '../../models/StatoRegistrazione';
 
 
 @Injectable()
@@ -27,15 +28,15 @@ export class EmailService implements IEmailService {
             // Aggiorna il campo keyReg nel database
             const result = await Orm.query(
                 this.accessiOptions.databaseOptions,
-                "UPDATE UTENTI SET KEYREG = ? WHERE USRNAME = ? RETURNING CODUTE",
-                [resetToken, email]
+                "UPDATE UTENTI SET KEYREG = ?, STAREG = ? WHERE USRNAME = ? RETURNING CODUTE",
+                [resetToken, StatoRegistrazione.INVIO, email]
             );
 
             if (result.length === 0) {
                 throw new Error("Email non trovata.");
             }
 
-            const resetUrl = `${baseUrl}/api/accessi/reset-password/${resetToken}`;
+            const resetUrl = `${baseUrl}/api/accessi/email/reset-password/${resetToken}`;
 
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,
