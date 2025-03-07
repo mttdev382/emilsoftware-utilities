@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Inject, Res, Param, Req } from '@nestjs/co
 import { Response } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import * as jwt from 'jsonwebtoken';
-import { RestUtilities, CryptUtilities } from '../../Utilities';
+import { RestUtilities, CryptUtilities, Deprecated } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
 import { PermissionService } from '../Services/PermissionService/PermissionService';
@@ -11,7 +11,7 @@ import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
 import { IUser } from '../Services/UserService/IUserService';
 
-
+@Deprecated("AccessiController è deprecato. Usa i controller specifici per ogni area.")
 @ApiTags('Accessi')
 @Controller('accessi')
 export class AccessiController {
@@ -23,9 +23,7 @@ export class AccessiController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })
-
-
+   
     @Get('reset-password/:token')
     async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string) {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
@@ -42,8 +40,7 @@ export class AccessiController {
         }
     }
 
-
-
+    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })
     @Post('get-user-by-token')
     async getUserByToken(@Body('token') token: string, @Res() res: Response) {
         try {
@@ -106,10 +103,12 @@ export class AccessiController {
 
             if(!protocol || !host ){
                 return RestUtilities.sendErrorMessage(res, "Impossibile procedere: protocollo e host non impostati negli header della richiesta.", AccessiController.name);
-            }
+            }            
+            await this.userService.register(registrationData);
+
             let confirmationEmailPrefix = protocol + "://"+ host;
-            await this.userService.register(registrationData, confirmationEmailPrefix);
-            return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo.");
+            await this.emailService.sendPasswordResetEmail(registrationData.username, confirmationEmailPrefix);
+            return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo, email di conferma inoltrata al destinatario.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
         }

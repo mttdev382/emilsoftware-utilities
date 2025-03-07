@@ -42,11 +42,11 @@ export interface IFiltriUtente {
 export interface IUserService {
   /**
    * Registra un nuovo utente nel sistema.
-   * @param {UserQueryResult} request - Dati dell'utente da registrare.
+   * @param {UserQueryResult} registrationData - Dati dell'utente da registrare.
    * @returns {Promise<void>} Una Promise che si risolve al completamento dell'operazione.
    * @throws {Error} Se l'inserimento fallisce per qualsiasi motivo.
    */
-  register(request: UserQueryResult, confirmationEmailPrefix: string): Promise<void>;
+  register(registrationData: UserQueryResult): Promise<void>;
 
   /**
    * Recupera un utente in base al suo username.

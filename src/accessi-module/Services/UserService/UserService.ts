@@ -101,12 +101,12 @@ export class UserService implements IUserService {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IFiltriUtente[];
     }
 
-    async register(request: IUser, confirmationEmailPrefix: string): Promise<void> {
+    async register(registrationData: IUser): Promise<void> {
         try {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,
                 "SELECT CODUTE FROM UTENTI WHERE USRNAME = ?",
-                [request.username]
+                [registrationData.username]
             );
     
             if (existingUser.length > 0) {
@@ -115,15 +115,13 @@ export class UserService implements IUserService {
 
 
             const queryUtenti = `INSERT INTO UTENTI (USRNAME, STAREG) VALUES (?,?) RETURNING CODUTE`;
-            const paramsUtenti = [request.username, StatoRegistrazione.INVIO];
+            const paramsUtenti = [registrationData.username, StatoRegistrazione.INVIO];
 
             const codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
 
             const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA) VALUES (?,?,?,?)`;
-            const paramsUtentiConfig = [codiceUtente, request.cognome, request.nome, request.codiceLingua];
+            const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome, registrationData.codiceLingua];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
-
-            await this.emailService.sendPasswordResetEmail(request.username, confirmationEmailPrefix);
 
         } catch (error) {
             throw error;
