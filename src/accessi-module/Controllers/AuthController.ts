@@ -15,6 +15,7 @@ export class AuthController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
+    @ApiOperation({ summary: 'Conferma il reset della password' })
     @Post('confirm-reset-password/:token')
     async resetPassword(@Res() res: Response, @Param('token') token: string, @Body("newPassword") newPassword: string) {
         try {

@@ -28,7 +28,7 @@ export async function initializeAccessiModule(app: Application, options: Accessi
         const server = nestApp.getHttpAdapter().getInstance();
         const router = server.router;
 
-        
+
         const availableRoutes: [] = router.stack
             .map(layer => {
                 if (layer.route) {
@@ -42,7 +42,7 @@ export async function initializeAccessiModule(app: Application, options: Accessi
             })
             .filter(item => item !== undefined);
         console.log(availableRoutes);
-    
+
 
     } catch (error) {
         console.error("Errore in initialize AccessiModule:", error);
@@ -53,3 +53,4 @@ export async function initializeAccessiModule(app: Application, options: Accessi
 export { AccessiModule } from "./AccessiModule";
 export { StatoRegistrazione } from "./models/StatoRegistrazione";
 export { ILoginResult } from "./Services/AuthService/IAuthService";
+export { IRoleWithMenus } from "./Services/PermissionService/IPermissionService"
