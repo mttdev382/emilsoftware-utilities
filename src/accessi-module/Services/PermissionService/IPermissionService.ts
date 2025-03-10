@@ -1,26 +1,28 @@
 import { IAbilitazioneMenu } from "../UserService/IUserService";
 
 export enum TipoAbilitazione {
-  Uno,
-  Due,
-  Tre
+  NESSUNA = 0,
+  LETTURA = 10,
+  SCRITTURA = 20
+  // SPECIAL = 30 IGNORA PER ORA
 }
 
 export interface IAbilitazione {
-    codiceUtente: string; 
-    codiceMenu: string; 
-    tipoAbilitazione: TipoAbilitazione;
+  codiceUtente: string;
+  codiceMenu: string;
+  tipoAbilitazione: TipoAbilitazione;
 }
 
 export interface IMenu {
-    codiceMenu: string; 
-    descrizioneMenu: string;
+  codiceMenu: string;
+  descrizioneMenu: string;
+  tipoAbilitazione: TipoAbilitazione;
 }
 
 export interface IRoleWithMenus {
-    codiceRuolo: number; 
-    descrizioneRuolo: string; 
-    menu: IMenu[];
+  codiceRuolo: number;
+  descrizioneRuolo: string;
+  menu: IMenu[];
 }
 
 /**

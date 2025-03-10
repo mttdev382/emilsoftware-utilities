@@ -46,11 +46,13 @@ export class AuthController {
         try {
             const userData = await this.authService.login(loginDto);
             if (!userData) return RestUtilities.sendInvalidCredentials(res);
+
             userData.token = {
                 expiresIn: this.options.jwtOptions.expiresIn,
                 value: jwt.sign({ userData }, this.options.jwtOptions.secret, { expiresIn: this.options.jwtOptions.expiresIn as any }),
                 type: 'Bearer',
             };
+            
             return RestUtilities.sendBaseResponse(res, userData);
         } catch (error) {
             return RestUtilities.sendInvalidCredentials(res);

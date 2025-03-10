@@ -50,39 +50,46 @@ export class PermissionService implements IPermissionService {
                     R.CODRUO AS codice_ruolo, 
                     R.DESRUO AS descrizione_ruolo, 
                     M.CODMNU AS codice_menu, 
-                    M.DESMNU AS descrizione_menu
+                    M.DESMNU AS descrizione_menu,
+                    RM.TIPABI AS tipo_abilitazione
                 FROM RUOLI R
                 LEFT JOIN RUOLI_MNU RM ON R.CODRUO = RM.CODRUO
                 LEFT JOIN MENU M ON RM.CODMNU = M.CODMNU
                 ORDER BY R.CODRUO, M.CODMNU
             `;
-
-            const result = await Orm.execute(this.accessiOptions.databaseOptions, query, []);
-
+    
+            let result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
+            result = result.map(RestUtilities.convertKeysToCamelCase);
+    
+            console.log("RESULT: ", result);
             const ruoliMap = new Map<number, IRoleWithMenus>();
-
-            for (const row of result.map(RestUtilities.convertKeysToCamelCase)) {
-                const codiceRuolo = row.codiceRuolo;
+    
+            for (const row of result) {
+                const { codiceRuolo, descrizioneRuolo, codiceMenu, descrizioneMenu, tipoAbilitazione } = row;
+    
                 if (!ruoliMap.has(codiceRuolo)) {
                     ruoliMap.set(codiceRuolo, {
                         codiceRuolo,
-                        descrizioneRuolo: row.descrizioneRuolo.trim(),
-                        menu: [],
+                        descrizioneRuolo: descrizioneRuolo?.trim(),
+                        menu: []
                     });
                 }
-                if (row.codiceMenu) {
+    
+                if (codiceMenu) {
                     ruoliMap.get(codiceRuolo)!.menu.push({
-                        codiceMenu: row.codiceMenu.trim(),
-                        descrizioneMenu: row.descrizioneMenu.trim(),
+                        codiceMenu: codiceMenu.trim(),
+                        tipoAbilitazione,
+                        descrizioneMenu: descrizioneMenu?.trim()
                     });
                 }
             }
-
+    
             return Array.from(ruoliMap.values());
         } catch (error) {
             throw error;
         }
     }
+    
 
 
     public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<IAbilitazioneMenu[]> {
@@ -116,4 +123,5 @@ export class PermissionService implements IPermissionService {
         return await Orm.query(this.accessiOptions.databaseOptions, query, isSuperAdmin ? [] : [codiceUtente])
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IAbilitazioneMenu[];
     }
+
 }

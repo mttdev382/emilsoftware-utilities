@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { RestUtilities } from '../../Utilities';
@@ -21,6 +21,17 @@ export class PermissionController {
         try {
             await this.permissionService.resetAbilitazioni(codiceUtente);
             return RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${codiceUtente} sono state resettate con successo.`);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
+        }
+    }
+
+    @ApiOperation({ summary: 'Resetta le abilitazioni di un utente' })
+    @Get('roles')
+    async getRoles(@Res() res: Response) {
+        try {
+            let roles = await this.permissionService.getRolesWithMenus();
+            return RestUtilities.sendBaseResponse(res, roles);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }

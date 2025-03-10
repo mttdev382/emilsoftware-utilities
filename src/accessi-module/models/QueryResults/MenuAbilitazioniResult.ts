@@ -1,6 +1,8 @@
+import { TipoAbilitazione } from "../../Services/PermissionService/IPermissionService";
+
 export interface MenuAbilitazioniResult {
     codiceMnu: string;
-    tipoAbilitazione: string;
+    tipoAbilitazione: TipoAbilitazione;
     descrizioneMnu: string;
     descrizioneGrp: string;
     codiceGrp: string;

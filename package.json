@@ -7,7 +7,6 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "release": "standard-version",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && npm run copy-views",
     "copy-views": "node copy-views.js",
     "prepublishOnly": "npm run build"
