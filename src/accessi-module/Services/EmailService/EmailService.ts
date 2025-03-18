@@ -2,13 +2,12 @@ import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
-import { IEmailService } from './IEmailService';
 import { Inject, Injectable } from '@nestjs/common';
-import { StatoRegistrazione } from '../../models/StatoRegistrazione';
+import { StatoRegistrazione } from '../../Dtos/StatoRegistrazione';
 
 
 @Injectable()
-export class EmailService implements IEmailService {
+export class EmailService {
 
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions

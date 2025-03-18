@@ -2,15 +2,16 @@
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
-import { IAbilitazioneMenu } from "../UserService/IUserService";
-import { IPermissionService, IRoleWithMenus } from "./IPermissionService";
+import { Permission } from "../../Dtos";
+import { AbilitazioneMenu } from "../../Dtos/AbilitazioneMenu";
+import { RoleWithMenus } from "../../Dtos/RoleWithMenus";
 import { Inject, Injectable } from "@nestjs/common";
 
 @Injectable()
-export class PermissionService implements IPermissionService {
+export class PermissionService  {
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
-    ) {}
+    ) { }
 
 
     public async addAbilitazioni(codiceUtente: string, menuAbilitazioni: any[]): Promise<void> {
@@ -43,7 +44,39 @@ export class PermissionService implements IPermissionService {
         }
     }
 
-    public async getRolesWithMenus(): Promise<IRoleWithMenus[]> {
+    public async updateOrInsertRole(role: RoleWithMenus): Promise<void> {
+        try {
+            let codiceRuolo: any;
+    
+            if (!role.codiceRuolo) {
+                let createRoleQuery = `INSERT INTO RUOLI (DESRUO) VALUES (?) RETURNING CODRUO`;
+                let result = await Orm.query(this.accessiOptions.databaseOptions, createRoleQuery, [role.descrizioneRuolo]);
+    
+                codiceRuolo = result[0].CODRUO;
+
+                console.log("CODICE RUOLO: ", result);
+            } else {
+                let updateRoleQuery = `UPDATE RUOLI SET DESRUO = ? WHERE CODRUO = ?`;
+                await Orm.query(this.accessiOptions.databaseOptions, updateRoleQuery, [role.descrizioneRuolo, role.codiceRuolo]);
+    
+                codiceRuolo = role.codiceRuolo;
+    
+                let deleteRoleMenuQuery = `DELETE FROM RUOLI_MNU WHERE CODRUO = ?`;
+                await Orm.query(this.accessiOptions.databaseOptions, deleteRoleMenuQuery, [codiceRuolo]);
+            }
+    
+            let createRoleMenuQuery = `INSERT INTO RUOLI_MNU (CODRUO, CODMNU, TIPABI) VALUES (?, ?, ?)`;
+            for (let menu of role.menu) {
+                await Orm.query(this.accessiOptions.databaseOptions, createRoleMenuQuery, [codiceRuolo, menu.codiceMenu, menu.tipoAbilitazione]);
+            }
+    
+        } catch (error: any) {
+            throw error;
+        }
+    }
+    
+
+    public async getRolesWithMenus(): Promise<RoleWithMenus[]> {
         try {
             const query = `
                 SELECT 
@@ -57,16 +90,15 @@ export class PermissionService implements IPermissionService {
                 LEFT JOIN MENU M ON RM.CODMNU = M.CODMNU
                 ORDER BY R.CODRUO, M.CODMNU
             `;
-    
+
             let result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
             result = result.map(RestUtilities.convertKeysToCamelCase);
-    
-            console.log("RESULT: ", result);
-            const ruoliMap = new Map<number, IRoleWithMenus>();
-    
+
+            const ruoliMap = new Map<number, RoleWithMenus>();
+
             for (const row of result) {
                 const { codiceRuolo, descrizioneRuolo, codiceMenu, descrizioneMenu, tipoAbilitazione } = row;
-    
+
                 if (!ruoliMap.has(codiceRuolo)) {
                     ruoliMap.set(codiceRuolo, {
                         codiceRuolo,
@@ -74,7 +106,7 @@ export class PermissionService implements IPermissionService {
                         menu: []
                     });
                 }
-    
+
                 if (codiceMenu) {
                     ruoliMap.get(codiceRuolo)!.menu.push({
                         codiceMenu: codiceMenu.trim(),
@@ -83,20 +115,20 @@ export class PermissionService implements IPermissionService {
                     });
                 }
             }
-    
+
             return Array.from(ruoliMap.values());
         } catch (error) {
             throw error;
         }
     }
-    
 
 
-    public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<IAbilitazioneMenu[]> {
+
+    public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<AbilitazioneMenu[]> {
         const query = isSuperAdmin
             ? `SELECT 
                     M.CODMNU AS codice_menu, 
-                    10 AS tipo_abilitazione, 
+                    30 AS tipo_abilitazione, 
                     M.DESMNU AS descrizione_menu, 
                     G.DESGRP AS descrizione_gruppo, 
                     G.CODGRP AS codice_gruppo, 
@@ -106,7 +138,8 @@ export class PermissionService implements IPermissionService {
                 FROM MENU M 
                 INNER JOIN MENU_GRP G ON G.CODGRP = M.CODGRP 
                 WHERE M.FLGENABLED = 1 AND G.FLGENABLED = 1`
-            : `SELECT 
+            : `WITH AbilitazioniTotali AS (
+                SELECT 
                     A.CODMNU AS codice_menu, 
                     A.TIPABI AS tipo_abilitazione, 
                     M.DESMNU AS descrizione_menu, 
@@ -118,10 +151,71 @@ export class PermissionService implements IPermissionService {
                 FROM ABILITAZIONI A 
                 INNER JOIN MENU M ON A.CODMNU = M.CODMNU 
                 INNER JOIN MENU_GRP G ON G.CODGRP = M.CODGRP
-                WHERE A.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1`;
-
-        return await Orm.query(this.accessiOptions.databaseOptions, query, isSuperAdmin ? [] : [codiceUtente])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IAbilitazioneMenu[];
+                WHERE A.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1
+    
+                UNION ALL
+    
+                SELECT 
+                    RM.CODMNU AS codice_menu, 
+                    5 AS tipo_abilitazione,
+                    M.DESMNU AS descrizione_menu, 
+                    G.DESGRP AS descrizione_gruppo, 
+                    G.CODGRP AS codice_gruppo, 
+                    M.ICON AS icona, 
+                    M.CODTIP AS tipo, 
+                    M.PAGINA AS pagina
+                FROM RUOLI_UTENTI RU
+                INNER JOIN RUOLI R ON RU.CODRUL = R.CODRUL
+                INNER JOIN RUOLI_MENU RM ON R.CODRUL = RM.CODRUL
+                INNER JOIN MENU M ON RM.CODMNU = M.CODMNU
+                INNER JOIN MENU_GRP G ON G.CODGRP = M.CODGRP
+                WHERE RU.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1
+            )
+            SELECT codice_menu, tipo_abilitazione, descrizione_menu, descrizione_gruppo, codice_gruppo, icona, tipo, pagina
+            FROM (
+                SELECT *, ROW_NUMBER() OVER (PARTITION BY codice_menu ORDER BY tipo_abilitazione DESC) AS row_num
+                FROM AbilitazioniTotali
+            ) AS Ranked
+            WHERE row_num = 1`;
+    
+        const queryParams = isSuperAdmin ? [] : [codiceUtente, codiceUtente];
+    
+        return await Orm.query(this.accessiOptions.databaseOptions, query, queryParams)
+            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as AbilitazioneMenu[];
     }
 
+
+    public async assignRolesToUser(codiceUtente: string, roles: string[]): Promise<void> {
+        try {
+            const deleteQuery = `DELETE FROM UTENTI_RUOLI WHERE CODUTE = ?`;
+            await Orm.query(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
+    
+            const insertQuery = `INSERT INTO UTENTI_RUOLI (CODUTE, CODRUO) VALUES (?, ?)`;
+    
+            for (const codiceRuolo of roles) {
+                await Orm.query(this.accessiOptions.databaseOptions, insertQuery, [codiceUtente, codiceRuolo]);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    public async assignPermissionsToUser(codiceUtente: string, permissions: Permission[]): Promise<void> {
+        try {
+            const deleteQuery = `DELETE FROM ABILITAZIONI WHERE CODUTE = ?`;
+            await Orm.execute(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
+    
+            const insertQuery = `INSERT INTO ABILITAZIONI (CODUTE, CODMNU, TIPABI) VALUES (?, ?, ?)`;
+    
+            for (const permission of permissions) {
+                await Orm.execute(this.accessiOptions.databaseOptions, insertQuery, [codiceUtente, permission.codiceMenu, permission.tipoAbilitazione]);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    
+    
 }

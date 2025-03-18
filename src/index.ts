@@ -7,7 +7,8 @@ import { autobind } from "./autobind";
 import { DocumentGenerator } from "./ContractGenerator";
 
 
-export { AccessiModule, StatoRegistrazione, ILoginResult, IRoleWithMenus } from "./accessi-module";
+export {RoleWithMenus} from "./accessi-module/Dtos/RoleWithMenus";
 
+export * from "./accessi-module";
 export * from "es-node-firebird";
 export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode, DocumentGenerator };

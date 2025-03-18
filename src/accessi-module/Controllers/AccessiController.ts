@@ -9,10 +9,10 @@ import { PermissionService } from '../Services/PermissionService/PermissionServi
 import { UserService } from '../Services/UserService/UserService';
 import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
-import { IUser } from '../Services/UserService/IUserService';
+import { User } from '../Dtos';
 
 @Deprecated("AccessiController è deprecato. Usa i controller specifici per ogni area.")
-@ApiTags('Accessi')
+@ApiTags('AccessiDEPRECATED')
 @Controller('accessi')
 export class AccessiController {
     constructor(
@@ -95,7 +95,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Registra un nuovo utente' })
     @Post('register')
-    async register(@Req() request: Request, @Body() registrationData: IUser, @Res() res: Response) {
+    async register(@Req() request: Request, @Body() registrationData: User, @Res() res: Response) {
         try {
 
             let protocol = request["protocol"];

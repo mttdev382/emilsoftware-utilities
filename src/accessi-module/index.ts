@@ -24,7 +24,8 @@ export async function initializeAccessiModule(app: Application, options: Accessi
         setupSwagger(nestApp);
         await nestApp.init();
 
-        console.log('Verifica API NestJS registrate:');
+        /*
+            console.log('Verifica API NestJS registrate:');
         const server = nestApp.getHttpAdapter().getInstance();
         const router = server.router;
 
@@ -41,7 +42,10 @@ export async function initializeAccessiModule(app: Application, options: Accessi
                 }
             })
             .filter(item => item !== undefined);
-        console.log(availableRoutes);
+        console.log(availableRoutes);    
+        
+        */
+
 
 
     } catch (error) {
@@ -51,6 +55,4 @@ export async function initializeAccessiModule(app: Application, options: Accessi
 }
 
 export { AccessiModule } from "./AccessiModule";
-export { StatoRegistrazione } from "./models/StatoRegistrazione";
-export { ILoginResult } from "./Services/AuthService/IAuthService";
-export { IRoleWithMenus } from "./Services/PermissionService/IPermissionService"
+export * from "./Dtos";

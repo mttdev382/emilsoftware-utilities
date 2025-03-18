@@ -1,14 +1,15 @@
 import { Orm } from "../../../Orm";
 import { CryptUtilities, RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
-import { StatoRegistrazione } from "../../models/StatoRegistrazione";
-import { IAuthService, ILoginResult, LoginRequest } from "./IAuthService";
+import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 import { Inject, Injectable } from "@nestjs/common";
 import { UserService } from "../UserService/UserService";
 import { PermissionService } from "../PermissionService/PermissionService";
+import { LoginRequest } from "../../Dtos/LoginRequest";
+import { LoginResult } from "../../Dtos/LoginResult";
 
 @Injectable()
-export class AuthService implements IAuthService {
+export class AuthService {
 
     constructor(
         private userService: UserService,
@@ -16,7 +17,7 @@ export class AuthService implements IAuthService {
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) { }
 
-    async login(request: LoginRequest): Promise<ILoginResult> {
+    async login(request: LoginRequest): Promise<LoginResult> {
         if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo") return this.getDemoUser();
         if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "admin") return this.getAdminUser();
 
@@ -74,7 +75,10 @@ export class AuthService implements IAuthService {
     }
 
 
-    getAdminUser(): ILoginResult {
+    async getAdminUser(): Promise<LoginResult> {
+
+        const abilitazioni = await this.permissionService.getAbilitazioniMenu("6789", true);
+        const filtri = await this.userService.getUserFilters("6789");
         return {
             utente: {
                 codiceUtente: "6789",
@@ -90,12 +94,12 @@ export class AuthService implements IAuthService {
                 flagSuper: true,
                 paginaDefault: "/home",
             },
-            filtri: null,
-            abilitazioni: []
+            filtri,
+            abilitazioni
         };
     }
 
-    getDemoUser(): ILoginResult {
+    getDemoUser(): LoginResult {
         return {
             utente: {
                 codiceUtente: "12345",

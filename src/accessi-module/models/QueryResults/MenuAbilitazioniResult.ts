@@ -1,4 +1,4 @@
-import { TipoAbilitazione } from "../../Services/PermissionService/IPermissionService";
+import { TipoAbilitazione } from "../../Dtos/TipoAbilitazione";
 
 export interface MenuAbilitazioniResult {
     codiceMnu: string;

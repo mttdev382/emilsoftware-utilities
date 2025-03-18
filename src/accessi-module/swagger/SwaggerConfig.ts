@@ -1,6 +1,7 @@
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
+const swaggerUrl = "swagger/accessi";
 export function setupSwagger(app: INestApplication) {
     const config = new DocumentBuilder()
         .setTitle("Accessi API")
@@ -10,7 +11,7 @@ export function setupSwagger(app: INestApplication) {
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup("swagger", app, document);
+    SwaggerModule.setup(swaggerUrl, app, document);
 
-    console.log("✅ Swagger disponibile su: http://localhost:3000/swagger");
+    console.log("✅ Swagger disponibile su: http://localhost:3000/"+swaggerUrl);
 }

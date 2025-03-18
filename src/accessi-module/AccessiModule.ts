@@ -14,6 +14,7 @@ import { UserService } from "./Services/UserService/UserService";
 import { EmailController } from "./Controllers/EmailController";
 import { AuthController } from "./Controllers/AuthController";
 import { PermissionController } from "./Controllers/PermissionController";
+import { UserController } from "./Controllers/UserController";
 
 export interface JwtOptions {
     secret: string
@@ -42,7 +43,7 @@ export interface AccessiOptions {
 
 @Global()
 @Module({
-  controllers: [AccessiController, EmailController, AuthController, PermissionController],
+  controllers: [AccessiController, EmailController, AuthController, PermissionController, UserController],
   providers: [AuthService, UserService, EmailService, PermissionService],
   exports: [AuthService, UserService, EmailService, PermissionService],
 })

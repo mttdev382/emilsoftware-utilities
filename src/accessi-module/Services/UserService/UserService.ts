@@ -4,13 +4,14 @@ import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
-import { StatoRegistrazione } from "../../models/StatoRegistrazione";
-import { IFiltriUtente, IUser, IUserService } from "./IUserService";
+import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 import { EmailService } from "../EmailService/EmailService";
+import { User } from "../../Dtos/User";
+import { FiltriUtente } from "../../Dtos/FiltriUtente";
 
 @autobind
 @Injectable()
-export class UserService implements IUserService {
+export class UserService  {
 
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService
@@ -57,7 +58,7 @@ export class UserService implements IUserService {
         }
     }
 
-    async getUserByUsername(username: string): Promise<IUser | null> {
+    async getUserByUsername(username: string): Promise<User | null> {
         const query = `
             SELECT 
                 U.CODUTE AS codice_utente, 
@@ -78,12 +79,12 @@ export class UserService implements IUserService {
         `;
 
         const utenti = await Orm.query(this.accessiOptions.databaseOptions, query, [username])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IUser[];
+            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as User[];
 
         return utenti.length > 0 ? utenti[0] : null;
     }
 
-    async getUserFilters(codiceUtente: string): Promise<IFiltriUtente[]> {
+    async getUserFilters(codiceUtente: string): Promise<FiltriUtente[]> {
         const query = `
             SELECT 
                 F.PROG AS progressivo, 
@@ -99,10 +100,10 @@ export class UserService implements IUserService {
         `;
 
         return await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as IFiltriUtente[];
+            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as FiltriUtente[];
     }
 
-    async register(registrationData: IUser): Promise<void> {
+    async register(registrationData: User): Promise<void> {
         try {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,
@@ -148,15 +149,15 @@ export class UserService implements IUserService {
         }
     }
 
-    async updateUser(user: UserQueryResult): Promise<void> {
+    async updateUser(user: User): Promise<void> {
         try {
             if (!user.codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
 
             const queryUtenti = `
                 UPDATE UTENTI 
-                SET usrname = ?, flggdpr = ?, datgdpr=?, datins=?, datscapwd=?, stareg=? 
+                SET usrname = ?, flggdpr = ?, stareg=? 
                 WHERE CODUTE = ?`;
-            const paramsUtenti = [user.username, user.flagGdpr, user.dataGdpr, user.dataInserimento, user.dataScadenzaPassword, user.statoRegistrazione, user.codiceUtente];
+            const paramsUtenti = [user.username, user.flagGdpr, user.statoRegistrazione, user.codiceUtente];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 
@@ -164,7 +165,7 @@ export class UserService implements IUserService {
                 UPDATE UTENTI_CONFIG 
                 SET cognome = ?, nome = ?, avatar=?, flg2fatt=?, codlingua=?, cellulare=?, flgsuper=?, pagdef=?, json_metadata=? 
                 WHERE CODUTE = ?`;
-            const paramsUtentiConfig = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.pagDef, user.jsonMetadata, user.codiceUtente];
+            const paramsUtentiConfig = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.paginaDefault, user.jsonMetadata, user.codiceUtente];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
         } catch (error) {

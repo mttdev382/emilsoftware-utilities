@@ -1,4 +1,4 @@
-import { StatoRegistrazione } from "../StatoRegistrazione";
+import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 
 export interface UserQueryResult {
     codiceUtente: string;
