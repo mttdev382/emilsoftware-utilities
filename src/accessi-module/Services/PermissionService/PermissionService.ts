@@ -4,7 +4,8 @@ import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { Permission } from "../../Dtos";
 import { AbilitazioneMenu } from "../../Dtos/AbilitazioneMenu";
-import { RoleWithMenus } from "../../Dtos/RoleWithMenus";
+import { MenuEntity } from "../../Dtos/GetMenusResponse";
+import { Role } from "../../Dtos/Role";
 import { Inject, Injectable } from "@nestjs/common";
 
 @Injectable()
@@ -44,23 +45,24 @@ export class PermissionService  {
         }
     }
 
-    public async updateOrInsertRole(role: RoleWithMenus): Promise<void> {
+    public async updateOrInsertRole(role: Role, codiceRuolo: string = null): Promise<void> {
         try {
-            let codiceRuolo: any;
     
-            if (!role.codiceRuolo) {
+            // creazione nuovo ruolo
+            if (!codiceRuolo) {
                 let createRoleQuery = `INSERT INTO RUOLI (DESRUO) VALUES (?) RETURNING CODRUO`;
                 let result = await Orm.query(this.accessiOptions.databaseOptions, createRoleQuery, [role.descrizioneRuolo]);
     
                 codiceRuolo = result[0].CODRUO;
 
-                console.log("CODICE RUOLO: ", result);
-            } else {
+            
+            } else 
+            // aggiornamento ruolo esistente
+            {
+
                 let updateRoleQuery = `UPDATE RUOLI SET DESRUO = ? WHERE CODRUO = ?`;
-                await Orm.query(this.accessiOptions.databaseOptions, updateRoleQuery, [role.descrizioneRuolo, role.codiceRuolo]);
-    
-                codiceRuolo = role.codiceRuolo;
-    
+                await Orm.query(this.accessiOptions.databaseOptions, updateRoleQuery, [role.descrizioneRuolo, codiceRuolo]);
+        
                 let deleteRoleMenuQuery = `DELETE FROM RUOLI_MNU WHERE CODRUO = ?`;
                 await Orm.query(this.accessiOptions.databaseOptions, deleteRoleMenuQuery, [codiceRuolo]);
             }
@@ -76,7 +78,7 @@ export class PermissionService  {
     }
     
 
-    public async getRolesWithMenus(): Promise<RoleWithMenus[]> {
+    public async getRolesWithMenus(): Promise<Role[]> {
         try {
             const query = `
                 SELECT 
@@ -94,7 +96,7 @@ export class PermissionService  {
             let result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
             result = result.map(RestUtilities.convertKeysToCamelCase);
 
-            const ruoliMap = new Map<number, RoleWithMenus>();
+            const ruoliMap = new Map<number, Role>();
 
             for (const row of result) {
                 const { codiceRuolo, descrizioneRuolo, codiceMenu, descrizioneMenu, tipoAbilitazione } = row;
@@ -125,6 +127,8 @@ export class PermissionService  {
 
 
     public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<AbilitazioneMenu[]> {
+
+        
         const query = isSuperAdmin
             ? `SELECT 
                     M.CODMNU AS codice_menu, 
@@ -187,6 +191,14 @@ export class PermissionService  {
 
     public async assignRolesToUser(codiceUtente: string, roles: string[]): Promise<void> {
         try {
+
+            const userExistsQuery = `SELECT COUNT(*) FROM UTENTI WHERE CODUTE = ?`;
+            let result = await Orm.query(this.accessiOptions.databaseOptions, userExistsQuery, [codiceUtente]);
+
+            if (result[0].COUNT === 0) {
+                throw new Error(`L'utente con codice ${codiceUtente} non esiste.`);
+            }
+
             const deleteQuery = `DELETE FROM UTENTI_RUOLI WHERE CODUTE = ?`;
             await Orm.query(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
     
@@ -203,6 +215,14 @@ export class PermissionService  {
 
     public async assignPermissionsToUser(codiceUtente: string, permissions: Permission[]): Promise<void> {
         try {
+
+            const userExistsQuery = `SELECT COUNT(*) FROM UTENTI WHERE CODUTE = ?`;
+            let result = await Orm.query(this.accessiOptions.databaseOptions, userExistsQuery, [codiceUtente]);
+
+            if (result[0].COUNT === 0) {
+                throw new Error(`L'utente con codice ${codiceUtente} non esiste.`);
+            }
+            
             const deleteQuery = `DELETE FROM ABILITAZIONI WHERE CODUTE = ?`;
             await Orm.execute(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
     
@@ -215,6 +235,58 @@ export class PermissionService  {
             throw error;
         }
     }
+
+
+    public async deleteRole(codiceRuolo: number): Promise<void> {
+        try {
+
+            const existsQuery = `SELECT COUNT(*) FROM RUOLI WHERE CODRUO = ?`;
+            let result = await Orm.query(this.accessiOptions.databaseOptions, existsQuery, [codiceRuolo]);
+
+            if (result[0].COUNT === 0) {
+                throw new Error(`Il ruolo con codice ${codiceRuolo} non esiste.`);
+            }
+            
+            const deleteRoleMenusQuery = `DELETE FROM RUOLI_MNU WHERE CODRUO = ?`;
+            await Orm.query(this.accessiOptions.databaseOptions, deleteRoleMenusQuery, [codiceRuolo]);
+    
+            const deleteRoleUsersQuery = `DELETE FROM UTENTI_RUOLI WHERE CODRUO = ?`;
+            await Orm.query(this.accessiOptions.databaseOptions, deleteRoleUsersQuery, [codiceRuolo]);
+    
+            const deleteRoleQuery = `DELETE FROM RUOLI WHERE CODRUO = ?`;
+            await Orm.query(this.accessiOptions.databaseOptions, deleteRoleQuery, [codiceRuolo]);
+    
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    public async getMenus(): Promise<MenuEntity[]> {
+        try {
+            const query = `
+                SELECT 
+                    M.CODMNU AS codiceMenu, 
+                    M.DESMNU AS descrizioneMenu,
+                    M.CODGRP AS codiceGruppo,
+                    G.DESGRP AS descrizioneGruppo,
+                    M.ICON AS icona,
+                    M.CODTIP AS tipo,
+                    M.PAGINA AS pagina
+                FROM MENU M
+                LEFT JOIN MENU_GRP G ON M.CODGRP = G.CODGRP
+                WHERE M.FLGENABLED = 1
+                ORDER BY G.CODGRP, M.CODMNU
+            `;
+    
+            const result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
+            return result.map(RestUtilities.convertKeysToCamelCase);
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    
     
     
     

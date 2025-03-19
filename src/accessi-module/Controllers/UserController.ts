@@ -7,6 +7,7 @@ import { UserService } from '../Services/UserService/UserService';
 import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
 import { User } from '../Dtos';
+import { GetUsersResponse } from '../Dtos/GetUsersResponse';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -25,7 +26,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Recupera la lista degli utenti' })
-    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo' })
+    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: [GetUsersResponse] })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Get('get-users')
     async getUsers(@Res() res: Response) {
@@ -38,13 +39,20 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Elimina un utente' })
-    @ApiBody({ schema: { properties: { codiceUtente: { type: 'string', description: 'Codice identificativo dell\'utente' } } } })
-    @ApiResponse({ status: 200, description: 'Utente eliminato con successo' })
-    @ApiResponse({ status: 400, description: 'Errore nei parametri della richiesta' })
-    @Delete('delete-user')
-    async deleteUser(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    @ApiParam({
+        name: 'codiceUtente',
+        description: "Codice identificativo dell'utente da eliminare",
+        required: true,
+        example: "USR123"
+    })
+    @ApiResponse({ status: 200, description: "Utente eliminato con successo" })
+    @ApiResponse({ status: 400, description: "Errore nei parametri della richiesta" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Delete('delete-user/:codiceUtente')
+    async deleteUser(@Param('codiceUtente') codiceUtente: string, @Res() res: Response) {
         try {
             if (!codiceUtente) throw new Error('Il campo "Codice Utente" è obbligatorio.');
+
             await this.userService.deleteUser(codiceUtente);
             return RestUtilities.sendOKMessage(res, "L'utente è stato eliminato con successo.");
         } catch (error) {
@@ -74,26 +82,48 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Aggiorna un utente esistente' })
-    @ApiBody({ type: User, description: 'Dati aggiornati dell\'utente' })
-    @ApiResponse({ status: 200, description: 'Utente aggiornato con successo' })
-    @ApiResponse({ status: 400, description: 'Errore nellaggiornamento' })
-    @Put('update-utente')
-    async updateUtente(@Body() user: User, @Res() res: Response) {
+    @ApiParam({
+        name: 'codiceUtente',
+        description: "Codice identificativo dell'utente da aggiornare",
+        required: true,
+        example: "USR123"
+    })
+    @ApiBody({
+        type: User,
+        description: "Dati aggiornati dell'utente (escluso il codice utente, che è nel path)"
+    })
+    @ApiResponse({ status: 200, description: "Utente aggiornato con successo" })
+    @ApiResponse({ status: 400, description: "Errore nell'aggiornamento" })
+    @Put('update-user/:codiceUtente')
+    async updateUtente(
+        @Param('codiceUtente') codiceUtente: string,
+        @Body() user: User,
+        @Res() res: Response
+    ) {
         try {
-            await this.userService.updateUser(user);
-            return RestUtilities.sendOKMessage(res, `L'utente ${user.codiceUtente} è stato aggiornato con successo.`);
+            if (!codiceUtente) throw new Error("Il codice utente è obbligatorio.");
+            
+            await this.userService.updateUser(codiceUtente, user);
+            return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} è stato aggiornato con successo.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, UserController.name);
         }
     }
 
-    @ApiOperation({ summary: 'Imposta il consenso GDPR' })
-    @ApiBody({ schema: { properties: { codiceUtente: { type: 'string', description: 'Codice identificativo dell\'utente' } } } })
-    @ApiResponse({ status: 200, description: 'Consenso GDPR impostato con successo' })
-    @ApiResponse({ status: 400, description: 'Errore nella richiesta' })
-    @Patch('set-gdpr')
-    async setGdpr(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    @ApiOperation({ summary: "Imposta il consenso GDPR per un utente" })
+    @ApiParam({
+        name: "codiceUtente",
+        description: "Codice identificativo dell'utente che accetta il GDPR",
+        required: true,
+        example: "USR123"
+    })
+    @ApiResponse({ status: 200, description: "Consenso GDPR impostato con successo" })
+    @ApiResponse({ status: 400, description: "Errore nella richiesta" })
+    @Patch('set-gdpr/:codiceUtente')
+    async setGdpr(@Param('codiceUtente') codiceUtente: string, @Res() res: Response) {
         try {
+            if (!codiceUtente) throw new Error("Il codice utente è obbligatorio.");
+            
             await this.userService.setGdpr(codiceUtente);
             return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} ha accettato il GDPR.`);
         } catch (error) {

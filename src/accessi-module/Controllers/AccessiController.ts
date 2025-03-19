@@ -158,16 +158,6 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Aggiorna un utente esistente' })
-    @Post('update-utente')
-    async updateUtente(@Body() user: any, @Res() res: Response) {
-        try {
-            await this.userService.updateUser(user);
-            return RestUtilities.sendOKMessage(res, `L'utente ${user.codiceUtente} è stato aggiornato con successo.`);
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
-        }
-    }
 
     @ApiOperation({ summary: 'Imposta il consenso GDPR' })
     @Post('set-gdpr')

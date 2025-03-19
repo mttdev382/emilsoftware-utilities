@@ -3,11 +3,11 @@ import { autobind } from "../../../autobind";
 import { Orm } from "../../../Orm";
 import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
-import { UserQueryResult } from "../../models/QueryResults/UserQueryResult";
 import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 import { EmailService } from "../EmailService/EmailService";
 import { User } from "../../Dtos/User";
 import { FiltriUtente } from "../../Dtos/FiltriUtente";
+import { GetUsersResponse } from "../../Dtos/GetUsersResponse";
 
 @autobind
 @Injectable()
@@ -16,7 +16,7 @@ export class UserService  {
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService
     ) { }
-    async getUsers(): Promise<UserQueryResult[]> {
+    async getUsers(): Promise<GetUsersResponse[]> {
         try {
             const query = ` 
             SELECT  
@@ -149,15 +149,15 @@ export class UserService  {
         }
     }
 
-    async updateUser(user: User): Promise<void> {
+    async updateUser(codiceUtente: string, user: User): Promise<void> {
         try {
-            if (!user.codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
+            if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
 
             const queryUtenti = `
                 UPDATE UTENTI 
                 SET usrname = ?, flggdpr = ?, stareg=? 
                 WHERE CODUTE = ?`;
-            const paramsUtenti = [user.username, user.flagGdpr, user.statoRegistrazione, user.codiceUtente];
+            const paramsUtenti = [user.username, user.flagGdpr, user.statoRegistrazione, codiceUtente];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 
@@ -165,7 +165,7 @@ export class UserService  {
                 UPDATE UTENTI_CONFIG 
                 SET cognome = ?, nome = ?, avatar=?, flg2fatt=?, codlingua=?, cellulare=?, flgsuper=?, pagdef=?, json_metadata=? 
                 WHERE CODUTE = ?`;
-            const paramsUtentiConfig = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.paginaDefault, user.jsonMetadata, user.codiceUtente];
+            const paramsUtentiConfig = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.paginaDefault, user.jsonMetadata, codiceUtente];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
         } catch (error) {

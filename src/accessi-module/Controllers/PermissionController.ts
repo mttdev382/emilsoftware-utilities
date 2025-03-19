@@ -1,10 +1,10 @@
-import { Body, Controller, Get, HttpStatus, Inject, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Inject, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiBody, ApiInternalServerErrorResponse, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { PermissionService } from '../Services/PermissionService/PermissionService';
-import { RoleWithMenus } from '../Dtos/RoleWithMenus';
+import { Role } from '../Dtos/Role';
 import { AssignRolesToUserRequest } from '../Dtos/AssignRolesToUserRequest';
 import { AssignPermissionsToUserRequest } from '../Dtos/AssignPermissionsToUserRequest';
 
@@ -37,7 +37,7 @@ export class PermissionController {
      * @returns Un array di ruoli con menù associati.
      */
     @ApiOperation({ summary: 'Ritorna i ruoli disponibili con i relativi menù', description: 'Recupera tutti i ruoli presenti nel sistema con le relative voci di menu accessibili.' })
-    @ApiOkResponse({ description: 'Elenco dei ruoli con i rispettivi menù', type: [RoleWithMenus] })
+    @ApiOkResponse({ description: 'Elenco dei ruoli con i rispettivi menù', type: [Role] })
     @ApiInternalServerErrorResponse({ description: 'Errore interno del server' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Lista dei ruoli con i menù restituita con successo.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Errore interno del server durante il recupero dei ruoli.' })
@@ -53,24 +53,32 @@ export class PermissionController {
     }
 
     @ApiOperation({ summary: 'Aggiorna un ruolo esistente' })
-    @ApiResponse({ status: 200, description: 'Il ruolo è stato aggiornato con successo' })
-    @ApiResponse({ status: 400, description: 'Errore di validazione nei dati inviati' })
-    @ApiResponse({ status: 500, description: 'Errore interno del server' })
-    @ApiBody({
-        description: 'Dati del ruolo da aggiornare',
+    @ApiParam({
+        name: 'codiceRuolo',
+        description: "Codice identificativo del ruolo da aggiornare",
         required: true,
-        type: RoleWithMenus
+        example: "ROLE_ADMIN"
     })
-    @Put('update-role')
-    async updateRole(@Res() res: Response, @Body() role: RoleWithMenus) {
+    @ApiBody({
+        description: "Dati aggiornati del ruolo (escluso il codice ruolo, che è nel path)",
+        type: Role
+    })
+    @ApiResponse({ status: 200, description: "Il ruolo è stato aggiornato con successo" })
+    @ApiResponse({ status: 400, description: "Errore di validazione nei dati inviati" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Put('update-role/:codiceRuolo')
+    async updateRole(
+        @Param('codiceRuolo') codiceRuolo: string,
+        @Body() role: Role,
+        @Res() res: Response
+    ) {
         try {
-            if (!role) throw new Error("Il ruolo non può essere vuoto.");
-            if (!role.codiceRuolo) throw new Error("Il codice del ruolo non può essere vuoto.");
+            if (!codiceRuolo) throw new Error("Il codice del ruolo è obbligatorio.");
             if (!role.descrizioneRuolo) throw new Error("La descrizione del ruolo non può essere vuota.");
             if (!role.menu || role.menu.length === 0) throw new Error("Il ruolo deve avere almeno un menù.");
 
-            await this.permissionService.updateOrInsertRole(role);
-            return RestUtilities.sendOKMessage(res, "Il ruolo è stato aggiornato con successo.");
+            await this.permissionService.updateOrInsertRole(role, codiceRuolo);
+            return RestUtilities.sendOKMessage(res, `Il ruolo ${codiceRuolo} è stato aggiornato con successo.`);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
@@ -83,10 +91,10 @@ export class PermissionController {
     @ApiBody({
         description: 'Dati del nuovo ruolo',
         required: true,
-        type: RoleWithMenus
+        type: Role
     })
     @Post('create-role')
-    async createRole(@Res() res: Response, @Body() role: RoleWithMenus) {
+    async createRole(@Res() res: Response, @Body() role: Role) {
         try {
             if (!role) throw new Error("Il ruolo non può essere vuoto.");
             if (!role.descrizioneRuolo) throw new Error("La descrizione del ruolo non può essere vuota.");
@@ -167,6 +175,43 @@ export class PermissionController {
 
             await this.permissionService.assignPermissionsToUser(codiceUtente, assignPermissionsRequest.permissions);
             return RestUtilities.sendOKMessage(res, `Le abilitazioni sono state assegnate all'utente ${codiceUtente}.`);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
+        }
+    }
+
+
+    @ApiOperation({ summary: 'Elimina un ruolo esistente' })
+    @ApiParam({
+        name: 'codiceRuolo',
+        description: "Codice identificativo del ruolo da eliminare",
+        required: true,
+        example: 382
+    })
+    @ApiResponse({ status: 200, description: "Ruolo eliminato con successo" })
+    @ApiResponse({ status: 400, description: "Errore nei parametri della richiesta" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Delete('delete-role/:codiceRuolo')
+    async deleteRole(@Param('codiceRuolo') codiceRuolo: number, @Res() res: Response) {
+        try {
+            if (!codiceRuolo) throw new Error("Il codice del ruolo è obbligatorio.");
+
+            await this.permissionService.deleteRole(codiceRuolo);
+            return RestUtilities.sendOKMessage(res, `Il ruolo ${codiceRuolo} è stato eliminato con successo.`);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
+        }
+    }
+
+
+    @ApiOperation({ summary: 'Recupera tutti i menù disponibili' })
+    @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Get('menus')
+    async getMenus(@Res() res: Response) {
+        try {
+            const menus = await this.permissionService.getMenus();
+            return RestUtilities.sendBaseResponse(res, menus);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
