@@ -18,14 +18,14 @@ export class UserController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @ApiOperation({ summary: 'Servire la pagina di reset password' })
+    @ApiOperation({ summary: 'Servire la pagina di reset password', operationId: "serveResetPasswordPage" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
     @Get('reset-password/:token')
     async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string) {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
     }
 
-    @ApiOperation({ summary: 'Recupera la lista degli utenti' })
+    @ApiOperation({ summary: 'Recupera la lista degli utenti', operationId: "getUsers" })
     @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: [GetUsersResponse] })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Get('get-users')
@@ -38,7 +38,7 @@ export class UserController {
         }
     }
 
-    @ApiOperation({ summary: 'Elimina un utente' })
+    @ApiOperation({ summary: 'Elimina un utente', operationId: "deleteUser" })
     @ApiParam({
         name: 'codiceUtente',
         description: "Codice identificativo dell'utente da eliminare",
@@ -60,7 +60,7 @@ export class UserController {
         }
     }
 
-    @ApiOperation({ summary: 'Registra un nuovo utente' })
+    @ApiOperation({ summary: 'Registra un nuovo utente', operationId: "register" })
     @ApiBody({ type: User, description: 'Dati dell\'utente da registrare' })
     @ApiResponse({ status: 201, description: 'Utente registrato con successo' })
     @ApiResponse({ status: 400, description: 'Errore nella registrazione' })
@@ -81,7 +81,7 @@ export class UserController {
         }
     }
 
-    @ApiOperation({ summary: 'Aggiorna un utente esistente' })
+    @ApiOperation({ summary: 'Aggiorna un utente esistente', operationId: "updateUtente" })
     @ApiParam({
         name: 'codiceUtente',
         description: "Codice identificativo dell'utente da aggiornare",
@@ -110,7 +110,7 @@ export class UserController {
         }
     }
 
-    @ApiOperation({ summary: "Imposta il consenso GDPR per un utente" })
+    @ApiOperation({ summary: "Imposta il consenso GDPR per un utente", operationId: "setGdpr" })
     @ApiParam({
         name: "codiceUtente",
         description: "Codice identificativo dell'utente che accetta il GDPR",

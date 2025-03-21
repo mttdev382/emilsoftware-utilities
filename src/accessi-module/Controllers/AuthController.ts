@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
+import { LoginRequest } from '../Dtos';
 
 @ApiTags('Auth')
 @Controller('accessi/auth')
@@ -14,7 +15,7 @@ export class AuthController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @ApiOperation({ summary: 'Conferma il reset della password' })
+    @ApiOperation({ summary: 'Conferma il reset della password', operationId: "resetPassword" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
     @ApiBody({ schema: { properties: { newPassword: { type: 'string', description: 'Nuova password da impostare' } } } })
     @ApiResponse({ status: 200, description: 'Password aggiornata con successo' })
@@ -29,7 +30,7 @@ export class AuthController {
         }
     }
 
-    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })
+    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT', operationId: "getUserByToken" })
     @ApiBody({ schema: { properties: { token: { type: 'string', description: 'JWT dell\'utente' } } } })
     @ApiResponse({ status: 200, description: 'Informazioni utente recuperate con successo' })
     @ApiResponse({ status: 401, description: 'Token non valido o scaduto' })
@@ -45,7 +46,7 @@ export class AuthController {
         }
     }
 
-    @ApiOperation({ summary: 'Effettua il login' })
+    @ApiOperation({ summary: 'Effettua il login', operationId: "login" })
     @ApiBody({
         schema: {
             properties: {
@@ -57,11 +58,11 @@ export class AuthController {
     @ApiResponse({ status: 200, description: 'Login effettuato con successo' })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Post('login')
-    async login(@Body() loginDto: { email: string; password: string }, @Res() res: Response) {
+    async login(@Body() loginRequest: LoginRequest, @Res() res: Response) {
         try {
 
 
-            const userData = await this.authService.login(loginDto);
+            const userData = await this.authService.login(loginRequest);
             if (!userData) return RestUtilities.sendInvalidCredentials(res);
 
             userData.token = {

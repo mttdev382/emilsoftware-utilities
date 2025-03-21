@@ -15,7 +15,7 @@ export class EmailController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @ApiOperation({ summary: 'Serve una pagina per il reset della password' })
+    @ApiOperation({ summary: 'Serve una pagina per il reset della password', operationId: "serveResetPasswordPage" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
     @ApiResponse({ status: 200, description: 'Pagina di reset password servita con successo' })
     @Get('reset-password-page/:token')
@@ -23,7 +23,7 @@ export class EmailController {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
     }
 
-    @ApiOperation({ summary: 'Invia una e-mail per il reset della password' })
+    @ApiOperation({ summary: 'Invia una e-mail per il reset della password', operationId: "sendPasswordResetEmail" })
     @ApiBody({ schema: { properties: { email: { type: 'string', description: "L'email dell'utente che richiede il reset" } } } })
     @ApiResponse({ status: 200, description: "L'email di reset è stata inviata con successo" })
     @ApiResponse({ status: 400, description: "Errore nella richiesta: protocollo o host non impostati" })

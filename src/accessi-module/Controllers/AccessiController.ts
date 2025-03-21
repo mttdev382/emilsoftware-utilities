@@ -40,7 +40,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT' })
+    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT', operationId: "getUserByToken" })
     @Post('get-user-by-token')
     async getUserByToken(@Body('token') token: string, @Res() res: Response) {
         try {
@@ -53,7 +53,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Effettua il login' })
+    @ApiOperation({ summary: 'Effettua il login', operationId: "login" })
     @Post('login')
     async login(@Body() loginDto: { email: string; password: string }, @Res() res: Response) {
         try {
@@ -70,7 +70,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Recupera la lista degli utenti' })
+    @ApiOperation({ summary: 'Recupera la lista degli utenti', operationId: "getUsers" })
     @Post('get-users')
     async getUsers(@Res() res: Response) {
         try {
@@ -81,7 +81,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Elimina un utente' })
+    @ApiOperation({ summary: 'Elimina un utente', operationId: "deleteUser" })
     @Post('delete-user')
     async deleteUser(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
         try {
@@ -93,7 +93,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Registra un nuovo utente' })
+    @ApiOperation({ summary: 'Registra un nuovo utente', operationId: "register" })
     @Post('register')
     async register(@Req() request: Request, @Body() registrationData: User, @Res() res: Response) {
         try {
@@ -114,7 +114,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Crittografa i dati' })
+    @ApiOperation({ summary: 'Crittografa i dati' , operationId: "encrypt"})
     @Post('encrypt')
     async encrypt(@Body('data') data: string, @Res() res: Response) {
         try {
@@ -125,7 +125,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Decrittografa i dati' })
+    @ApiOperation({ summary: 'Decrittografa i dati', operationId: "decrypt" })
     @Post('decrypt')
     async decrypt(@Body('data') data: string, @Res() res: Response) {
         try {
@@ -136,7 +136,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Resetta le abilitazioni di un utente' })
+    @ApiOperation({ summary: 'Resetta le abilitazioni di un utente', operationId: "resetAbilitazioni" })
     @Post('reset-abilitazioni')
     async resetAbilitazioni(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
         try {
@@ -147,7 +147,7 @@ export class AccessiController {
         }
     }
 
-    @ApiOperation({ summary: 'Imposta una nuova password' })
+    @ApiOperation({ summary: 'Imposta una nuova password', operationId: "setPassword" })
     @Post('set-password')
     async setPassword(@Body() request: { codiceUtente: string; nuovaPassword: string }, @Res() res: Response) {
         try {
@@ -159,7 +159,7 @@ export class AccessiController {
     }
 
 
-    @ApiOperation({ summary: 'Imposta il consenso GDPR' })
+    @ApiOperation({ summary: 'Imposta il consenso GDPR', operationId: "setGdpr" })
     @Post('set-gdpr')
     async setGdpr(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
         try {

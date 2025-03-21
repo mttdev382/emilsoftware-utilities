@@ -18,7 +18,7 @@ export class PermissionController {
     ) { }
 
     /*
-        @ApiOperation({ summary: 'Resetta le abilitazioni di un utente' })
+        @ApiOperation({ summary: 'Resetta le abilitazioni di un utente', operationId: "resetAbilitazioni" })
         @Post('reset-abilitazioni')
         async resetAbilitazioni(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
             try {
@@ -36,7 +36,7 @@ export class PermissionController {
      * @description Endpoint per ottenere tutti i ruoli con i relativi menù.
      * @returns Un array di ruoli con menù associati.
      */
-    @ApiOperation({ summary: 'Ritorna i ruoli disponibili con i relativi menù', description: 'Recupera tutti i ruoli presenti nel sistema con le relative voci di menu accessibili.' })
+    @ApiOperation({ summary: 'Ritorna i ruoli disponibili con i relativi menù', operationId: "getRoles", description: 'Recupera tutti i ruoli presenti nel sistema con le relative voci di menu accessibili.' })
     @ApiOkResponse({ description: 'Elenco dei ruoli con i rispettivi menù', type: [Role] })
     @ApiInternalServerErrorResponse({ description: 'Errore interno del server' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Lista dei ruoli con i menù restituita con successo.' })
@@ -52,7 +52,7 @@ export class PermissionController {
         }
     }
 
-    @ApiOperation({ summary: 'Aggiorna un ruolo esistente' })
+    @ApiOperation({ summary: 'Aggiorna un ruolo esistente', operationId: "updateRole" })
     @ApiParam({
         name: 'codiceRuolo',
         description: "Codice identificativo del ruolo da aggiornare",
@@ -84,7 +84,7 @@ export class PermissionController {
         }
     }
 
-    @ApiOperation({ summary: 'Crea un nuovo ruolo' })
+    @ApiOperation({ summary: 'Crea un nuovo ruolo', operationId: "createRole" })
     @ApiResponse({ status: 201, description: 'Il ruolo è stato creato con successo' })
     @ApiResponse({ status: 400, description: 'Errore di validazione nei dati inviati' })
     @ApiResponse({ status: 500, description: 'Errore interno del server' })
@@ -110,7 +110,7 @@ export class PermissionController {
 
 
     
-    @ApiOperation({ summary: 'Assegna più ruoli a un utente' })
+    @ApiOperation({ summary: 'Assegna più ruoli a un utente', operationId: "assignRolesToUser" })
     @ApiParam({
         name: 'codiceUtente',
         description: 'Codice identificativo dell\'utente a cui assegnare i ruoli',
@@ -147,7 +147,7 @@ export class PermissionController {
 
 
 
-    @ApiOperation({ summary: 'Assegna abilitazioni dirette a un utente' })
+    @ApiOperation({ summary: 'Assegna abilitazioni dirette a un utente', operationId: "assignPermissionsToUser" })
     @ApiParam({
         name: 'codiceUtente',
         description: 'Codice identificativo dell\'utente a cui assegnare le abilitazioni',
@@ -181,7 +181,7 @@ export class PermissionController {
     }
 
 
-    @ApiOperation({ summary: 'Elimina un ruolo esistente' })
+    @ApiOperation({ summary: 'Elimina un ruolo esistente', operationId: "deleteRole" })
     @ApiParam({
         name: 'codiceRuolo',
         description: "Codice identificativo del ruolo da eliminare",
@@ -204,7 +204,7 @@ export class PermissionController {
     }
 
 
-    @ApiOperation({ summary: 'Recupera tutti i menù disponibili' })
+    @ApiOperation({ summary: 'Recupera tutti i menù disponibili', operationId: "getMenus" })
     @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
     @ApiResponse({ status: 500, description: "Errore interno del server" })
     @Get('menus')
