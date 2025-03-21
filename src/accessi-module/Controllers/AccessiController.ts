@@ -55,7 +55,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Effettua il login' })
     @Post('login')
-    async login(@Body() loginDto: { username: string; password: string }, @Res() res: Response) {
+    async login(@Body() loginDto: { email: string; password: string }, @Res() res: Response) {
         try {
             const userData = await this.authService.login(loginDto);
             if (!userData) return RestUtilities.sendInvalidCredentials(res);
@@ -107,7 +107,7 @@ export class AccessiController {
             await this.userService.register(registrationData);
 
             let confirmationEmailPrefix = protocol + "://"+ host;
-            await this.emailService.sendPasswordResetEmail(registrationData.username, confirmationEmailPrefix);
+            await this.emailService.sendPasswordResetEmail(registrationData.email, confirmationEmailPrefix);
             return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo, email di conferma inoltrata al destinatario.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, AccessiController.name);

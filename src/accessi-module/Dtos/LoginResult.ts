@@ -17,7 +17,7 @@ export class LoginResult {
 
     abilitazioni?: AbilitazioneMenu[];
 
-    @ApiProperty({ description: 'Username utente' })
+    @ApiProperty({ description: 'Token' })
     token?: TokenResult
 }
 

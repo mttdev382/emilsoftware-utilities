@@ -9,11 +9,11 @@ export class GetUsersResponse {
     codiceUtente: string;
 
     @ApiProperty({
-        description: "Username dell'utente.",
+        description: "Email dell'utente.",
         type: String,
-        example: "mario.rossi"
+        example: "mario.rossi@dev.it"
     })
-    username: string;
+    email: string;
 
     @ApiProperty({
         description: "Flag che indica se l'utente ha accettato il GDPR.",

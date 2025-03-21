@@ -9,10 +9,10 @@ export class User {
     codiceUtente?: string;
 
     @ApiPropertyOptional({
-        description: "Nome utente per l'autenticazione",
-        example: "m.rossi"
+        description: "Email per l'autenticazione",
+        example: "m.rossi@dev.it"
     })
-    username?: string;
+    email?: string;
 
     @ApiPropertyOptional({
         description: "Flag per l'accettazione del GDPR",
@@ -58,6 +58,14 @@ export class User {
     })
     codiceLingua?: string;
 
+
+    @ApiPropertyOptional({
+        description: "Data scadenza password",
+        example: "2025-06-01"
+    })
+    dataScadenzaPassword?: string;
+
+
     @ApiPropertyOptional({
         description: "Numero di cellulare dell'utente",
         example: "+393331234567",
@@ -82,4 +90,7 @@ export class User {
         example: "{ \"key\": \"value\" }",
     })
     jsonMetadata?: string;
+
+    roles: any[];
+    permissions: any[];
 }

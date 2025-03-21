@@ -21,7 +21,7 @@ export class UserService  {
             const query = ` 
             SELECT  
                 U.CODUTE as codice_utente, 
-                U.USRNAME as username, 
+                U.USRNAME as email, 
                 U.FLGGDPR as flag_gdpr, 
                 U.DATGDPR as data_gdpr, 
                 U.DATINS as data_inserimento, 
@@ -48,22 +48,23 @@ export class UserService  {
         }
     }
 
-    async getCodiceUtenteByUsername(username: string): Promise<{ codiceUtente: string }> {
+    async getCodiceUtenteByEmail(email: string): Promise<{ codiceUtente: string }> {
         try {
             const query = `SELECT CODUTE as codice_utente FROM UTENTI WHERE LOWER(USRNAME) = ?`;
-            const result = await Orm.query(this.accessiOptions.databaseOptions, query, [username.trim().toLowerCase()]);
+            const result = await Orm.query(this.accessiOptions.databaseOptions, query, [email.trim().toLowerCase()]);
             return result.map(RestUtilities.convertKeysToCamelCase)[0];
         } catch (error) {
             throw error;
         }
     }
 
-    async getUserByUsername(username: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<User | null> {
         const query = `
             SELECT 
                 U.CODUTE AS codice_utente, 
-                U.USRNAME AS username, 
+                U.USRNAME AS email, 
                 U.FLGGDPR AS flag_gdpr,
+                U.DATSCAPWD as data_scadenza_password,
                 U.STAREG AS stato_registrazione, 
                 C.COGNOME AS cognome, 
                 C.NOME AS nome, 
@@ -78,7 +79,7 @@ export class UserService  {
             WHERE LOWER(U.USRNAME) = ?
         `;
 
-        const utenti = await Orm.query(this.accessiOptions.databaseOptions, query, [username])
+        const utenti = await Orm.query(this.accessiOptions.databaseOptions, query, [email])
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as User[];
 
         return utenti.length > 0 ? utenti[0] : null;
@@ -108,22 +109,28 @@ export class UserService  {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,
                 "SELECT CODUTE FROM UTENTI WHERE USRNAME = ?",
-                [registrationData.username]
+                [registrationData.email]
             );
     
             if (existingUser.length > 0) {
-                throw new Error("Utente già esistente!");
+                throw new Error("Questa e-mail è già stata utilizzata!");
             }
 
 
             const queryUtenti = `INSERT INTO UTENTI (USRNAME, STAREG) VALUES (?,?) RETURNING CODUTE`;
-            const paramsUtenti = [registrationData.username, StatoRegistrazione.INVIO];
+            const paramsUtenti = [registrationData.email, StatoRegistrazione.INVIO];
 
             const codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
 
             const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA) VALUES (?,?,?,?)`;
             const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome, registrationData.codiceLingua];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
+
+            // TODO: Aggiungere la gestione dei ruoli
+            //registrationData.roles
+
+            // TODO: Aggiungere la gestione delle abilitazioni
+            //registrationData.permissions
 
         } catch (error) {
             throw error;
@@ -157,7 +164,7 @@ export class UserService  {
                 UPDATE UTENTI 
                 SET usrname = ?, flggdpr = ?, stareg=? 
                 WHERE CODUTE = ?`;
-            const paramsUtenti = [user.username, user.flagGdpr, user.statoRegistrazione, codiceUtente];
+            const paramsUtenti = [user.email, user.flagGdpr, user.statoRegistrazione, codiceUtente];
 
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
 

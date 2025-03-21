@@ -46,17 +46,21 @@ export class AuthController {
     }
 
     @ApiOperation({ summary: 'Effettua il login' })
-    @ApiBody({ schema: { 
-        properties: { 
-            username: { type: 'string', description: 'Username dell\'utente' }, 
-            password: { type: 'string', description: 'Password dell\'utente' } 
-        } 
-    }})
+    @ApiBody({
+        schema: {
+            properties: {
+                email: { type: 'string', description: 'Email dell\'utente' },
+                password: { type: 'string', description: 'Password dell\'utente' }
+            }
+        }
+    })
     @ApiResponse({ status: 200, description: 'Login effettuato con successo' })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Post('login')
-    async login(@Body() loginDto: { username: string; password: string }, @Res() res: Response) {
+    async login(@Body() loginDto: { email: string; password: string }, @Res() res: Response) {
         try {
+
+
             const userData = await this.authService.login(loginDto);
             if (!userData) return RestUtilities.sendInvalidCredentials(res);
 

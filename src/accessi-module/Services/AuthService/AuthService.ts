@@ -18,13 +18,16 @@ export class AuthService {
     ) { }
 
     async login(request: LoginRequest): Promise<LoginResult> {
-        if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "demo") return this.getDemoUser();
-        if (this.accessiOptions.mockDemoUser && request.username.toLowerCase() === "admin") return this.getAdminUser();
+        //TODO: gestione campi esterni con variabili di ambiente
+
+
+        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "demo") return this.getDemoUser();
+        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "admin") return this.getAdminUser();
 
         const passwordCifrata = CryptUtilities.encrypt(request.password, this.accessiOptions.encryptionKey);
 
         // Recupera l'utente dal database
-        const utente = await this.userService.getUserByUsername(request.username.toLowerCase());
+        const utente = await this.userService.getUserByEmail(request.email.toLowerCase());
         if (!utente) throw new Error("Nome utente o password errata!");
 
         // Verifica lo stato della registrazione
@@ -46,11 +49,21 @@ export class AuthService {
         const isPasswordValid = await this.verifyPassword(utente.codiceUtente, passwordCifrata);
         if (!isPasswordValid) throw new Error("Nome utente o password errata!");
 
+        const today = new Date();
+        const targetDate = new Date(utente.dataScadenzaPassword);
+
+        if (today >= targetDate) {
+            throw new Error("Password scaduta!");
+        }
+
         // Recupera le abilitazioni
         const abilitazioni = await this.permissionService.getAbilitazioniMenu(utente.codiceUtente, utente.flagSuper);
 
         // Recupera i filtri
         const filtri = await this.userService.getUserFilters(utente.codiceUtente);
+
+        const updateLastAccessDateQuery = "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
+        await Orm.query(this.accessiOptions.databaseOptions, updateLastAccessDateQuery, [utente.codiceUtente]);
 
         return { utente, filtri, abilitazioni };
     }
@@ -82,7 +95,7 @@ export class AuthService {
         return {
             utente: {
                 codiceUtente: "6789",
-                username: "admin",
+                email: "admin",
                 statoRegistrazione: StatoRegistrazione.CONF,
                 cognome: "Admin",
                 nome: "Admin",
@@ -93,6 +106,8 @@ export class AuthService {
                 cellulare: "+391234567890",
                 flagSuper: true,
                 paginaDefault: "/home",
+                roles: [],
+                permissions: []
             },
             filtri,
             abilitazioni
@@ -103,7 +118,7 @@ export class AuthService {
         return {
             utente: {
                 codiceUtente: "12345",
-                username: "jdoe",
+                email: "jdoe",
                 statoRegistrazione: StatoRegistrazione.CONF,
                 cognome: "Doe",
                 nome: "John",
@@ -114,6 +129,8 @@ export class AuthService {
                 cellulare: "+391234567890",
                 flagSuper: false,
                 paginaDefault: "/home",
+                roles: [],
+                permissions: []
             },
             filtri: null,
             abilitazioni: []
