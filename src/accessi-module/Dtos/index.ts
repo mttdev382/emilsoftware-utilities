@@ -4,7 +4,7 @@ export * from "./AssignPermissionsToUserRequest";
 export * from "./AssignRolesToUserRequest";
 export * from "./FiltriUtente";
 export * from "./LoginRequest";
-export * from "./LoginResult";
+export * from "./LoginResponse";
 export * from "./Permission";
 export * from "./Role";
 export * from "./StatoRegistrazione";

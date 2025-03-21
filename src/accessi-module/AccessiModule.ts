@@ -17,27 +17,35 @@ import { PermissionController } from "./Controllers/PermissionController";
 import { UserController } from "./Controllers/UserController";
 
 export interface JwtOptions {
-    secret: string
-    expiresIn: string
+  secret: string
+  expiresIn: string
 }
 
 export interface EmailOptions {
-    host: string,
-    port: number,
-    secure: boolean,
-    from: string
-    auth: {
-        user: string,
-        pass: string
-    }
+  host: string,
+  port: number,
+  secure: boolean,
+  from: string
+  auth: {
+    user: string,
+    pass: string
+  }
+}
+
+export interface ExternalFieldsOptions {
+  databaseOptions: Options;
+  tableName: string;
+  tableFields: string[];
 }
 
 export interface AccessiOptions {
-    databaseOptions: Options;
-    encryptionKey: string;
-    mockDemoUser: boolean;
-    jwtOptions: JwtOptions;
-    emailOptions: EmailOptions;
+  databaseOptions: Options;
+  encryptionKey: string;
+  mockDemoUser: boolean;
+  jwtOptions: JwtOptions;
+  emailOptions: EmailOptions;
+
+  extensionFieldsOptions: ExternalFieldsOptions[];
 }
 
 
@@ -49,7 +57,7 @@ export interface AccessiOptions {
 })
 export class AccessiModule {
   static forRoot(options: AccessiOptions): DynamicModule {
-    
+
     return {
       module: AccessiModule,
       providers: [

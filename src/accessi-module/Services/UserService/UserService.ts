@@ -8,13 +8,14 @@ import { EmailService } from "../EmailService/EmailService";
 import { User } from "../../Dtos/User";
 import { FiltriUtente } from "../../Dtos/FiltriUtente";
 import { GetUsersResponse } from "../../Dtos/GetUsersResponse";
+import { PermissionService } from "../PermissionService/PermissionService";
 
 @autobind
 @Injectable()
 export class UserService  {
 
     constructor(
-        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService, private readonly permissionService: PermissionService
     ) { }
     async getUsers(): Promise<GetUsersResponse[]> {
         try {
@@ -126,33 +127,16 @@ export class UserService  {
             const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome, registrationData.codiceLingua];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
 
-            // TODO: Aggiungere la gestione dei ruoli
-            //registrationData.roles
+            if(!!registrationData.roles && registrationData.roles.length > 0) {
+                await this.permissionService.assignRolesToUser(codiceUtente, registrationData.roles);
+            }
 
-            // TODO: Aggiungere la gestione delle abilitazioni
-            //registrationData.permissions
+            if(!!registrationData.permissions && registrationData.permissions.length > 0) {
+                await this.permissionService.assignPermissionsToUser(codiceUtente, registrationData.permissions);
+            }
 
         } catch (error) {
             throw error;
-        }
-    }
-
-    async setRegistrazioneConfermata(userKey: string): Promise<void> {
-        try {
-            const result = await Orm.query(
-                this.accessiOptions.databaseOptions,
-                "UPDATE UTENTI SET STAREG = ? WHERE KEYREG = ?",
-                [StatoRegistrazione.CONF, userKey]
-            );
-
-            if (result.affectedRows === 0) {
-                throw new Error("Nessun account trovato con la chiave fornita.");
-            }
-
-            console.log(`Registrazione confermata per la chiave: ${userKey}`);
-        } catch (error) {
-            console.error("Errore nell'aggiornamento dello stato di registrazione:", error);
-            throw new Error("Errore durante la conferma della registrazione.");
         }
     }
 
@@ -193,19 +177,6 @@ export class UserService  {
         try {
             let query = ` UPDATE OR INSERT UTENTI_GDPR SET CODUTE = ?, GDPR = ? `;
             let params = [codiceUtente, true];
-            let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
-            return result;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-    public async setStatoRegistrazione(statoRegistrazione: StatoRegistrazione, codiceUtente: string) {
-        try {
-            let query = ` UPDATE UTENTI SET STAREG = ? WHERE CODUTE = ? `;
-
-            let params = [statoRegistrazione, codiceUtente];
             let result = await Orm.execute(this.accessiOptions.databaseOptions, query, params);
             return result;
         } catch (error) {

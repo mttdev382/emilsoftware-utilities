@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { StatoRegistrazione } from "./StatoRegistrazione";
+import { Permission } from "./Permission";
 
 export class User {
     @ApiPropertyOptional({
@@ -91,6 +92,15 @@ export class User {
     })
     jsonMetadata?: string;
 
-    roles: any[];
-    permissions: any[];
+    @ApiPropertyOptional({
+        description: "Roles assigned to the user",
+        example: ["admin", "editor"],
+    })
+    roles: string[];
+
+    @ApiPropertyOptional({
+        description: "Permissions granted to the user",
+        example: [{ action: "read", resource: "posts" }],
+    })
+    permissions: Permission[];
 }

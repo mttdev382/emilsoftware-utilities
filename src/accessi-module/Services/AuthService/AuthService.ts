@@ -6,7 +6,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UserService } from "../UserService/UserService";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { LoginRequest } from "../../Dtos/LoginRequest";
-import { LoginResult } from "../../Dtos/LoginResult";
+import { LoginResponse } from "../../Dtos/LoginResponse";
 
 @Injectable()
 export class AuthService {
@@ -17,8 +17,7 @@ export class AuthService {
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) { }
 
-    async login(request: LoginRequest): Promise<LoginResult> {
-        //TODO: gestione campi esterni con variabili di ambiente
+    async login(request: LoginRequest): Promise<LoginResponse> {
 
 
         if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "demo") return this.getDemoUser();
@@ -65,7 +64,14 @@ export class AuthService {
         const updateLastAccessDateQuery = "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
         await Orm.query(this.accessiOptions.databaseOptions, updateLastAccessDateQuery, [utente.codiceUtente]);
 
-        return { utente, filtri, abilitazioni };
+        const extensionFields: any[] = [];
+        this.accessiOptions.extensionFieldsOptions.forEach(async (ext) => {
+            extensionFields.push(
+                await Orm.query(ext.databaseOptions, `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE CODUTE=?`, [utente.codiceUtente])
+            );
+        });
+
+        return { utente, filtri, abilitazioni, extensionFields };
     }
 
     public async setPassword(codiceUtente: string, nuovaPassword: string) {
@@ -88,7 +94,7 @@ export class AuthService {
     }
 
 
-    async getAdminUser(): Promise<LoginResult> {
+    async getAdminUser(): Promise<LoginResponse> {
 
         const abilitazioni = await this.permissionService.getAbilitazioniMenu("6789", true);
         const filtri = await this.userService.getUserFilters("6789");
@@ -114,7 +120,7 @@ export class AuthService {
         };
     }
 
-    getDemoUser(): LoginResult {
+    getDemoUser(): LoginResponse {
         return {
             utente: {
                 codiceUtente: "12345",
