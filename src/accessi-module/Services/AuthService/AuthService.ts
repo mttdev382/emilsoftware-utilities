@@ -67,7 +67,7 @@ export class AuthService {
         const extensionFields: any[] = [];
         this.accessiOptions.extensionFieldsOptions.forEach(async (ext) => {
             extensionFields.push(
-                await Orm.query(ext.databaseOptions, `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE CODUTE=?`, [utente.codiceUtente])
+                await Orm.query(ext.databaseOptions, `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName} = ?`, [utente.codiceUtente])
             );
         });
 

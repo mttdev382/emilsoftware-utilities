@@ -36,6 +36,7 @@ export interface ExternalFieldsOptions {
   databaseOptions: Options;
   tableName: string;
   tableFields: string[];
+  tableJoinFieldName: string;
 }
 
 export interface AccessiOptions {
@@ -45,7 +46,7 @@ export interface AccessiOptions {
   jwtOptions: JwtOptions;
   emailOptions: EmailOptions;
 
-  extensionFieldsOptions: ExternalFieldsOptions[];
+  extensionFieldsOptions?: ExternalFieldsOptions[];
 }
 
 
