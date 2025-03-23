@@ -96,11 +96,11 @@ export class AuthService {
 
     async getAdminUser(): Promise<LoginResponse> {
 
-        const abilitazioni = await this.permissionService.getAbilitazioniMenu("6789", true);
-        const filtri = await this.userService.getUserFilters("6789");
+        const abilitazioni = await this.permissionService.getAbilitazioniMenu(6789, true);
+        const filtri = await this.userService.getUserFilters(6789);
         return {
             utente: {
-                codiceUtente: "6789",
+                codiceUtente: 6789,
                 email: "admin",
                 statoRegistrazione: StatoRegistrazione.CONF,
                 cognome: "Admin",
@@ -123,7 +123,7 @@ export class AuthService {
     getDemoUser(): LoginResponse {
         return {
             utente: {
-                codiceUtente: "12345",
+                codiceUtente: 12345,
                 email: "jdoe",
                 statoRegistrazione: StatoRegistrazione.CONF,
                 cognome: "Doe",

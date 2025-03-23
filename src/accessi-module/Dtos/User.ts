@@ -5,9 +5,9 @@ import { Permission } from "./Permission";
 export class User {
     @ApiPropertyOptional({
         description: "Codice identificativo dell'utente",
-        example: "USR12345"
+        example: 123123
     })
-    codiceUtente?: string;
+    codiceUtente?: number;
 
     @ApiPropertyOptional({
         description: "Email per l'autenticazione",
