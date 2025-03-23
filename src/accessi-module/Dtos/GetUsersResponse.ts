@@ -6,7 +6,7 @@ export class GetUsersResponse {
         type: String,
         example: "USR123"
     })
-    codiceUtente: string;
+    codiceUtente: number;
 
     @ApiProperty({
         description: "Email dell'utente.",

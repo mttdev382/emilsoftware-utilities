@@ -49,7 +49,7 @@ export class UserController {
     @ApiResponse({ status: 400, description: "Errore nei parametri della richiesta" })
     @ApiResponse({ status: 500, description: "Errore interno del server" })
     @Delete('delete-user/:codiceUtente')
-    async deleteUser(@Param('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    async deleteUser(@Param('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             if (!codiceUtente) throw new Error('Il campo "Codice Utente" è obbligatorio.');
 
@@ -96,7 +96,7 @@ export class UserController {
     @ApiResponse({ status: 400, description: "Errore nell'aggiornamento" })
     @Put('update-user/:codiceUtente')
     async updateUtente(
-        @Param('codiceUtente') codiceUtente: string,
+        @Param('codiceUtente') codiceUtente: number,
         @Body() user: User,
         @Res() res: Response
     ) {
@@ -120,7 +120,7 @@ export class UserController {
     @ApiResponse({ status: 200, description: "Consenso GDPR impostato con successo" })
     @ApiResponse({ status: 400, description: "Errore nella richiesta" })
     @Patch('set-gdpr/:codiceUtente')
-    async setGdpr(@Param('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    async setGdpr(@Param('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             if (!codiceUtente) throw new Error("Il codice utente è obbligatorio.");
             

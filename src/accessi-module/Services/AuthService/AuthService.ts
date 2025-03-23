@@ -74,7 +74,7 @@ export class AuthService {
         return { utente, filtri, abilitazioni, extensionFields };
     }
 
-    public async setPassword(codiceUtente: string, nuovaPassword: string) {
+    public async setPassword(codiceUtente: number, nuovaPassword: string) {
         try {
             const query = `UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)`;
             const hashedPassword = CryptUtilities.encrypt(nuovaPassword, this.accessiOptions.encryptionKey);
@@ -85,7 +85,7 @@ export class AuthService {
         }
     }
 
-    async verifyPassword(codiceUtente: string, passwordCifrata: string): Promise<boolean> {
+    async verifyPassword(codiceUtente: number, passwordCifrata: string): Promise<boolean> {
         const query = `SELECT PWD AS password FROM UTENTI_PWD WHERE CODUTE = ?`;
         const result = await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente])
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as { password: string }[];

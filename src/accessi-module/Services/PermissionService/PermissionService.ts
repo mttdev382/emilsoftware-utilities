@@ -15,7 +15,7 @@ export class PermissionService  {
     ) { }
 
 
-    public async addAbilitazioni(codiceUtente: string, menuAbilitazioni: any[]): Promise<void> {
+    public async addAbilitazioni(codiceUtente: number, menuAbilitazioni: any[]): Promise<void> {
         try {
             const deleteQuery = `DELETE FROM ABILITAZIONI WHERE CODUTE = ?`;
             await Orm.execute(this.accessiOptions.databaseOptions, deleteQuery, [codiceUtente]);
@@ -36,7 +36,7 @@ export class PermissionService  {
     }
 
 
-    public async resetAbilitazioni(codiceUtente: string): Promise<void> {
+    public async resetAbilitazioni(codiceUtente: number): Promise<void> {
         try {
             const query = "DELETE FROM ABILITAZIONI WHERE CODUTE = ?";
             await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente]);
@@ -126,7 +126,7 @@ export class PermissionService  {
 
 
 
-    public async getAbilitazioniMenu(codiceUtente: string, isSuperAdmin: boolean): Promise<AbilitazioneMenu[]> {
+    public async getAbilitazioniMenu(codiceUtente: number, isSuperAdmin: boolean): Promise<AbilitazioneMenu[]> {
 
         
         const query = isSuperAdmin
@@ -189,7 +189,7 @@ export class PermissionService  {
     }
 
 
-    public async assignRolesToUser(codiceUtente: string, roles: string[]): Promise<void> {
+    public async assignRolesToUser(codiceUtente: number, roles: string[]): Promise<void> {
         try {
 
             const userExistsQuery = `SELECT COUNT(*) FROM UTENTI WHERE CODUTE = ?`;
@@ -213,7 +213,7 @@ export class PermissionService  {
     }
 
 
-    public async assignPermissionsToUser(codiceUtente: string, permissions: Permission[]): Promise<void> {
+    public async assignPermissionsToUser(codiceUtente: number, permissions: Permission[]): Promise<void> {
         try {
 
             const userExistsQuery = `SELECT COUNT(*) FROM UTENTI WHERE CODUTE = ?`;

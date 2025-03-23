@@ -11,7 +11,7 @@ export class Abilitazione {
   @IsString()
   @IsNotEmpty({ message: "Il codice utente è obbligatorio." })
   @Length(5, 20, { message: "Il codice utente deve essere tra 5 e 20 caratteri." })
-  codiceUtente: string;
+  codiceUtente: number;
 
   @ApiProperty({
     description: 'Codice univoco del menu',

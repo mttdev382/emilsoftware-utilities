@@ -83,7 +83,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Elimina un utente', operationId: "deleteUser" })
     @Post('delete-user')
-    async deleteUser(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    async deleteUser(@Body('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             if (!codiceUtente) throw new Error('Il campo "Codice Utente" è obbligatorio.');
             await this.userService.deleteUser(codiceUtente);
@@ -138,7 +138,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Resetta le abilitazioni di un utente', operationId: "resetAbilitazioni" })
     @Post('reset-abilitazioni')
-    async resetAbilitazioni(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    async resetAbilitazioni(@Body('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             await this.permissionService.resetAbilitazioni(codiceUtente);
             return RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${codiceUtente} sono state resettate con successo.`);
@@ -149,7 +149,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Imposta una nuova password', operationId: "setPassword" })
     @Post('set-password')
-    async setPassword(@Body() request: { codiceUtente: string; nuovaPassword: string }, @Res() res: Response) {
+    async setPassword(@Body() request: { codiceUtente: number; nuovaPassword: string }, @Res() res: Response) {
         try {
             await this.authService.setPassword(request.codiceUtente, request.nuovaPassword);
             return RestUtilities.sendOKMessage(res, `La password dell'utente ${request.codiceUtente} è stata impostata correttamente.`);
@@ -161,7 +161,7 @@ export class AccessiController {
 
     @ApiOperation({ summary: 'Imposta il consenso GDPR', operationId: "setGdpr" })
     @Post('set-gdpr')
-    async setGdpr(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+    async setGdpr(@Body('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             await this.userService.setGdpr(codiceUtente);
             return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} ha accettato il GDPR.`);

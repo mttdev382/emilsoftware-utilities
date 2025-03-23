@@ -49,7 +49,7 @@ export class UserService  {
         }
     }
 
-    async getCodiceUtenteByEmail(email: string): Promise<{ codiceUtente: string }> {
+    async getCodiceUtenteByEmail(email: string): Promise<{ codiceUtente: number }> {
         try {
             const query = `SELECT CODUTE as codice_utente FROM UTENTI WHERE LOWER(USRNAME) = ?`;
             const result = await Orm.query(this.accessiOptions.databaseOptions, query, [email.trim().toLowerCase()]);
@@ -86,7 +86,7 @@ export class UserService  {
         return utenti.length > 0 ? utenti[0] : null;
     }
 
-    async getUserFilters(codiceUtente: string): Promise<FiltriUtente[]> {
+    async getUserFilters(codiceUtente: number): Promise<FiltriUtente[]> {
         const query = `
             SELECT 
                 F.PROG AS progressivo, 
@@ -140,7 +140,7 @@ export class UserService  {
         }
     }
 
-    async updateUser(codiceUtente: string, user: User): Promise<void> {
+    async updateUser(codiceUtente: number, user: User): Promise<void> {
         try {
             if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
 
@@ -164,7 +164,7 @@ export class UserService  {
         }
     }
 
-    async deleteUser(codiceCliente: string): Promise<void> {
+    async deleteUser(codiceCliente: number): Promise<void> {
         try {
             const query = `UPDATE UTENTI SET STAREG = ? WHERE CODUTE = ?`;
             await Orm.execute(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE, codiceCliente]);
@@ -173,7 +173,7 @@ export class UserService  {
         }
     }
 
-    public async setGdpr(codiceUtente: string) {
+    public async setGdpr(codiceUtente: number) {
         try {
             let query = ` UPDATE OR INSERT UTENTI_GDPR SET CODUTE = ?, GDPR = ? `;
             let params = [codiceUtente, true];

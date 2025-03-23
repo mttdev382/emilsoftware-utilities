@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
-import { LoginRequest } from '../Dtos';
+import { LoginRequest, LoginResponse } from '../Dtos';
 
 @ApiTags('Auth')
 @Controller('accessi/auth')
@@ -46,34 +46,40 @@ export class AuthController {
         }
     }
 
-    @ApiOperation({ summary: 'Effettua il login', operationId: "login" })
-    @ApiBody({
-        schema: {
-            properties: {
-                email: { type: 'string', description: 'Email dell\'utente' },
-                password: { type: 'string', description: 'Password dell\'utente' }
-            }
-        }
-    })
-    @ApiResponse({ status: 200, description: 'Login effettuato con successo' })
-    @ApiResponse({ status: 401, description: 'Credenziali non valide' })
-    @Post('login')
-    async login(@Body() loginRequest: LoginRequest, @Res() res: Response) {
-        try {
+  @ApiOperation({
+    summary: 'Effettua il login utente',
+    description: 'Autentica l\'utente con email e password. Restituisce un token JWT e i dati dell\'utente se le credenziali sono corrette.',
+    operationId: 'login',
+  })
+  @ApiBody({ type: LoginRequest })
+  @ApiResponse({
+    status: 200,
+    description: 'Login effettuato con successo',
+    type: LoginResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Credenziali non valide',
+  })
+  @Post('login')
+  async login(@Body() loginRequest: LoginRequest, @Res() res: Response) {
+    try {
+      const userData = await this.authService.login(loginRequest);
+      if (!userData) {
+        return RestUtilities.sendInvalidCredentials(res);
+      }
 
+      userData.token = {
+        expiresIn: this.options.jwtOptions.expiresIn,
+        value: jwt.sign({ userData }, this.options.jwtOptions.secret, {
+          expiresIn: this.options.jwtOptions.expiresIn as any,
+        }),
+        type: 'Bearer',
+      };
 
-            const userData = await this.authService.login(loginRequest);
-            if (!userData) return RestUtilities.sendInvalidCredentials(res);
-
-            userData.token = {
-                expiresIn: this.options.jwtOptions.expiresIn,
-                value: jwt.sign({ userData }, this.options.jwtOptions.secret, { expiresIn: this.options.jwtOptions.expiresIn as any }),
-                type: 'Bearer',
-            };
-
-            return RestUtilities.sendBaseResponse(res, userData);
-        } catch (error) {
-            return RestUtilities.sendInvalidCredentials(res);
-        }
+      return RestUtilities.sendBaseResponse(res, userData);
+    } catch (error) {
+      return RestUtilities.sendInvalidCredentials(res);
     }
+  }
 }

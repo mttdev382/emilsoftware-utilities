@@ -20,7 +20,7 @@ export class PermissionController {
     /*
         @ApiOperation({ summary: 'Resetta le abilitazioni di un utente', operationId: "resetAbilitazioni" })
         @Post('reset-abilitazioni')
-        async resetAbilitazioni(@Body('codiceUtente') codiceUtente: string, @Res() res: Response) {
+        async resetAbilitazioni(@Body('codiceUtente') codiceUtente: number, @Res() res: Response) {
             try {
                 await this.permissionService.resetAbilitazioni(codiceUtente);
                 RestUtilities.sendOKMessage(res, `Le abilitazioni dell'utente ${codiceUtente} sono state resettate con successo.`);
@@ -127,7 +127,7 @@ export class PermissionController {
     @Post('assign-roles/:codiceUtente')
     async assignRolesToUser(
         @Res() res: Response,
-        @Param('codiceUtente') codiceUtente: string,
+        @Param('codiceUtente') codiceUtente: number,
         @Body() assignRolesRequest: AssignRolesToUserRequest
     ) {
         try {
@@ -164,7 +164,7 @@ export class PermissionController {
     @Post('assign-permissions/:codiceUtente')
     async assignPermissionsToUser(
         @Res() res: Response,
-        @Param('codiceUtente') codiceUtente: string,
+        @Param('codiceUtente') codiceUtente: number,
         @Body() assignPermissionsRequest: AssignPermissionsToUserRequest
     ) {
         try {
