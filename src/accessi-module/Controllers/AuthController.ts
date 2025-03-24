@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
-import { LoginRequest, LoginResponse } from '../Dtos';
+import { BaseResponse, LoginRequest, LoginResponse } from '../Dtos';
 
 @ApiTags('Auth')
 @Controller('accessi/auth')
@@ -55,7 +55,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Login effettuato con successo',
-    type: LoginResponse,
+    type: BaseResponse<LoginResponse>,
   })
   @ApiResponse({
     status: 401,

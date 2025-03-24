@@ -161,7 +161,7 @@ export class RestUtilities {
                     errorDescription: "",
                 },
                 Result: payload,
-                Message: "",
+                Message: "Dati recuperati con successo.",
             };
             return res.send(response);
         } catch (error) {
@@ -337,6 +337,6 @@ export class DatabaseUtilities {
 
 export function Deprecated(message: string) {
     return function (target: any, key?: string, descriptor?: PropertyDescriptor) {
-      console.warn(`⚠️ [DEPRECATED] ${message}`);
+      console.warn(`[DEPRECATED] ${message}`);
     };
   }

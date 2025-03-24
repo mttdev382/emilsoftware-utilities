@@ -2,6 +2,8 @@ export * from "./Abilitazione";
 export * from "./AbilitazioneMenu";
 export * from "./AssignPermissionsToUserRequest";
 export * from "./AssignRolesToUserRequest";
+export * from "./BaseResponse";
+
 export * from "./FiltriUtente";
 export * from "./LoginRequest";
 export * from "./LoginResponse";

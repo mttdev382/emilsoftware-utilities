@@ -6,7 +6,7 @@ import { AccessiOptions } from '../AccessiModule';
 import { UserService } from '../Services/UserService/UserService';
 import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
-import { User } from '../Dtos';
+import { BaseResponse, User } from '../Dtos';
 import { GetUsersResponse } from '../Dtos/GetUsersResponse';
 
 @ApiTags('User')
@@ -26,7 +26,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Recupera la lista degli utenti', operationId: "getUsers" })
-    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: [GetUsersResponse] })
+    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: [BaseResponse<GetUsersResponse[]>] })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Get('get-users')
     async getUsers(@Res() res: Response) {
