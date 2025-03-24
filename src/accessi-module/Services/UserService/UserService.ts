@@ -143,26 +143,81 @@ export class UserService  {
     async updateUser(codiceUtente: number, user: UserDto): Promise<void> {
         try {
             if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
-
-            const queryUtenti = `
-                UPDATE UTENTI 
-                SET usrname = ?, flggdpr = ?, stareg=? 
-                WHERE CODUTE = ?`;
-            const paramsUtenti = [user.email, user.flagGdpr, user.statoRegistrazione, codiceUtente];
-
-            await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti);
-
-            const queryUtentiConfig = `
-                UPDATE UTENTI_CONFIG 
-                SET cognome = ?, nome = ?, avatar=?, flg2fatt=?, codlingua=?, cellulare=?, flgsuper=?, pagdef=?, json_metadata=? 
-                WHERE CODUTE = ?`;
-            const paramsUtentiConfig = [user.cognome, user.nome, user.avatar, user.flagDueFattori, user.codiceLingua, user.cellulare, user.flagSuper, user.paginaDefault, user.jsonMetadata, codiceUtente];
-
-            await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
+    
+            // Costruzione dinamica della query per UTENTI
+            const utentiUpdates = [];
+            const utentiParams = [];
+    
+            if (user.email !== undefined) {
+                utentiUpdates.push("usrname = ?");
+                utentiParams.push(user.email);
+            }
+            if (user.flagGdpr !== undefined) {
+                utentiUpdates.push("flggdpr = ?");
+                utentiParams.push(user.flagGdpr);
+            }
+            if (user.statoRegistrazione !== undefined) {
+                utentiUpdates.push("stareg = ?");
+                utentiParams.push(user.statoRegistrazione);
+            }
+    
+            if (utentiUpdates.length > 0) {
+                const queryUtenti = `UPDATE UTENTI SET ${utentiUpdates.join(", ")} WHERE CODUTE = ?`;
+                utentiParams.push(codiceUtente);
+                await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, utentiParams);
+            }
+    
+            // Costruzione dinamica della query per UTENTI_CONFIG
+            const utentiConfigUpdates = [];
+            const utentiConfigParams = [];
+    
+            if (user.cognome !== undefined) {
+                utentiConfigUpdates.push("cognome = ?");
+                utentiConfigParams.push(user.cognome);
+            }
+            if (user.nome !== undefined) {
+                utentiConfigUpdates.push("nome = ?");
+                utentiConfigParams.push(user.nome);
+            }
+            if (user.avatar !== undefined) {
+                utentiConfigUpdates.push("avatar = ?");
+                utentiConfigParams.push(user.avatar);
+            }
+            if (user.flagDueFattori !== undefined) {
+                utentiConfigUpdates.push("flg2fatt = ?");
+                utentiConfigParams.push(user.flagDueFattori);
+            }
+            if (user.codiceLingua !== undefined) {
+                utentiConfigUpdates.push("codlingua = ?");
+                utentiConfigParams.push(user.codiceLingua);
+            }
+            if (user.cellulare !== undefined) {
+                utentiConfigUpdates.push("cellulare = ?");
+                utentiConfigParams.push(user.cellulare);
+            }
+            if (user.flagSuper !== undefined) {
+                utentiConfigUpdates.push("flgsuper = ?");
+                utentiConfigParams.push(user.flagSuper);
+            }
+            if (user.paginaDefault !== undefined) {
+                utentiConfigUpdates.push("pagdef = ?");
+                utentiConfigParams.push(user.paginaDefault);
+            }
+            if (user.jsonMetadata !== undefined) {
+                utentiConfigUpdates.push("json_metadata = ?");
+                utentiConfigParams.push(user.jsonMetadata);
+            }
+    
+            if (utentiConfigUpdates.length > 0) {
+                const queryUtentiConfig = `UPDATE UTENTI_CONFIG SET ${utentiConfigUpdates.join(", ")} WHERE CODUTE = ?`;
+                utentiConfigParams.push(codiceUtente);
+                await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, utentiConfigParams);
+            }
         } catch (error) {
             throw error;
         }
     }
+    
 
     async deleteUser(codiceCliente: number): Promise<void> {
         try {
