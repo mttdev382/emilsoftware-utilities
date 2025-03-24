@@ -6,8 +6,8 @@ import { AccessiOptions } from '../AccessiModule';
 import { UserService } from '../Services/UserService/UserService';
 import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
-import { BaseResponse, User } from '../Dtos';
 import { GetUsersResponse } from '../Dtos/GetUsersResponse';
+import { UserDto } from '../Dtos';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -26,7 +26,7 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Recupera la lista degli utenti', operationId: "getUsers" })
-    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: [BaseResponse<GetUsersResponse[]>] })
+    @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: GetUsersResponse })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Get('get-users')
     async getUsers(@Res() res: Response) {
@@ -61,11 +61,11 @@ export class UserController {
     }
 
     @ApiOperation({ summary: 'Registra un nuovo utente', operationId: "register" })
-    @ApiBody({ type: User, description: 'Dati dell\'utente da registrare' })
+    @ApiBody({ type: UserDto, description: 'Dati dell\'utente da registrare' })
     @ApiResponse({ status: 201, description: 'Utente registrato con successo' })
     @ApiResponse({ status: 400, description: 'Errore nella registrazione' })
     @Post('register')
-    async register(@Req() request: Request, @Body() registrationData: User, @Res() res: Response) {
+    async register(@Req() request: Request, @Body() registrationData: UserDto, @Res() res: Response) {
         try {
             let protocol = request["protocol"];
             let host = request.headers["host"];
@@ -89,7 +89,7 @@ export class UserController {
         example: "USR123"
     })
     @ApiBody({
-        type: User,
+        type: UserDto,
         description: "Dati aggiornati dell'utente (escluso il codice utente, che è nel path)"
     })
     @ApiResponse({ status: 200, description: "Utente aggiornato con successo" })
@@ -97,7 +97,7 @@ export class UserController {
     @Put('update-user/:codiceUtente')
     async updateUtente(
         @Param('codiceUtente') codiceUtente: number,
-        @Body() user: User,
+        @Body() user: UserDto,
         @Res() res: Response
     ) {
         try {

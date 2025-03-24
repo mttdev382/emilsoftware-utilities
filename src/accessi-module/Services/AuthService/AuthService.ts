@@ -6,7 +6,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { UserService } from "../UserService/UserService";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { LoginRequest } from "../../Dtos/LoginRequest";
-import { LoginResponse } from "../../Dtos/LoginResponse";
+import { LoginResponse, LoginResult } from "../../Dtos/LoginResponse";
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
     ) { }
 
-    async login(request: LoginRequest): Promise<LoginResponse> {
+    async login(request: LoginRequest): Promise<LoginResult> {
 
 
         if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "demo") return this.getDemoUser();
@@ -94,7 +94,7 @@ export class AuthService {
     }
 
 
-    async getAdminUser(): Promise<LoginResponse> {
+    async getAdminUser(): Promise<LoginResult> {
 
         const abilitazioni = await this.permissionService.getAbilitazioniMenu(6789, true);
         const filtri = await this.userService.getUserFilters(6789);
@@ -120,7 +120,7 @@ export class AuthService {
         };
     }
 
-    getDemoUser(): LoginResponse {
+    getDemoUser(): LoginResult {
         return {
             utente: {
                 codiceUtente: 12345,

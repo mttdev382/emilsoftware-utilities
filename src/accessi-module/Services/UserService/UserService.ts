@@ -5,10 +5,10 @@ import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 import { EmailService } from "../EmailService/EmailService";
-import { User } from "../../Dtos/User";
 import { FiltriUtente } from "../../Dtos/FiltriUtente";
 import { GetUsersResponse } from "../../Dtos/GetUsersResponse";
 import { PermissionService } from "../PermissionService/PermissionService";
+import { UserDto } from "../../Dtos";
 
 @autobind
 @Injectable()
@@ -59,7 +59,7 @@ export class UserService  {
         }
     }
 
-    async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<UserDto | null> {
         const query = `
             SELECT 
                 U.CODUTE AS codice_utente, 
@@ -81,7 +81,7 @@ export class UserService  {
         `;
 
         const utenti = await Orm.query(this.accessiOptions.databaseOptions, query, [email])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as User[];
+            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as UserDto[];
 
         return utenti.length > 0 ? utenti[0] : null;
     }
@@ -105,7 +105,7 @@ export class UserService  {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as FiltriUtente[];
     }
 
-    async register(registrationData: User): Promise<void> {
+    async register(registrationData: UserDto): Promise<void> {
         try {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,
@@ -140,7 +140,7 @@ export class UserService  {
         }
     }
 
-    async updateUser(codiceUtente: number, user: User): Promise<void> {
+    async updateUser(codiceUtente: number, user: UserDto): Promise<void> {
         try {
             if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
 

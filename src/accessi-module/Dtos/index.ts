@@ -12,4 +12,4 @@ export * from "./Role";
 export * from "./StatoRegistrazione";
 export * from "./TipoAbilitazione";
 export * from "./TokenResult";
-export * from "./User";
+export * from "./UserDto";

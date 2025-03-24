@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsString, ValidateNested, IsObject } from 'class-validator';
+import { IsObject, IsString, ValidateNested } from 'class-validator';
 
-export class StatusDto {
+export class Status {
   @ApiProperty({ example: '0', description: 'Codice di errore, "0" se tutto ok' })
   @IsString()
   errorCode: string;
@@ -12,13 +12,10 @@ export class StatusDto {
   errorDescription: string;
 }
 
-export class BaseResponse<T> {
-  @ApiProperty({ type: StatusDto })
+export abstract class BaseResponse {
+  @ApiProperty({ type: Status })
   @ValidateNested()
-  @Type(() => StatusDto)
+  @Type(() => Status)
   @IsObject()
-  Status: StatusDto;
-
-  @ApiProperty({ description: 'Risultato della richiesta', required: false })
-  Result: T;
+  Status: Status;
 }

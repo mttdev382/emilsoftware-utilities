@@ -9,6 +9,7 @@ import { AssignRolesToUserRequest } from '../Dtos/AssignRolesToUserRequest';
 import { AssignPermissionsToUserRequest } from '../Dtos/AssignPermissionsToUserRequest';
 import { BaseResponse } from '../Dtos';
 import { MenuEntity } from '../Dtos/GetMenusResponse';
+import { GetRolesResponse } from '../Dtos/GetRolesResponse';
 
 
 @ApiTags('Permission')
@@ -39,7 +40,7 @@ export class PermissionController {
      * @returns Un array di ruoli con menù associati.
      */
     @ApiOperation({ summary: 'Ritorna i ruoli disponibili con i relativi menù', operationId: "getRoles", description: 'Recupera tutti i ruoli presenti nel sistema con le relative voci di menu accessibili.' })
-    @ApiOkResponse({ description: 'Elenco dei ruoli con i rispettivi menù', type: [BaseResponse<Role[]>] })
+    @ApiOkResponse({ description: 'Elenco dei ruoli con i rispettivi menù', type: GetRolesResponse })
     @ApiInternalServerErrorResponse({ description: 'Errore interno del server' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Lista dei ruoli con i menù restituita con successo.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Errore interno del server durante il recupero dei ruoli.' })
@@ -207,7 +208,7 @@ export class PermissionController {
 
 
     @ApiOperation({ summary: 'Recupera tutti i menù disponibili', operationId: "getMenus" })
-    @ApiOkResponse({ description: 'Elenco menù', type: [BaseResponse<MenuEntity[]>] })
+    @ApiOkResponse({ description: 'Elenco menù', type: MenuEntity })
     @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
     @ApiResponse({ status: 500, description: "Errore interno del server" })
     @Get('menus')
