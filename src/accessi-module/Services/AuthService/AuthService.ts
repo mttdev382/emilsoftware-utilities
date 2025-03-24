@@ -55,8 +55,8 @@ export class AuthService {
             throw new Error("Password scaduta!");
         }
 
-        // Recupera le abilitazioni
-        const abilitazioni = await this.permissionService.getAbilitazioniMenu(utente.codiceUtente, utente.flagSuper);
+        // Recupera i grants
+        const userGrants = await this.permissionService.getUserRolesAndGrants(utente.codiceUtente);
 
         // Recupera i filtri
         const filtri = await this.userService.getUserFilters(utente.codiceUtente);
@@ -71,7 +71,7 @@ export class AuthService {
             );
         });
 
-        return { utente, filtri, abilitazioni, extensionFields };
+        return { utente, filtri, userGrants , extensionFields };
     }
 
     public async setPassword(codiceUtente: number, nuovaPassword: string) {
@@ -95,8 +95,7 @@ export class AuthService {
 
 
     async getAdminUser(): Promise<LoginResult> {
-
-        const abilitazioni = await this.permissionService.getAbilitazioniMenu(6789, true);
+                
         const filtri = await this.userService.getUserFilters(6789);
         return {
             utente: {
@@ -116,7 +115,11 @@ export class AuthService {
                 permissions: []
             },
             filtri,
-            abilitazioni
+            userGrants: {
+                abilitazioni: [],
+                grants: [],
+                ruoli: []
+            }
         };
     }
 
@@ -139,7 +142,11 @@ export class AuthService {
                 permissions: []
             },
             filtri: null,
-            abilitazioni: []
+            userGrants: {
+                abilitazioni: [],
+                grants: [],
+                ruoli: []
+            }
         };
     }
 

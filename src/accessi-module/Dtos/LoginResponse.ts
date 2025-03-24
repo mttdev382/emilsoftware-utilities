@@ -6,6 +6,7 @@ import { TokenResult } from "./TokenResult";
 import { UserDto } from "./UserDto";
 import { Type } from "class-transformer";
 import { ValidateNested } from "class-validator";
+import { UserGrantsDto } from "./UserGrantsDto";
 
 export class LoginResult {
   @ApiProperty({ description: 'Dati utente', type: UserDto })
@@ -18,10 +19,10 @@ export class LoginResult {
   @Type(() => FiltriUtente)
   filtri?: FiltriUtente[];
 
-  @ApiProperty({ description: 'Abilitazioni utente', type: [AbilitazioneMenu] })
-  @ValidateNested({ each: true })
-  @Type(() => AbilitazioneMenu)
-  abilitazioni?: AbilitazioneMenu[];
+  @ApiProperty({ description: 'Abilitazioni e ruoli utente', type: UserGrantsDto })
+  @ValidateNested()
+  @Type(() => UserGrantsDto)
+  userGrants?: UserGrantsDto;
 
   @ApiProperty({ description: 'Extension Fields', type: [Object] })
   extensionFields?: any[];

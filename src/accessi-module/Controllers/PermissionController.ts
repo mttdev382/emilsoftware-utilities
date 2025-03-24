@@ -10,6 +10,7 @@ import { AssignPermissionsToUserRequest } from '../Dtos/AssignPermissionsToUserR
 import { BaseResponse } from '../Dtos';
 import { MenuEntity } from '../Dtos/GetMenusResponse';
 import { GetRolesResponse } from '../Dtos/GetRolesResponse';
+import { UserGrantsDto } from '../Dtos/UserGrantsDto';
 
 
 @ApiTags('Permission')
@@ -220,4 +221,21 @@ export class PermissionController {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
     }
+
+
+
+    @ApiOperation({ summary: 'Recupera i ruoli e i menù di un utente', operationId: "getUserRolesAndGrants" })
+    @ApiOkResponse({ description: 'Elenco menù', type: UserGrantsDto })
+    @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Get('grants/:codiceUtente')
+    async getUserRolesAndGrants(@Param('codiceUtente') codiceUtente: number, @Res() res: Response) {
+        try {
+            const menus = await this.permissionService.getUserRolesAndGrants(codiceUtente);
+            return RestUtilities.sendBaseResponse(res, menus);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
+        }
+    }
+    
 }

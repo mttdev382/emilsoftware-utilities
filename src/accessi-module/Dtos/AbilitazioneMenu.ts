@@ -13,37 +13,37 @@ export class AbilitazioneMenu {
   @Length(3, 20, { message: "Il codice menu deve essere tra 3 e 20 caratteri." })
   codiceMenu: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Tipo di abilitazione',
     enum: TipoAbilitazione,
     example: TipoAbilitazione.LETTURA
   })
   @IsEnum(TipoAbilitazione, { message: "Il tipo di abilitazione non è valido." })
-  tipoAbilitazione: TipoAbilitazione;
+  tipoAbilitazione?: TipoAbilitazione;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Descrizione del menu',
     example: 'Gestione utenti'
   })
   @IsString()
   @IsNotEmpty({ message: "La descrizione del menu è obbligatoria." })
-  descrizioneMenu: string;
+  descrizioneMenu?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Descrizione del gruppo a cui appartiene il menu',
     example: 'Amministrazione'
   })
   @IsString()
   @IsNotEmpty({ message: "La descrizione del gruppo è obbligatoria." })
-  descrizioneGruppo: string;
+  descrizioneGruppo?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Codice univoco del gruppo a cui appartiene il menu',
     example: 'GRP_ADMIN'
   })
   @IsString()
   @IsNotEmpty({ message: "Il codice gruppo è obbligatorio." })
-  codiceGruppo: string;
+  codiceGruppo?: string;
 
   @ApiPropertyOptional({
     description: 'Nome dell\'icona associata al menu',
@@ -51,7 +51,7 @@ export class AbilitazioneMenu {
   })
   @IsString()
   @IsOptional()
-  icona: string | null;
+  icona?: string | null;
 
   @ApiPropertyOptional({
     description: 'Tipo di menu (es. statico, dinamico, ecc.)',
@@ -59,7 +59,7 @@ export class AbilitazioneMenu {
   })
   @IsString()
   @IsOptional()
-  tipo: string | null;
+  tipo?: string | null;
 
   @ApiPropertyOptional({
     description: 'Percorso della pagina associata al menu',
@@ -67,5 +67,5 @@ export class AbilitazioneMenu {
   })
   @IsString()
   @IsOptional()
-  pagina: string | null;
+  pagina?: string | null;
 }
