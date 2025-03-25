@@ -284,7 +284,7 @@ export class PermissionService {
                         M.DESMNU AS descrizione_menu
                     FROM UTENTI_RUOLI RU
                     INNER JOIN RUOLI R ON RU.CODRUO = R.CODRUO
-                    INNER JOIN RUOLI_MENU RM ON R.CODRUO = RM.CODRUO
+                    INNER JOIN RUOLI_MNU RM ON R.CODRUO = RM.CODRUO
                     INNER JOIN MENU M ON RM.CODMNU = M.CODMNU
                     INNER JOIN MENU_GRP G ON G.CODGRP = M.CODGRP
                     WHERE RU.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1
