@@ -71,7 +71,7 @@ export class AuthController {
 
       userData.token = {
         expiresIn: this.options.jwtOptions.expiresIn,
-        value: jwt.sign({ userData }, this.options.jwtOptions.secret, {
+        value: jwt.sign({ ...userData }, this.options.jwtOptions.secret, {
           expiresIn: this.options.jwtOptions.expiresIn as any,
         }),
         type: 'Bearer',
