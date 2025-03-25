@@ -282,7 +282,7 @@ export class PermissionService {
                         RM.CODMNU AS codice_menu,
                         RM.TIPABI AS tipo_abilitazione,
                         M.DESMNU AS descrizione_menu
-                    FROM RUOLI_UTENTI RU
+                    FROM UTENTI_RUOLI RU
                     INNER JOIN RUOLI R ON RU.CODRUL = R.CODRUL
                     INNER JOIN RUOLI_MENU RM ON R.CODRUL = RM.CODRUL
                     INNER JOIN MENU M ON RM.CODMNU = M.CODMNU
