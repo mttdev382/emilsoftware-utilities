@@ -54,6 +54,7 @@ export class Logger {
                 }),
             ],
             levels: {
+                log: 0,
                 error: 1,
                 warn: 2,
                 warning: 2,

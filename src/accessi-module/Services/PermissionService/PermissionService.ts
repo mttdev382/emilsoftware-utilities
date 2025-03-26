@@ -4,6 +4,7 @@ import { RestUtilities } from "../../../Utilities";
 import { AccessiOptions } from "../../AccessiModule";
 import { Permission, TipoAbilitazione } from "../../Dtos";
 import { AbilitazioneMenu } from "../../Dtos/AbilitazioneMenu";
+import { GroupWithMenusEntity } from "../../Dtos/GetGroupsWithMenusResponse";
 import { MenuEntity } from "../../Dtos/GetMenusResponse";
 import { Role } from "../../Dtos/Role";
 import { Inject, Injectable } from "@nestjs/common";
@@ -223,6 +224,58 @@ export class PermissionService {
     }
 
 
+    public async getGroupsWithMenus(): Promise<GroupWithMenusEntity[]> {
+        try {
+            const query = `
+                SELECT
+                    M.CODMNU AS codice_menu,
+                    M.DESMNU AS descrizione_menu,
+                    M.CODGRP AS codice_gruppo,
+                    G.DESGRP AS descrizione_gruppo,
+                    M.ICON AS icona,
+                    M.CODTIP AS tipo,
+                    M.PAGINA AS pagina,
+                    G.ORDINE AS ordine_gruppo,
+                    M.ORDINE as ordine_menu
+                FROM MENU M
+                LEFT JOIN MENU_GRP G ON M.CODGRP = G.CODGRP
+                WHERE M.FLGENABLED = 1
+                ORDER BY G.CODGRP, M.CODMNU
+            `;
+
+            const result = await Orm.query(this.accessiOptions.databaseOptions, query, []);
+
+            // Process the result to group menus by their respective groups
+            const groupMap = new Map<string, GroupWithMenusEntity>();
+
+            result.forEach(row => {
+                const menu = RestUtilities.convertKeysToCamelCase(row) as MenuEntity;
+                const groupKey = menu.codiceGruppo;
+
+                if (!groupMap.has(groupKey)) {
+                    groupMap.set(groupKey, {
+                        codiceGruppo: menu.codiceGruppo,
+                        descrizioneGruppo: menu.descrizioneGruppo,
+                        ordineGruppo: menu.ordineGruppo,
+                        menus: []
+                    });
+                }
+
+
+                groupMap.get(groupKey).menus.push(menu);
+                groupMap.get(groupKey).menus = groupMap.get(groupKey).menus.sort((a, b) => a.ordineMenu - b.ordineMenu);
+            });
+
+            let groupsArray = Array.from(groupMap.values()).sort((a, b) => a.ordineGruppo - b.ordineGruppo);
+            return groupsArray;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+
     public async getUserRolesAndGrants(codiceUtente: number): Promise<{
         abilitazioni: AbilitazioneMenu[],
         ruoli: Role[],
@@ -232,13 +285,13 @@ export class PermissionService {
             const codiceUtenteQuery = "SELECT FLGSUPER as flag_super FROM UTENTI_CONFIG WHERE CODUTE = ?";
             let result = await Orm.query(this.accessiOptions.databaseOptions, codiceUtenteQuery, [codiceUtente]);
             if (!result || result.length == 0) throw new Error("Nessun utente trovato con il codice utente " + codiceUtente);
-    
+
             result = result.map(RestUtilities.convertKeysToCamelCase) as { flagSuper: boolean }[];
             const isSuperAdmin = result[0].flagSuper;
-    
+
             let abilitazioni: AbilitazioneMenu[] = [];
             let ruoli: Role[] = [];
-    
+
             if (isSuperAdmin) {
                 const query = `
                     SELECT
@@ -274,7 +327,7 @@ export class PermissionService {
                 `;
                 abilitazioni = await Orm.query(this.accessiOptions.databaseOptions, queryAbilitazioni, [codiceUtente])
                     .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as AbilitazioneMenu[];
-    
+
                 const queryRuoli = `
                     SELECT
                         R.CODRUO AS codice_ruolo,
@@ -290,11 +343,11 @@ export class PermissionService {
                     WHERE RU.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1
                 `;
                 const ruoliResult = await Orm.query(this.accessiOptions.databaseOptions, queryRuoli, [codiceUtente]);
-    
+
                 const ruoliMap = new Map<number, Role>();
                 for (const row of ruoliResult) {
                     const { codiceRuolo, descrizioneRuolo, codiceMenu, descrizioneMenu, tipoAbilitazione } = row;
-    
+
                     if (!ruoliMap.has(codiceRuolo)) {
                         ruoliMap.set(codiceRuolo, {
                             codiceRuolo,
@@ -302,7 +355,7 @@ export class PermissionService {
                             menu: []
                         });
                     }
-    
+
                     if (codiceMenu) {
                         ruoliMap.get(codiceRuolo)!.menu.push({
                             codiceMenu: codiceMenu.trim(),
@@ -311,18 +364,18 @@ export class PermissionService {
                         });
                     }
                 }
-    
+
                 ruoli = Array.from(ruoliMap.values());
             }
-    
+
             // Merge user-specific and role-based permissions
             const grantsMap = new Map<string, AbilitazioneMenu>();
-    
+
             // Add user-specific permissions
             for (const abilitazione of abilitazioni) {
                 grantsMap.set(abilitazione.codiceMenu, abilitazione);
             }
-    
+
             // Add role-based permissions if not already present
             for (const ruolo of ruoli) {
                 for (const menu of ruolo.menu) {
@@ -331,15 +384,15 @@ export class PermissionService {
                     }
                 }
             }
-    
+
             const grants = Array.from(grantsMap.values());
-    
+
             return { abilitazioni, ruoli, grants };
         } catch (error) {
             throw error;
         }
     }
-    
+
 
 
 }

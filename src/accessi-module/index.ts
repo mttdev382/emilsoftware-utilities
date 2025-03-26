@@ -3,9 +3,13 @@ import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { AccessiModule, AccessiOptions } from "./AccessiModule";
 import { setupSwagger } from "./swagger/SwaggerConfig";
+import { Logger } from "../Logger";
+
 
 
 export async function initializeAccessiModule(app: Application, options: AccessiOptions) {
+    const logger: Logger = new Logger("initializeAccessiModule");
+
     try {
         // Creiamo un'istanza Express separata per NestJS
         const nestExpressInstance = new ExpressAdapter(app);
@@ -24,32 +28,8 @@ export async function initializeAccessiModule(app: Application, options: Accessi
         setupSwagger(nestApp);
         await nestApp.init();
 
-        /*
-            console.log('Verifica API NestJS registrate:');
-        const server = nestApp.getHttpAdapter().getInstance();
-        const router = server.router;
-
-
-        const availableRoutes: [] = router.stack
-            .map(layer => {
-                if (layer.route) {
-                    return {
-                        route: {
-                            path: layer.route?.path,
-                            method: layer.route?.stack[0].method,
-                        },
-                    };
-                }
-            })
-            .filter(item => item !== undefined);
-        console.log(availableRoutes);    
-        
-        */
-
-
-
     } catch (error) {
-        console.error("Errore in initialize AccessiModule:", error);
+        logger.error("Errore in initialize AccessiModule:", error);
         throw error;
     }
 }

@@ -59,7 +59,7 @@ export class DocumentGenerator {
     private curY: number = 0;
     private configLoaded: boolean = false;
 
-    constructor(private configPath?: string) {}
+    constructor(private configPath?: string) { }
 
     public setConfig(config: DocumentConfig) {
         this.config = config;
@@ -107,7 +107,7 @@ export class DocumentGenerator {
         const absolutePath = path.resolve(fontPath);
         const buffer = await fs.readFile(absolutePath);
         const base64Font = buffer.toString('base64');
-        console.log(`Installing font ${fontName} from ${absolutePath}`);
+        //console.log(`Installing font ${fontName} from ${absolutePath}`);
         this.doc.addFileToVFS(`${fontName}.ttf`, base64Font);
         this.doc.addFont(`${fontName}.ttf`, fontName, 'normal');
         this.doc.setFont(fontName);
@@ -280,7 +280,7 @@ export class DocumentGenerator {
                     this.curY = this.config.margini.alto;
                 }
                 this.doc.addImage(base64Image, format, startX, this.curY, imgConf.dimensioni[0], imgConf.dimensioni[1]);
-                console.log(`Image inserted at X: ${startX}, Y: ${this.curY}`);
+                //console.log(`Image inserted at X: ${startX}, Y: ${this.curY}`);
                 this.curY = this.curY + imgConf.dimensioni[1] + this.config.staccoriga;
             }
         }

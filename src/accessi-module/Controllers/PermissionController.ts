@@ -8,9 +8,10 @@ import { Role } from '../Dtos/Role';
 import { AssignRolesToUserRequest } from '../Dtos/AssignRolesToUserRequest';
 import { AssignPermissionsToUserRequest } from '../Dtos/AssignPermissionsToUserRequest';
 import { BaseResponse } from '../Dtos';
-import { MenuEntity } from '../Dtos/GetMenusResponse';
+import { GetMenusResponse, MenuEntity } from '../Dtos/GetMenusResponse';
 import { GetRolesResponse } from '../Dtos/GetRolesResponse';
 import { UserGrantsDto } from '../Dtos/UserGrantsDto';
+import { GetGroupsWithMenusResponse } from '../Dtos/GetGroupsWithMenusResponse';
 
 
 @ApiTags('Permission')
@@ -113,7 +114,7 @@ export class PermissionController {
 
 
 
-    
+
     @ApiOperation({ summary: 'Assegna più ruoli a un utente', operationId: "assignRolesToUser" })
     @ApiParam({
         name: 'codiceUtente',
@@ -209,7 +210,7 @@ export class PermissionController {
 
 
     @ApiOperation({ summary: 'Recupera tutti i menù disponibili', operationId: "getMenus" })
-    @ApiOkResponse({ description: 'Elenco menù', type: MenuEntity })
+    @ApiOkResponse({ description: 'Elenco menù', type: GetMenusResponse })
     @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
     @ApiResponse({ status: 500, description: "Errore interno del server" })
     @Get('menus')
@@ -221,6 +222,21 @@ export class PermissionController {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
     }
+
+    @ApiOperation({ summary: 'Recupera tutti i gruppi disponibili con i relativi menù', operationId: "getGroupsWithMenus" })
+    @ApiOkResponse({ description: 'Elenco gruppi con relativi menù', type: GetGroupsWithMenusResponse })
+    @ApiResponse({ status: 200, description: "Lista dei menù recuperata con successo" })
+    @ApiResponse({ status: 500, description: "Errore interno del server" })
+    @Get('groups-with-menus')
+    async getGroupsWithMenus(@Res() res: Response) {
+        try {
+            const menus = await this.permissionService.getGroupsWithMenus();
+            return RestUtilities.sendBaseResponse(res, menus);
+        } catch (error) {
+            return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
+        }
+    }
+
 
 
 
@@ -237,5 +253,5 @@ export class PermissionController {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
     }
-    
+
 }

@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { BaseResponse } from "./BaseResponse";
+import { ValidateNested } from "class-validator";
+import { Type } from "class-transformer";
 
-export class GetMenusResponse {
-    menus: MenuEntity[];
-}
+
+
 
 
 export class MenuEntity {
@@ -60,4 +62,27 @@ export class MenuEntity {
         required: false
     })
     pagina?: string;
+
+
+    @ApiProperty({
+        description: "Ordine del menu.",
+        type: Number,
+        example: 1
+    })
+    ordineMenu: number;
+
+
+    @ApiProperty({
+        description: "Ordine del gruppo.",
+        type: Number,
+        example: 1
+    })
+    ordineGruppo: number;
+}
+
+export class GetMenusResponse extends BaseResponse {
+    @ApiProperty({ type: [MenuEntity] })
+    @ValidateNested({ each: true })
+    @Type(() => MenuEntity)
+    Result: MenuEntity[];
 }

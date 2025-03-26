@@ -1,10 +1,12 @@
 import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-
-const swaggerPath = "swagger/accessi";
-const swaggerJsonPath = `${swaggerPath}-json`;
+import { Logger } from "../../Logger";
 
 export function setupSwagger(app: INestApplication) {
+    const logger: Logger = new Logger("SwaggerConfig");
+    const swaggerPath = "swagger/accessi";
+    const swaggerJsonPath = `${swaggerPath}-json`;
+
     const config = new DocumentBuilder()
         .setTitle("Accessi API")
         .setDescription("API per la gestione degli accessi utenti")
@@ -16,11 +18,13 @@ export function setupSwagger(app: INestApplication) {
     SwaggerModule.setup(swaggerPath, app, document);
 
     app.use(`/${swaggerJsonPath}`, (_, res) => {
-        res.setHeader('Content-Type', 'application/json');
+        res.setHeader("Content-Type", "application/json");
         res.send(document);
     });
 
-    console.log("Swagger disponibile su: http://localhost:3000/"+swaggerPath);
-    console.log(`Swagger JSON disponibile su: http://localhost:3000/${swaggerJsonPath}`);
+    let port = app.getHttpServer()?.address?.port || 3000;
 
+    logger.info(
+        `Swagger disponibile su: http://localhost:${port}/${swaggerPath}`
+    );
 }

@@ -13,7 +13,6 @@ async function copyHtmlFiles() {
         }
 
         if (files.length === 0) {
-            console.log("ℹ️ Nessun file HTML trovato.");
             return;
         }
 
@@ -24,8 +23,6 @@ async function copyHtmlFiles() {
                 const destPath = path.join(distDir, file);
                 await fs.copy(srcPath, destPath);
             }
-
-            console.log("Tutti i file HTML sono stati copiati con successo mantenendo la struttura!");
         } catch (err) {
             console.error("Errore nella copia dei file HTML:", err);
             process.exit(1);
