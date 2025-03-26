@@ -35,7 +35,7 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
-            const resetUrl = `${baseUrl}/api/accessi/email/reset-password/${resetToken}`;
+            const resetUrl = `${baseUrl}/api/accessi/email/reset-password-page/${resetToken}`;
 
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,

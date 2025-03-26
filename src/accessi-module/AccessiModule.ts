@@ -6,7 +6,6 @@
  */
 import { Options } from "es-node-firebird";
 import { DynamicModule, Global, Module } from "@nestjs/common";
-import { AccessiController } from "./Controllers/AccessiController";
 import { AuthService } from "./Services/AuthService/AuthService";
 import { EmailService } from "./Services/EmailService/EmailService";
 import { PermissionService } from "./Services/PermissionService/PermissionService";
@@ -52,7 +51,7 @@ export interface AccessiOptions {
 
 @Global()
 @Module({
-  controllers: [AccessiController, EmailController, AuthController, PermissionController, UserController],
+  controllers: [EmailController, AuthController, PermissionController, UserController],
   providers: [AuthService, UserService, EmailService, PermissionService],
   exports: [AuthService, UserService, EmailService, PermissionService],
 })
