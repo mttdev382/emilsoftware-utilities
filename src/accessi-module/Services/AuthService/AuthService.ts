@@ -10,29 +10,41 @@ import { LoginResponse, LoginResult } from "../../Dtos/LoginResponse";
 
 @Injectable()
 export class AuthService {
-
     constructor(
         private userService: UserService,
         private permissionService: PermissionService,
-        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
+        @Inject("ACCESSI_OPTIONS") private readonly accessiOptions: AccessiOptions
     ) { }
 
     async login(request: LoginRequest): Promise<LoginResult> {
+        if (
+            this.accessiOptions.mockDemoUser &&
+            request.email.toLowerCase() === "demo"
+        )
+            return this.getDemoUser();
+        if (
+            this.accessiOptions.mockDemoUser &&
+            request.email.toLowerCase() === "admin"
+        )
+            return this.getAdminUser();
 
-
-        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "demo") return this.getDemoUser();
-        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "admin") return this.getAdminUser();
-
-        const passwordCifrata = CryptUtilities.encrypt(request.password, this.accessiOptions.encryptionKey);
+        const passwordCifrata = CryptUtilities.encrypt(
+            request.password,
+            this.accessiOptions.encryptionKey
+        );
 
         // Recupera l'utente dal database
-        const utente = await this.userService.getUserByEmail(request.email.toLowerCase());
+        const utente = await this.userService.getUserByEmail(
+            request.email.toLowerCase()
+        );
         if (!utente) throw new Error("Nome utente o password errata!");
 
         // Verifica lo stato della registrazione
         switch (utente.statoRegistrazione) {
             case undefined:
-                throw new Error("Struttura dati compromessa: Stato Registrazione inesistente.");
+                throw new Error(
+                    "Struttura dati compromessa: Stato Registrazione inesistente."
+                );
             case StatoRegistrazione.BLOCC:
             case StatoRegistrazione.DELETE:
                 throw new Error("Utente non abilitato");
@@ -41,11 +53,16 @@ export class AuthService {
         }
 
         if (utente.statoRegistrazione !== StatoRegistrazione.CONF) {
-            throw new Error(`Errore generico. Stato di registrazione non valido: ${utente.statoRegistrazione}.`);
+            throw new Error(
+                `Errore generico. Stato di registrazione non valido: ${utente.statoRegistrazione}.`
+            );
         }
 
         // Verifica la password
-        const isPasswordValid = await this.verifyPassword(utente.codiceUtente, passwordCifrata);
+        const isPasswordValid = await this.verifyPassword(
+            utente.codiceUtente,
+            passwordCifrata
+        );
         if (!isPasswordValid) throw new Error("Nome utente o password errata!");
 
         const today = new Date();
@@ -56,46 +73,72 @@ export class AuthService {
         }
 
         // Recupera i grants
-        const userGrants = await this.permissionService.getUserRolesAndGrants(utente.codiceUtente);
+        const userGrants = await this.permissionService.getUserRolesAndGrants(
+            utente.codiceUtente
+        );
 
         // Recupera i filtri
         const filtri = await this.userService.getUserFilters(utente.codiceUtente);
 
-        const updateLastAccessDateQuery = "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
-        await Orm.query(this.accessiOptions.databaseOptions, updateLastAccessDateQuery, [utente.codiceUtente]);
+        const updateLastAccessDateQuery =
+            "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
+        await Orm.query(
+            this.accessiOptions.databaseOptions,
+            updateLastAccessDateQuery,
+            [utente.codiceUtente]
+        );
 
-        const extensionFields: any[] = [];
-        this.accessiOptions.extensionFieldsOptions.forEach(async (ext) => {
-            extensionFields.push(
-                await Orm.query(ext.databaseOptions, `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName} = ?`, [utente.codiceUtente])
-            );
-        });
+        let extensionFields = {};
 
-        return { utente, filtri, userGrants , extensionFields };
+        for (const ext of this.accessiOptions.extensionFieldsOptions) {
+            const values = (
+                await Orm.query(
+                    ext.databaseOptions,
+                    `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName
+                    } = ?`,
+                    [utente.codiceUtente]
+                )
+            ).map(RestUtilities.convertKeysToCamelCase);
+
+            extensionFields[ext.objectKey] = values;
+        }
+        return { utente, filtri, userGrants, extensionFields };
     }
 
     public async setPassword(codiceUtente: number, nuovaPassword: string) {
         try {
             const query = `UPDATE OR INSERT INTO UTENTI_PWD (CODUTE, PWD) VALUES (?, ?)`;
-            const hashedPassword = CryptUtilities.encrypt(nuovaPassword, this.accessiOptions.encryptionKey);
+            const hashedPassword = CryptUtilities.encrypt(
+                nuovaPassword,
+                this.accessiOptions.encryptionKey
+            );
 
-            return await Orm.execute(this.accessiOptions.databaseOptions, query, [codiceUtente, hashedPassword]);
+            return await Orm.execute(this.accessiOptions.databaseOptions, query, [
+                codiceUtente,
+                hashedPassword,
+            ]);
         } catch (error) {
             throw error;
         }
     }
 
-    async verifyPassword(codiceUtente: number, passwordCifrata: string): Promise<boolean> {
+    async verifyPassword(
+        codiceUtente: number,
+        passwordCifrata: string
+    ): Promise<boolean> {
         const query = `SELECT PWD AS password FROM UTENTI_PWD WHERE CODUTE = ?`;
-        const result = await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente])
-            .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as { password: string }[];
+        const result = (await Orm.query(
+            this.accessiOptions.databaseOptions,
+            query,
+            [codiceUtente]
+        ).then((results) => results.map(RestUtilities.convertKeysToCamelCase))) as {
+            password: string;
+        }[];
 
         return result.length > 0 && result[0].password === passwordCifrata;
     }
 
-
     async getAdminUser(): Promise<LoginResult> {
-                
         const filtri = await this.userService.getUserFilters(6789);
         return {
             utente: {
@@ -112,14 +155,14 @@ export class AuthService {
                 flagSuper: true,
                 paginaDefault: "/home",
                 roles: [],
-                permissions: []
+                permissions: [],
             },
             filtri,
             userGrants: {
                 abilitazioni: [],
                 grants: [],
-                ruoli: []
-            }
+                ruoli: [],
+            },
         };
     }
 
@@ -139,19 +182,21 @@ export class AuthService {
                 flagSuper: false,
                 paginaDefault: "/home",
                 roles: [],
-                permissions: []
+                permissions: [],
             },
             filtri: null,
             userGrants: {
                 abilitazioni: [],
                 grants: [],
-                ruoli: []
-            }
+                ruoli: [],
+            },
         };
     }
 
-
-    public async confirmResetPassword(token: string, newPassword: string): Promise<void> {
+    public async confirmResetPassword(
+        token: string,
+        newPassword: string
+    ): Promise<void> {
         try {
             // Controlliamo se il token esiste
             const result = await Orm.query(
@@ -165,7 +210,10 @@ export class AuthService {
             }
 
             // Hashiamo la nuova password
-            const hashedPassword = CryptUtilities.encrypt(newPassword, this.accessiOptions.encryptionKey);
+            const hashedPassword = CryptUtilities.encrypt(
+                newPassword,
+                this.accessiOptions.encryptionKey
+            );
 
             // Aggiorniamo la password e rimuoviamo il token di reset
             await Orm.query(

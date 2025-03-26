@@ -24,8 +24,8 @@ export class LoginResult {
   @Type(() => UserGrantsDto)
   userGrants?: UserGrantsDto;
 
-  @ApiProperty({ description: 'Extension Fields', type: [Object] })
-  extensionFields?: any[];
+  @ApiProperty({ description: 'Extension Fields', type: Object })
+  extensionFields?: any;
 
   @ApiProperty({ description: 'Token', type: TokenResult })
   @ValidateNested()
