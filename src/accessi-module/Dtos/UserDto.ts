@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { StatoRegistrazione } from './StatoRegistrazione';
 import { Permission } from './Permission';
+import { TipoAbilitazione } from './TipoAbilitazione';
 
 export class UserDto {
   @ApiProperty({ description: "Codice identificativo univoco dell'utente.", example: "USR123" })
@@ -60,7 +61,7 @@ export class UserDto {
   @ApiPropertyOptional({ description: "Ruoli assegnati all'utente.", example: ["admin", "editor"] })
   roles?: string[];
 
-  @ApiPropertyOptional({ description: "Permessi assegnati all'utente.", example: [{ action: "read", resource: "posts" }] })
+  @ApiPropertyOptional({ description: "Permessi assegnati all'utente.", type: [Permission], example: [{ codiceMenu: "MNUOFFICINA", tipoAbilitazione: TipoAbilitazione.SCRITTURA }] })
   permissions?: Permission[];
 
   // Campi extra dalla JOIN
