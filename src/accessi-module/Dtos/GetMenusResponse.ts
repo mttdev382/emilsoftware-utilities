@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { BaseResponse } from "./BaseResponse";
 import { ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
@@ -78,6 +78,13 @@ export class MenuEntity {
         example: 1
     })
     ordineGruppo: number;
+
+    @ApiPropertyOptional({
+        description: "Tipo abilitazione opzionale",
+        type: Number,
+        example: 1
+    })
+    tipoAbilitazione?: number;
 }
 
 export class GetMenusResponse extends BaseResponse {
