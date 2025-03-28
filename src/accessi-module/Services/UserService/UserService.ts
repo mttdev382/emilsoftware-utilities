@@ -105,7 +105,7 @@ export class UserService  {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as FiltriUtente[];
     }
 
-    async register(registrationData: UserDto): Promise<void> {
+    async register(registrationData: UserDto): Promise<string> {
         try {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,

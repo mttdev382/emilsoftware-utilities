@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { RestUtilities } from '../../Utilities';
@@ -60,26 +60,49 @@ export class UserController {
         }
     }
 
-    @ApiOperation({ summary: 'Registra un nuovo utente', operationId: "register" })
-    @ApiBody({ type: UserDto, description: 'Dati dell\'utente da registrare' })
-    @ApiResponse({ status: 201, description: 'Utente registrato con successo' })
-    @ApiResponse({ status: 400, description: 'Errore nella registrazione' })
+    @ApiOperation({
+        summary: 'Registra un nuovo utente',
+        operationId: 'register',
+    })
+    @ApiBody({
+        type: UserDto,
+        description: "Dati necessari per la registrazione dell'utente"
+    })
+    @ApiResponse({
+        status: HttpStatus.CREATED,
+        description: 'Utente registrato con successo. Viene restituito il codice utente e viene inviata una mail di conferma/reset password.'
+    })
+    @ApiResponse({
+        status: HttpStatus.BAD_REQUEST,
+        description: 'Errore nella registrazione. Potrebbe essere dovuto a dati mancanti, email già esistente o configurazione non valida.'
+    })
+    @ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        description: 'Errore interno del server durante la registrazione o l’invio dell’email.'
+    })
     @Post('register')
-    async register(@Req() request: Request, @Body() registrationData: UserDto, @Res() res: Response) {
+    async register(
+        @Req() request: Request,
+        @Body() registrationData: UserDto,
+        @Res() res: Response
+    ) {
         try {
-            let protocol = request["protocol"];
-            let host = request.headers["host"];
+            const protocol = request['protocol'];
+            const host = request.headers['host'];
             if (!protocol || !host) {
                 throw new Error("Impossibile procedere: protocollo e host non impostati negli header della richiesta.");
             }
-            const users = await this.userService.register(registrationData);
-            let confirmationEmailPrefix = `${protocol}://${host}`;
+    
+            const codiceUtente = await this.userService.register(registrationData);
+            const confirmationEmailPrefix = `${protocol}://${host}`;
             await this.emailService.sendPasswordResetEmail(registrationData.email, confirmationEmailPrefix);
-            return RestUtilities.sendBaseResponse(res, users);
+    
+            return RestUtilities.sendBaseResponse(res, codiceUtente);
         } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, UserController.name);
+            return RestUtilities.sendErrorMessage(res, error, UserController.name, HttpStatus.BAD_REQUEST);
         }
     }
+    
 
     @ApiOperation({ summary: 'Aggiorna un utente esistente', operationId: "updateUtente" })
     @ApiParam({
@@ -92,7 +115,7 @@ export class UserController {
         type: UserDto,
         description: "Dati aggiornati dell'utente (escluso il codice utente, che è nel path)"
     })
-    @ApiResponse({ status: 200, description: "Utente aggiornato con successo" })
+    @ApiResponse({ status: HttpStatus.OK, description: "Utente aggiornato con successo" })
     @ApiResponse({ status: 400, description: "Errore nell'aggiornamento" })
     @Put('update-user/:codiceUtente')
     async updateUtente(
