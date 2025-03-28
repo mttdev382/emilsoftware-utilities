@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { UserService } from '../Services/UserService/UserService';
@@ -8,6 +8,7 @@ import { EmailService } from '../Services/EmailService/EmailService';
 import { join } from 'path';
 import { GetUsersResponse } from '../Dtos/GetUsersResponse';
 import { UserDto } from '../Dtos';
+import { RegisterResponse } from '../Dtos/RegisterResponse';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -68,9 +69,9 @@ export class UserController {
         type: UserDto,
         description: "Dati necessari per la registrazione dell'utente"
     })
-    @ApiResponse({
-        status: HttpStatus.CREATED,
-        description: 'Utente registrato con successo. Viene restituito il codice utente e viene inviata una mail di conferma/reset password.'
+    @ApiCreatedResponse({
+        description: 'Utente registrato con successo. Restituisce il codice utente e invia una mail di conferma/reset password.',
+        type: RegisterResponse
     })
     @ApiResponse({
         status: HttpStatus.BAD_REQUEST,
