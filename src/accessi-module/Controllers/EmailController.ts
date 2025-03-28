@@ -1,12 +1,10 @@
-import { Body, Controller, Get, Inject, Param, Post, Req, Res } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { Body, Controller, Get, Inject, Param, Post, Query, Req, Res } from '@nestjs/common';
+import { ApiOperation, ApiTags, ApiResponse, ApiParam, ApiBody, ApiQuery } from '@nestjs/swagger';
 import { Response, Request } from 'express';
 import { join } from 'path';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { EmailService } from '../Services/EmailService/EmailService';
-import { AccessiController } from './AccessiController';
-
 @ApiTags('Email')
 @Controller('accessi/email')
 export class EmailController {
@@ -17,9 +15,10 @@ export class EmailController {
 
     @ApiOperation({ summary: 'Serve una pagina per il reset della password', operationId: "serveResetPasswordPage" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
+    @ApiQuery({ name: 'returnUrl', description: 'Url di ritorno della pagina. Default: https://google.com', required: false })
     @ApiResponse({ status: 200, description: 'Pagina di reset password servita con successo' })
     @Get('reset-password-page/:token')
-    async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string) {
+    async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string,  @Query('returnUrl') returnUrl?: string) {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
     }
 
@@ -35,14 +34,14 @@ export class EmailController {
             let host = request.headers["host"];
 
             if (!protocol || !host) {
-                return RestUtilities.sendErrorMessage(res, "Impossibile procedere: protocollo e host non impostati negli header della richiesta.", AccessiController.name);
+                throw new Error("Impossibile procedere: protocollo e host non impostati negli header della richiesta.");
             }
 
             let confirmationEmailPrefix = `${protocol}://${host}`;
             await this.emailService.sendPasswordResetEmail(sendResetPasswordData.email, confirmationEmailPrefix);
             return RestUtilities.sendOKMessage(res, "L'email di reset è stata inoltrata al destinatario.");
         } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AccessiController.name);
+            return RestUtilities.sendErrorMessage(res, error, EmailController.name);
         }
     }
 }
