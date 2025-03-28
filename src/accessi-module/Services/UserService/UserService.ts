@@ -135,6 +135,8 @@ export class UserService  {
                 await this.permissionService.assignPermissionsToUser(codiceUtente, registrationData.permissions);
             }
 
+            return codiceUtente;
+
         } catch (error) {
             throw error;
         }

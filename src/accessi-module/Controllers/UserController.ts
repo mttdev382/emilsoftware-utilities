@@ -72,10 +72,10 @@ export class UserController {
             if (!protocol || !host) {
                 throw new Error("Impossibile procedere: protocollo e host non impostati negli header della richiesta.");
             }
-            await this.userService.register(registrationData);
+            const users = await this.userService.register(registrationData);
             let confirmationEmailPrefix = `${protocol}://${host}`;
             await this.emailService.sendPasswordResetEmail(registrationData.email, confirmationEmailPrefix);
-            return RestUtilities.sendOKMessage(res, "L'utente è stato registrato con successo, email di conferma inoltrata al destinatario.");
+            return RestUtilities.sendBaseResponse(res, users);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, UserController.name);
         }
@@ -102,7 +102,7 @@ export class UserController {
     ) {
         try {
             if (!codiceUtente) throw new Error("Il codice utente è obbligatorio.");
-            
+
             await this.userService.updateUser(codiceUtente, user);
             return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} è stato aggiornato con successo.`);
         } catch (error) {
@@ -123,7 +123,7 @@ export class UserController {
     async setGdpr(@Param('codiceUtente') codiceUtente: number, @Res() res: Response) {
         try {
             if (!codiceUtente) throw new Error("Il codice utente è obbligatorio.");
-            
+
             await this.userService.setGdpr(codiceUtente);
             return RestUtilities.sendOKMessage(res, `L'utente ${codiceUtente} ha accettato il GDPR.`);
         } catch (error) {
