@@ -12,7 +12,7 @@ import { UserDto } from "../../Dtos";
 
 @autobind
 @Injectable()
-export class UserService  {
+export class UserService {
 
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService, private readonly permissionService: PermissionService
@@ -112,7 +112,7 @@ export class UserService  {
                 "SELECT CODUTE FROM UTENTI WHERE USRNAME = ?",
                 [registrationData.email]
             );
-    
+
             if (existingUser.length > 0) {
                 throw new Error("Questa e-mail è già stata utilizzata!");
             }
@@ -127,11 +127,11 @@ export class UserService  {
             const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome, registrationData.codiceLingua];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
 
-            if(!!registrationData.roles && registrationData.roles.length > 0) {
+            if (!!registrationData.roles && registrationData.roles.length > 0) {
                 await this.permissionService.assignRolesToUser(codiceUtente, registrationData.roles);
             }
 
-            if(!!registrationData.permissions && registrationData.permissions.length > 0) {
+            if (!!registrationData.permissions && registrationData.permissions.length > 0) {
                 await this.permissionService.assignPermissionsToUser(codiceUtente, registrationData.permissions);
             }
 
@@ -145,11 +145,11 @@ export class UserService  {
     async updateUser(codiceUtente: number, user: UserDto): Promise<void> {
         try {
             if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
-    
+
             // Costruzione dinamica della query per UTENTI
             const utentiUpdates = [];
             const utentiParams = [];
-    
+
             if (user.email !== undefined) {
                 utentiUpdates.push("usrname = ?");
                 utentiParams.push(user.email);
@@ -162,17 +162,17 @@ export class UserService  {
                 utentiUpdates.push("stareg = ?");
                 utentiParams.push(user.statoRegistrazione);
             }
-    
+
             if (utentiUpdates.length > 0) {
                 const queryUtenti = `UPDATE UTENTI SET ${utentiUpdates.join(", ")} WHERE CODUTE = ?`;
                 utentiParams.push(codiceUtente);
                 await Orm.execute(this.accessiOptions.databaseOptions, queryUtenti, utentiParams);
             }
-    
+
             // Costruzione dinamica della query per UTENTI_CONFIG
             const utentiConfigUpdates = [];
             const utentiConfigParams = [];
-    
+
             if (user.cognome !== undefined) {
                 utentiConfigUpdates.push("cognome = ?");
                 utentiConfigParams.push(user.cognome);
@@ -209,17 +209,26 @@ export class UserService  {
                 utentiConfigUpdates.push("json_metadata = ?");
                 utentiConfigParams.push(user.jsonMetadata);
             }
-    
+
             if (utentiConfigUpdates.length > 0) {
                 const queryUtentiConfig = `UPDATE UTENTI_CONFIG SET ${utentiConfigUpdates.join(", ")} WHERE CODUTE = ?`;
                 utentiConfigParams.push(codiceUtente);
                 await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, utentiConfigParams);
             }
+
+
+            if (!!user.roles && user.roles.length > 0) {
+                await this.permissionService.assignRolesToUser(codiceUtente, user.roles);
+            }
+
+            if (!!user.permissions && user.permissions.length > 0) {
+                await this.permissionService.assignPermissionsToUser(codiceUtente, user.permissions);
+            }
         } catch (error) {
             throw error;
         }
     }
-    
+
 
     async deleteUser(codiceCliente: number): Promise<void> {
         try {
