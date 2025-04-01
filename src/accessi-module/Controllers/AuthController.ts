@@ -6,10 +6,13 @@ import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
 import { LoginRequest, LoginResponse } from '../Dtos';
+import { Logger } from '../../Logger';
 
 @ApiTags('Auth')
 @Controller('accessi/auth')
 export class AuthController {
+
+  logger: Logger = new Logger(AuthController.name);
     constructor(
         private readonly authService: AuthService,
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
@@ -79,6 +82,7 @@ export class AuthController {
 
       return RestUtilities.sendBaseResponse(res, userData);
     } catch (error) {
+      this.logger.error('Errore durante il login', error);
       return RestUtilities.sendInvalidCredentials(res);
     }
   }
