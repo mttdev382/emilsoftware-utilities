@@ -113,8 +113,6 @@ export class PermissionController {
     }
 
 
-
-
     @ApiOperation({ summary: 'Assegna più ruoli a un utente', operationId: "assignRolesToUser" })
     @ApiParam({
         name: 'codiceUtente',
@@ -147,9 +145,6 @@ export class PermissionController {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
     }
-
-
-
 
 
     @ApiOperation({ summary: 'Assegna abilitazioni dirette a un utente', operationId: "assignPermissionsToUser" })
@@ -236,8 +231,6 @@ export class PermissionController {
             return RestUtilities.sendErrorMessage(res, error, PermissionController.name);
         }
     }
-
-
 
 
     @ApiOperation({ summary: 'Recupera i ruoli e i menù di un utente', operationId: "getUserRolesAndGrants" })

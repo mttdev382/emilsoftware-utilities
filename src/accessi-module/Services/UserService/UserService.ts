@@ -9,6 +9,7 @@ import { FiltriUtente } from "../../Dtos/FiltriUtente";
 import { GetUsersResponse } from "../../Dtos/GetUsersResponse";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { UserDto } from "../../Dtos";
+import { RegisterRequest } from "../../Dtos/RegisterRequest";
 
 @autobind
 @Injectable()
@@ -105,7 +106,7 @@ export class UserService {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as FiltriUtente[];
     }
 
-    async register(registrationData: UserDto): Promise<string> {
+    async register(registrationData: RegisterRequest): Promise<string> {
         try {
             const existingUser = await Orm.query(
                 this.accessiOptions.databaseOptions,
@@ -123,8 +124,8 @@ export class UserService {
 
             const codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
 
-            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME,CODLINGUA) VALUES (?,?,?,?)`;
-            const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome, registrationData.codiceLingua];
+            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME) VALUES (?,?,?)`;
+            const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome];
             await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
 
             if (!!registrationData.roles && registrationData.roles.length > 0) {

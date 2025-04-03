@@ -9,6 +9,7 @@ import { join } from 'path';
 import { GetUsersResponse } from '../Dtos/GetUsersResponse';
 import { UserDto } from '../Dtos';
 import { RegisterResponse } from '../Dtos/RegisterResponse';
+import { RegisterRequest } from '../Dtos/RegisterRequest';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -66,7 +67,7 @@ export class UserController {
         operationId: 'register',
     })
     @ApiBody({
-        type: UserDto,
+        type: RegisterRequest,
         description: "Dati necessari per la registrazione dell'utente"
     })
     @ApiCreatedResponse({
@@ -84,7 +85,7 @@ export class UserController {
     @Post('register')
     async register(
         @Req() request: Request,
-        @Body() registrationData: UserDto,
+        @Body() registrationData: RegisterRequest,
         @Res() res: Response
     ) {
         try {
