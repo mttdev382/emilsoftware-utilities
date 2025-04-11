@@ -305,7 +305,8 @@ export class PermissionService {
                     INNER JOIN MENU_GRP G ON G.CODGRP = M.CODGRP
                     WHERE RU.CODUTE = ? AND M.FLGENABLED = 1 AND G.FLGENABLED = 1
                 `;
-            const ruoliResult = await Orm.query(this.accessiOptions.databaseOptions, queryRuoli, [codiceUtente]);
+            let ruoliResult = await Orm.query(this.accessiOptions.databaseOptions, queryRuoli, [codiceUtente]);
+            ruoliResult = ruoliResult.map(RestUtilities.convertKeysToCamelCase);
 
             const ruoliMap = new Map<number, Role>();
             for (const row of ruoliResult) {
