@@ -1,6 +1,6 @@
 import {ApiBody, ApiConsumes, ApiResponse} from "@nestjs/swagger";
-import { Controller, Post, Get, Delete, Param, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Controller, Post, Get, Delete, Param, UploadedFiles, UseInterceptors, BadRequestException } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { AllegatiService } from "../Services/AllegatiService/AllegatiService";
 import {UploadAllegatoResponseDto} from "../Dtos/UploadAllegatoResponseDto";
 import {AllegatoDto} from "../Dtos/AllegatoDto";
@@ -12,8 +12,32 @@ export class AllegatiController {
     constructor(private readonly allegatiService: AllegatiService) {}
 
     @Post('upload')
-    @UseInterceptors(FileInterceptor('file'))
-    @ApiConsumes('multipart/form-data') // 👈 Dichiari che accetti multipart
+    @UseInterceptors(FilesInterceptor('files'))
+    @ApiConsumes('multipart/form-data')
+    @ApiResponse({ status: 201, description: 'File caricati con successo.', type: [UploadAllegatoResponseDto] })
+    @ApiBody({
+        description: 'File da caricare',
+        required: true,
+        schema: {
+            type: 'object',
+            properties: {
+                files: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                        format: 'binary',
+                    },
+                },
+            },
+        },
+    })
+    async upload(@UploadedFiles() files: Express.Multer.File[]): Promise<UploadAllegatoResponseDto[]> {
+        return await this.allegatiService.uploadFiles(files);
+    }
+
+    @Post('upload-single')
+    @UseInterceptors(FilesInterceptor('file'))
+    @ApiConsumes('multipart/form-data')
     @ApiResponse({ status: 201, description: 'File caricato con successo.', type: UploadAllegatoResponseDto })
     @ApiBody({
         description: 'File da caricare',
@@ -28,9 +52,14 @@ export class AllegatiController {
             },
         },
     })
-
-    async upload(@UploadedFile() file: Express.Multer.File): Promise<UploadAllegatoResponseDto> {
-        return await this.allegatiService.uploadFile(file);
+    async uploadSingle(@UploadedFiles() files: Express.Multer.File[]): Promise<UploadAllegatoResponseDto> {
+        if (!files || files.length === 0) {
+            throw new BadRequestException('Nessun file fornito');
+        }
+        if (files.length > 1) {
+            throw new BadRequestException('Questo endpoint accetta un solo file alla volta');
+        }
+        return await this.allegatiService.uploadFile(files[0]);
     }
 
     @Get(':id')

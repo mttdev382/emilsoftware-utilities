@@ -12,14 +12,27 @@ async function main() {
             user: 'SYSDBA',
             password: 'masterkey',
         },
+        attachmentTypes: [{
+            id: 1,
+            desc: 'Documento'
+        }],
+        codes: [{
+            id: 'DEFAULT',
+            desc: 'Codice di default'
+        }],
+        references: [{
+            tipRif: 'TIPO',
+            tabRif: 'TABELLA',
+            desRif: 'DESCRIZIONE'
+        }]
     });
 
-    const PORT = 3000; // Usa una sola porta
+    const PORT = 3000;
     app.listen(PORT, () => {
         console.log(`Test app for AllegatiModule running on http://localhost:${PORT}`);
     });
 
-    return new Promise(() => {}); // <-- blocca il main in attesa infinita
+    return new Promise(() => {});
 }
 
 main();

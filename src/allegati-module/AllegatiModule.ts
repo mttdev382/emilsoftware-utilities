@@ -8,13 +8,15 @@ export interface AllegatiOptions {
     attachmentTypes: {
         id: number;
         desc: string;
-        defaultFilename?: string;
-        isUnique?: boolean;
-        forClient?: boolean;
     }[];
     codes: {
         id: string;
         desc: string;
+    }[];
+    references: {
+        tipRif: string;
+        tabRif: string;
+        desRif: string;
     }[];
 }
 
