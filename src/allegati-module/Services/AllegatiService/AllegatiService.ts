@@ -50,6 +50,24 @@ export class AllegatiService {
         }
     }
 
+
+    async getAttachmentTypes(): Promise<any[]> {
+        try {
+            const query = `SELECT IDXTIPOALL as id, DESCRIZIONE as description FROM TIPOALL`;
+            const results = await Orm.query(this.allegatiOptions.databaseOptions, query);
+
+            if (!results) {
+                throw new InternalServerErrorException('Errore durante il recupero dei tipi di allegato');
+            }
+
+            return results;
+        } catch (error) {
+            if (error instanceof InternalServerErrorException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Errore durante il recupero dei tipi di allegato');
+        }
+    }
     async uploadFile(file: Express.Multer.File): Promise<UploadAllegatoResponseDto> {
         try {
             this.validateFile(file);
