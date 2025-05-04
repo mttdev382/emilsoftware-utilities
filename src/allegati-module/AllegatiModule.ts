@@ -5,19 +5,6 @@ import {Options} from "es-node-firebird";
 
 export interface AllegatiOptions {
     databaseOptions: Options;
-    attachmentTypes: {
-        id: number;
-        desc: string;
-    }[];
-    codes: {
-        id: string;
-        desc: string;
-    }[];
-    references: {
-        tipRif: string;
-        tabRif: string;
-        desRif: string;
-    }[];
 }
 
 @Global()
