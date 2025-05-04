@@ -2,7 +2,7 @@ import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Logger } from "../../Logger";
 
-export function setupSwagger(app: INestApplication) {
+export function setupAccessiSwagger(app: INestApplication) {
     const logger: Logger = new Logger("SwaggerConfig");
     const swaggerPath = "swagger/accessi";
     const swaggerJsonPath = `${swaggerPath}-json`;

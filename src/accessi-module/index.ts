@@ -2,7 +2,7 @@ import { Application } from "express";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { AccessiModule, AccessiOptions } from "./AccessiModule";
-import { setupSwagger } from "./swagger/SwaggerConfig";
+import { setupAccessiSwagger } from "./swagger/SwaggerConfig";
 import { Logger } from "../Logger";
 
 
@@ -10,6 +10,7 @@ import { Logger } from "../Logger";
 export async function initializeAccessiModule(app: Application, options: AccessiOptions) {
     const logger: Logger = new Logger("initializeAccessiModule");
 
+    console.log("Accessi initialized");
     try {
         // Creiamo un'istanza Express separata per NestJS
         const nestExpressInstance = new ExpressAdapter(app);
@@ -25,7 +26,7 @@ export async function initializeAccessiModule(app: Application, options: Accessi
             exclude: ['/swagger', '/swagger/(.*)']
         });
 
-        setupSwagger(nestApp);
+        setupAccessiSwagger(nestApp);
         await nestApp.init();
 
     } catch (error) {

@@ -2,8 +2,9 @@ import { Application } from "express";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { AllegatiModule, AllegatiOptions } from "./AllegatiModule";
+import { setupAllegatiSwagger } from "./swagger/SwaggerConfig";
+
 import { Logger } from "../Logger";
-import {setupSwaggerAllegati} from "./swagger/SwaggerConfig";
 
 export async function initializeAllegatiModule(app: Application, options: AllegatiOptions) {
     const logger: Logger = new Logger("initializeAllegatiModule");
@@ -21,7 +22,7 @@ export async function initializeAllegatiModule(app: Application, options: Allega
         });
 
         // (opzionale) puoi settare Swagger se vuoi:
-        setupSwaggerAllegati(nestApp);
+        setupAllegatiSwagger(nestApp);
 
         await nestApp.init();
 

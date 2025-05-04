@@ -1,4 +1,4 @@
 export * from "./AllegatoDto";
-export * from "./DownloadAllegatoResponseDto";
-export * from "./UploadAllegatoResponseDto";
+export * from "./responses/DownloadAllegatoResponseDto";
+export * from "./responses/UploadAllegatoResponseDto";
 

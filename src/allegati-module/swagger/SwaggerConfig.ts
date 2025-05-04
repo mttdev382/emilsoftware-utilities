@@ -2,16 +2,16 @@ import { INestApplication } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { Logger } from "../../Logger";
 
-export function setupSwaggerAllegati(app: INestApplication) {
-    const logger: Logger = new Logger("SwaggerConfigAllegati");
+export function setupAllegatiSwagger(app: INestApplication) {
+    const logger: Logger = new Logger("SwaggerConfig");
     const swaggerPath = "swagger/allegati";
     const swaggerJsonPath = `${swaggerPath}-json`;
 
     const config = new DocumentBuilder()
         .setTitle("Allegati API")
-        .setDescription("API per la gestione degli allegati (upload, download, delete)")
+        .setDescription("API per la gestione degli allegati")
         .setVersion("1.0")
-        .addBearerAuth() // Se usi autenticazione
+        .addBearerAuth()
         .build();
 
     const document = SwaggerModule.createDocument(app, config);
@@ -22,9 +22,9 @@ export function setupSwaggerAllegati(app: INestApplication) {
         res.send(document);
     });
 
-    const port = app.getHttpServer()?.address?.port || 3000;
+    let port = app.getHttpServer()?.address?.port || 3000;
 
     logger.info(
-        `Swagger Allegati disponibile su: http://localhost:${port}/${swaggerPath}`
+        `Swagger disponibile su: http://localhost:${port}/${swaggerPath}`
     );
 }

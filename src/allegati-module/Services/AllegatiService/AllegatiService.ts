@@ -3,6 +3,7 @@ import { autobind } from "../../../autobind";
 import { Orm } from "../../../Orm";
 import { AllegatiOptions } from "../../AllegatiModule";
 import { UploadAllegatoResponseDto, DownloadAllegatoResponseDto, AllegatoDto} from "../../Dtos";
+import { UploadSingleFileRequest } from "../../Dtos/UploadSingleFileRequest";
 
 export class AllegatiError extends Error {
     constructor(
@@ -68,7 +69,7 @@ export class AllegatiService {
             throw new InternalServerErrorException('Errore durante il recupero dei tipi di allegato');
         }
     }
-    async uploadFile(file: Express.Multer.File): Promise<UploadAllegatoResponseDto> {
+    async uploadFile(file: Express.Multer.File, uploadSingleFileRequest: UploadSingleFileRequest): Promise<UploadAllegatoResponseDto> {
         try {
             this.validateFile(file);
 
@@ -80,16 +81,16 @@ export class AllegatiService {
                 RETURNING IDXALL
             `;
 
-            const codice = this.allegatiOptions.codes?.[0]?.id || 'DEFAULT';
-            const tipcod = 'DEF';
-            const ordine = 1;
-            const desall = file.originalname;
+            const codice = uploadSingleFileRequest.codice;
+            const tipcod = uploadSingleFileRequest.tipoCodice;
+            const ordine = uploadSingleFileRequest.ordine;
+            const desall = uploadSingleFileRequest.descrizioneAllegato;
             const nomefile = file.originalname;
-            const dadataval = new Date();
-            const adataval = null;
+            const dadataval = uploadSingleFileRequest.dataInizioValidita;
+            const adataval = uploadSingleFileRequest.dataFineValidita;
             const allegato = file.buffer;
-            const idxtipoall = this.allegatiOptions.attachmentTypes?.[0]?.id || 0;
-            const docrif = null;
+            const idxtipoall = uploadSingleFileRequest.idTipoAllegato;
+            const docrif = uploadSingleFileRequest.riferimentoDocumento;
 
             const params = [
                 codice, tipcod, ordine, desall, nomefile,
@@ -236,25 +237,4 @@ export class AllegatiService {
         }
     }
 
-    async uploadFiles(files: Express.Multer.File[]): Promise<UploadAllegatoResponseDto[]> {
-        try {
-            if (!files || files.length === 0) {
-                throw new BadRequestException('Nessun file fornito');
-            }
-
-            // Validazione di tutti i file
-            files.forEach(file => this.validateFile(file));
-
-            // Caricamento in parallelo dei file
-            const uploadPromises = files.map(file => this.uploadFile(file));
-            const results = await Promise.all(uploadPromises);
-
-            return results;
-        } catch (error) {
-            if (error instanceof BadRequestException || error instanceof InternalServerErrorException) {
-                throw error;
-            }
-            throw new InternalServerErrorException('Errore durante il caricamento dei file');
-        }
-    }
 }
