@@ -17,15 +17,11 @@ export class AuthService {
     ) { }
 
     async login(request: LoginRequest): Promise<LoginResult> {
-        if (
-            this.accessiOptions.mockDemoUser &&
-            request.email.toLowerCase() === "demo"
-        )
+
+        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "demo") 
             return this.getDemoUser();
-        if (
-            this.accessiOptions.mockDemoUser &&
-            request.email.toLowerCase() === "admin"
-        )
+
+        if (this.accessiOptions.mockDemoUser && request.email.toLowerCase() === "admin") 
             return this.getAdminUser();
 
         const passwordCifrata = CryptUtilities.encrypt(
@@ -33,7 +29,6 @@ export class AuthService {
             this.accessiOptions.encryptionKey
         );
 
-        // Recupera l'utente dal database
         const utente = await this.userService.getUserByEmail(
             request.email.toLowerCase()
         );
@@ -139,7 +134,7 @@ export class AuthService {
     }
 
     async getAdminUser(): Promise<LoginResult> {
-        const filtri = await this.userService.getUserFilters(6789);
+        ///const filtri = await this.userService.getUserFilters(6789);
         return {
             utente: {
                 codiceUtente: 6789,
@@ -157,7 +152,7 @@ export class AuthService {
                 roles: [],
                 permissions: [],
             },
-            filtri,
+            filtri: null,
             userGrants: {
                 abilitazioni: [],
                 grants: [],

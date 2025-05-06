@@ -67,6 +67,7 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginRequest: LoginRequest, @Res() res: Response) {
     try {
+      
       const userData = await this.authService.login(loginRequest);
       if (!userData) {
         return RestUtilities.sendInvalidCredentials(res);
