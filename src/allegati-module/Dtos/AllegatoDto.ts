@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsNumber } from "class-validator";
+import { IsString, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 
 export class AllegatoDto {
 
@@ -33,4 +33,68 @@ export class AllegatoDto {
     @IsString()
     @IsNotEmpty({ message: "La data di upload è obbligatoria." })
     uploadDate: string;
+
+    @ApiProperty({
+        description: 'Codice incrementale',
+        example: '1',
+    })
+    @IsString()
+    @IsOptional()
+    codice?: string;
+
+    @ApiProperty({
+        description: 'Tipo del codice fornito',
+        example: 'CF',
+    })
+    @IsString()
+    @IsOptional()
+    tipoCodice?: string;
+
+    @ApiProperty({
+        description: 'Numero o valore usato per ordinare o identificare la sequenza degli allegati',
+        example: '1',
+    })
+    @IsString()
+    @IsOptional()
+    ordine?: string;
+
+    @ApiProperty({
+        description: 'Descrizione testuale dell\'allegato',
+        example: 'Documento di identità fronte',
+    })
+    @IsString()
+    @IsOptional()
+    descrizioneAllegato?: string;
+
+    @ApiProperty({
+        description: 'Data di inizio validità del documento',
+        example: '2024-01-01',
+    })
+    @IsString()
+    @IsOptional()
+    dataInizioValidita?: string;
+
+    @ApiProperty({
+        description: 'Data di fine validità del documento',
+        example: '2025-01-01',
+    })
+    @IsString()
+    @IsOptional()
+    dataFineValidita?: string;
+
+    @ApiProperty({
+        description: 'ID del tipo di allegato',
+        example: 3,
+    })
+    @IsNumber()
+    @IsOptional()
+    idTipoAllegato?: number;
+
+    @ApiProperty({
+        description: 'Riferimento esterno o identificativo del documento',
+        example: 'PRAT-2024-0001',
+    })
+    @IsString()
+    @IsOptional()
+    riferimentoDocumento?: string;
 }
