@@ -23,9 +23,9 @@ export class GetUsersResult {
 }
 
 export class GetUsersResponse extends BaseResponse {
-  @ApiProperty({ type: [UserDto] })
+  @ApiProperty({ type: [GetUsersResult] })
   @ValidateNested({ each: true })
-  @Type(() => UserDto)
+  @Type(() => GetUsersResult)
   Result: GetUsersResult[];
 }
 
