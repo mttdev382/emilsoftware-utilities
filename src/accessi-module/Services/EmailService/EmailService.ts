@@ -20,7 +20,7 @@ export class EmailService {
     private transporter = nodemailer.createTransport(this.accessiOptions.emailOptions);
 
 
-    public async sendPasswordResetEmail(email: string, baseUrl: string): Promise<void> {
+    public async sendPasswordResetEmail(email: string): Promise<void> {
         try {
             const resetToken = uuidv4(); // Generiamo un nuovo token unico
 
@@ -35,8 +35,9 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
-            const returnUrlQueryParams = "?returnUrl="+this.accessiOptions.confirmationEmailReturnUrl;
-            const resetUrl = `${baseUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
+            const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl;
+            const { confirmationEmailUrl } = this.accessiOptions;
+            const resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
 
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,

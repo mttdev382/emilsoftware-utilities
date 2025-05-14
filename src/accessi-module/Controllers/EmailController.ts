@@ -18,7 +18,7 @@ export class EmailController {
     @ApiQuery({ name: 'returnUrl', description: 'Url di ritorno della pagina. Default: https://google.com', required: false })
     @ApiResponse({ status: 200, description: 'Pagina di reset password servita con successo' })
     @Get('reset-password-page/:token')
-    async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string,  @Query('returnUrl') returnUrl?: string) {
+    async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string, @Query('returnUrl') returnUrl?: string) {
         return res.sendFile(join(__dirname, '..', 'Views', 'reset-password.html'));
     }
 
@@ -30,15 +30,8 @@ export class EmailController {
     @Post('send-reset-password-email')
     async sendPasswordResetEmail(@Req() request: Request, @Body() sendResetPasswordData: { email: string }, @Res() res: Response) {
         try {
-            let protocol = request["protocol"];
-            let host = request.headers["host"];
 
-            if (!protocol || !host) {
-                throw new Error("Impossibile procedere: protocollo e host non impostati negli header della richiesta.");
-            }
-
-            let confirmationEmailPrefix = `${protocol}://${host}`;
-            await this.emailService.sendPasswordResetEmail(sendResetPasswordData.email, confirmationEmailPrefix);
+            await this.emailService.sendPasswordResetEmail(sendResetPasswordData.email);
             return RestUtilities.sendOKMessage(res, "L'email di reset è stata inoltrata al destinatario.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, EmailController.name);

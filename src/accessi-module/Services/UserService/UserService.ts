@@ -6,7 +6,7 @@ import { AccessiOptions } from "../../AccessiModule";
 import { StatoRegistrazione } from "../../Dtos/StatoRegistrazione";
 import { EmailService } from "../EmailService/EmailService";
 import { FiltriUtente } from "../../Dtos/FiltriUtente";
-import { GetUsersResponse } from "../../Dtos/GetUsersResponse";
+import { GetUsersResponse, GetUsersResult } from "../../Dtos/GetUsersResponse";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { UserDto } from "../../Dtos";
 import { RegisterRequest } from "../../Dtos/RegisterRequest";
@@ -18,7 +18,7 @@ export class UserService {
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService, private readonly permissionService: PermissionService
     ) { }
-    async getUsers(): Promise<GetUsersResponse[]> {
+    async getUsers(): Promise<GetUsersResult[]> {
         try {
             const query = ` 
             SELECT  
@@ -43,8 +43,38 @@ export class UserService {
             WHERE STAREG <> ?
             ORDER BY U.CODUTE`;
 
-            const result = await Orm.query(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE]);
-            return result.map(RestUtilities.convertKeysToCamelCase);
+            let users = await Orm.query(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE]) as UserDto[];
+            users = users.map(RestUtilities.convertKeysToCamelCase);
+
+
+            let usersResponse: GetUsersResult[] = [];
+
+            for (const user of users) {
+                const userGrants = await this.permissionService.getUserRolesAndGrants(user.codiceUtente);
+
+                let extensionFields = {};
+
+                for (const ext of this.accessiOptions.extensionFieldsOptions) {
+                    const values = (
+                        await Orm.query(
+                            ext.databaseOptions,
+                            `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName
+                            } = ?`,
+                            [user.codiceUtente]
+                        )
+                    ).map(RestUtilities.convertKeysToCamelCase);
+
+                    extensionFields[ext.objectKey] = values;
+                }
+                let userResult: GetUsersResult = {
+                    utente: user,
+                    userGrants: userGrants,
+                    extensionFields: extensionFields
+                }
+
+                usersResponse.push(userResult);
+            }
+            return usersResponse;
         } catch (error) {
             throw error;
         }

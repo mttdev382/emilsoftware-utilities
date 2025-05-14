@@ -10,10 +10,14 @@ import { GetUsersResponse } from '../Dtos/GetUsersResponse';
 import { UserDto } from '../Dtos';
 import { RegisterResponse } from '../Dtos/RegisterResponse';
 import { RegisterRequest } from '../Dtos/RegisterRequest';
+import { Logger } from '../../Logger';
 
 @ApiTags('User')
 @Controller('accessi/user')
 export class UserController {
+
+    private readonly logger = new Logger(UserController.name);
+
     constructor(
         private readonly userService: UserService,
         private readonly emailService: EmailService,
@@ -36,7 +40,8 @@ export class UserController {
             const users = await this.userService.getUsers();
             return RestUtilities.sendBaseResponse(res, users);
         } catch (error) {
-            return RestUtilities.sendInvalidCredentials(res);
+            this.logger.error('Errore durante il recupero degli utenti', error);
+            return RestUtilities.sendErrorMessage(res, error, UserController.name);
         }
     }
 
@@ -89,22 +94,15 @@ export class UserController {
         @Res() res: Response
     ) {
         try {
-            const protocol = request['protocol'];
-            const host = request.headers['host'];
-            if (!protocol || !host) {
-                throw new Error("Impossibile procedere: protocollo e host non impostati negli header della richiesta.");
-            }
-    
             const codiceUtente = await this.userService.register(registrationData);
-            const confirmationEmailPrefix = `${protocol}://${host}`;
-            await this.emailService.sendPasswordResetEmail(registrationData.email, confirmationEmailPrefix);
-    
+            await this.emailService.sendPasswordResetEmail(registrationData.email);
+
             return RestUtilities.sendBaseResponse(res, codiceUtente);
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, UserController.name, HttpStatus.BAD_REQUEST);
         }
     }
-    
+
 
     @ApiOperation({ summary: 'Aggiorna un utente esistente', operationId: "updateUtente" })
     @ApiParam({

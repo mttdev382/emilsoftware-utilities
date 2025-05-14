@@ -41,6 +41,7 @@ export interface ExtensionFieldsOptions {
 
 export interface AccessiOptions {
   databaseOptions: Options;
+  confirmationEmailUrl: string;
   confirmationEmailReturnUrl: string;
   encryptionKey: string;
   mockDemoUser: boolean;
