@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.3.127 (2025-05-14)
+
+
+### Bug Fixes
+
+* confirmation email url ([f32f463](https://github.com/mttdev382/emilsoftware-utilities/commit/f32f463496b9aba381984131e6278f7ebd387074))
+
 ### 1.3.126 (2025-05-06)
 
 ### 1.3.125 (2025-04-11)
