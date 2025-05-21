@@ -1,6 +1,6 @@
 import {ApiBody, ApiConsumes, ApiResponse, ApiQuery} from "@nestjs/swagger";
 
-import { Controller, Post, Get, Delete, Param, UploadedFiles, UseInterceptors, BadRequestException, Body, Response, Query, Res } from "@nestjs/common";
+import { Controller, Post, Get, Delete, Param, UploadedFiles, UseInterceptors, BadRequestException, Body, Response, Query, Res, Patch } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { AllegatiService } from "../Services/AllegatiService/AllegatiService";
 import {UploadAllegatoResponseDto} from "../Dtos/responses/UploadAllegatoResponseDto";
@@ -66,15 +66,33 @@ export class AllegatiController {
         @Param('id') id: number,
         @Res() res: e.Response
     ): Promise<void> {
-        const file = await this.allegatiService.downloadFile(id);
-        
-        // Set headers for file download
-        res.setHeader('Content-Type', file.mimetype);
-        res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
-        
-        // Convert base64 to buffer and send
-        const buffer = Buffer.from(file.contentBase64, 'base64');
-        res.send(buffer);
+        try {
+            const file = await this.allegatiService.downloadFile(id);
+            
+            // Convert base64 to buffer in chunks
+            const chunkSize = 1024 * 1024; // 1MB chunks
+            const base64Content = file.contentBase64;
+            const bufferSize = Math.ceil((base64Content.length * 3) / 4);
+            const buffer = Buffer.alloc(bufferSize);
+            
+            let bufferIndex = 0;
+            for (let i = 0; i < base64Content.length; i += chunkSize) {
+                const chunk = base64Content.slice(i, i + chunkSize);
+                const chunkBuffer = Buffer.from(chunk, 'base64');
+                chunkBuffer.copy(buffer, bufferIndex);
+                bufferIndex += chunkBuffer.length;
+            }
+
+            // Set headers for file download
+            res.setHeader('Content-Type', file.mimetype);
+            res.setHeader('Content-Disposition', `attachment; filename="${file.filename}"`);
+            res.setHeader('Content-Length', buffer.length);
+            
+            res.status(200).end(buffer);
+        } catch (error) {
+            console.error('[AllegatiController] downloadFile - Errore:', error);
+            throw error;
+        }
     }
 
     @Delete(':id')
@@ -103,4 +121,26 @@ export class AllegatiController {
             idxtipoall: idxtipoall ? Number(idxtipoall) : undefined
         });
     }
+
+    @Post('search')
+@ApiResponse({ status: 200, description: 'Ricerca allegati per campi.' })
+async searchByFields(@Body() body: { tipcod?: string; codice?: number; docrif?: string; idxtipoall?: number }) {
+    return await this.allegatiService.findByFields(body);
+}
+
+@Post('get-by-fields')
+@ApiResponse({ status: 200, description: 'Ottieni un allegato per campi.' })
+async getOneByFields(@Body() body: { tipcod?: string; codice?: number; docrif?: string; idxtipoall?: number }) {
+    return await this.allegatiService.getOneByFields(body);
+}
+
+@Patch('update-fields/:id')
+@ApiResponse({ status: 200, description: 'Aggiorna i campi di un allegato.' })
+async updateFieldsById(
+    @Param('id') id: number,
+    @Body() body: { tipcod?: string; codice?: number; docrif?: string; idxtipoall?: number }
+) {
+    await this.allegatiService.updateFieldsById(Number(id), body);
+    return { message: 'Aggiornamento completato' };
+}
 }
