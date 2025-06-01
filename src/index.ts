@@ -6,7 +6,19 @@ import { DateUtilities, RestUtilities, DatabaseUtilities, StatusCode } from "./U
 import { autobind } from "./autobind";
 import { DocumentGenerator } from "./ContractGenerator";
 
-export * from "./allegati-module";
+export * from "./Orm";
+export * from "./Utilities";
+export * from "./Logger";
+export * from "./autobind";
+export * from "./ExecutionTimeLogger";
+export * from "./RoutesLoggerMiddleware";
+export * from "./ContractGenerator";
+export * from "./DatabaseUpdater";
+
 export * from "./accessi-module";
-export * from "es-node-firebird";
-export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode, DocumentGenerator };
+export * from "./allegati-module";
+
+// Unified module exports
+export * from "./UnifiedModule";
+export * from "./initializeUnifiedModule";
+export * from "./swagger/SwaggerConfig";

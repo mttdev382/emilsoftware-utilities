@@ -2,8 +2,6 @@ import { Application } from "express";
 import { NestFactory } from "@nestjs/core";
 import { ExpressAdapter } from "@nestjs/platform-express";
 import { AllegatiModule, AllegatiOptions } from "./AllegatiModule";
-import { setupAllegatiSwagger } from "./swagger/SwaggerConfig";
-
 import { Logger } from "../Logger";
 
 export async function initializeAllegatiModule(app: Application, options: AllegatiOptions) {
@@ -18,12 +16,10 @@ export async function initializeAllegatiModule(app: Application, options: Allega
         nestApp.enableCors();
 
         nestApp.setGlobalPrefix('api', {
-            exclude: ['/swagger', '/swagger/(.*)'] // oppure più fine
+            exclude: ['/swagger', '/swagger/(.*)']
         });
 
-        // (opzionale) puoi settare Swagger se vuoi:
-        setupAllegatiSwagger(nestApp);
-
+        // Note: Swagger setup is now handled by the unified module
         await nestApp.init();
 
     } catch (error) {
