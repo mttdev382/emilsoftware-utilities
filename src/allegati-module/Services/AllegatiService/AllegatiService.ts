@@ -105,12 +105,12 @@ export class AllegatiService {
 
             const result = await Orm.query(this.allegatiOptions.databaseOptions, insertQuery, params);
             
-            if (!result || !result[0] || !result[0].IDXALL) {
+            if (!result || !result.IDXALL) {
                 throw new InternalServerErrorException('Errore durante il salvataggio del file');
             }
 
             return {
-                id: result[0].IDXALL,
+                id: result.IDXALL,
                 filename: file.originalname,
             };
         } catch (error) {
