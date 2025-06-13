@@ -217,11 +217,9 @@ export class AllegatiService {
             }
 
             const query = `DELETE FROM ALLEGATI WHERE IDXALL = ?`;
-            const result = await Orm.execute(this.allegatiOptions.databaseOptions, query, [id]);
+            await Orm.execute(this.allegatiOptions.databaseOptions, query, [id]);
             
-            if (!result) {
-                throw new InternalServerErrorException('Errore durante la cancellazione del file');
-            }
+           
         } catch (error) {
             console.error('[AllegatiService] deleteFile - Errore:', error);
             if (error instanceof BadRequestException || 
