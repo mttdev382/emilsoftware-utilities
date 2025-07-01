@@ -136,6 +136,70 @@ export class UserService {
             .then(results => results.map(RestUtilities.convertKeysToCamelCase)) as FiltriUtente[];
     }
 
+    async insertUserFilters(codiceUtente: number, filterData: RegisterRequest): Promise<void> {
+        try {
+            if (!codiceUtente || codiceUtente <= 0) {
+                throw new Error('Codice utente non valido');
+            }
+
+            const fieldMapping: Record<string, { dbField: string; type: 'string' | 'number' }> = {
+                numeroReport: { dbField: 'NUMREP', type: 'number' },
+                indicePersonale: { dbField: 'IDXPERS', type: 'number' }, 
+                codiceClienteSuper: { dbField: 'CODCLISUPER', type: 'string' },
+                codiceAgenzia: { dbField: 'CODAGE', type: 'string' },
+                codiceClienteCollegato: { dbField: 'CODCLICOL', type: 'string' },
+                codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
+                tipoFiltro: { dbField: 'TIPFIL', type: 'string' }
+            };
+
+            const fieldsToInsert = Object.entries(fieldMapping)
+                .filter(([tsField]) => {
+                    const value = filterData[tsField as keyof RegisterRequest];
+                    return value !== undefined && value !== null && value !== '';
+                })
+                .map(([tsField, config]) => {
+                    const value = filterData[tsField as keyof RegisterRequest];
+                    
+                    if (config.type === 'number' && typeof value !== 'number') {
+                        throw new Error(`Il campo ${tsField} deve essere un numero`);
+                    }
+                    if (config.type === 'string' && typeof value !== 'string') {
+                        throw new Error(`Il campo ${tsField} deve essere una stringa`);
+                    }
+                    
+                    return { tsField, dbField: config.dbField, value };
+                });
+
+            if (fieldsToInsert.length === 0) {
+                return; 
+            }
+
+            await this.executeInTransaction(async () => {
+                await Orm.execute(
+                    this.accessiOptions.databaseOptions, 
+                    'DELETE FROM FILTRI WHERE CODUTE = ?', 
+                    [codiceUtente]
+                );
+
+                const dbFields = ['CODUTE', ...fieldsToInsert.map(f => f.dbField)];
+                const placeholders = dbFields.map(() => '?');
+                const values = [codiceUtente, ...fieldsToInsert.map(f => f.value)];
+
+                const insertQuery = `INSERT INTO FILTRI (${dbFields.join(', ')}) VALUES (${placeholders.join(', ')})`;
+                await Orm.execute(this.accessiOptions.databaseOptions, insertQuery, values);
+            });
+
+        } catch (error) {
+            throw new Error(`Errore durante l'inserimento dei filtri per utente ${codiceUtente}: ${error.message}`);
+        }
+    }
+
+    private async executeInTransaction(operation: () => Promise<void>): Promise<void> {
+        await operation();
+    }
+
+ 
+
     async register(registrationData: RegisterRequest): Promise<string> {
         try {
             const existingUser = await Orm.query(
@@ -154,9 +218,29 @@ export class UserService {
 
             const codiceUtente = (await Orm.query(this.accessiOptions.databaseOptions, queryUtenti, paramsUtenti)).CODUTE;
 
-            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (CODUTE,COGNOME,NOME) VALUES (?,?,?)`;
-            const paramsUtentiConfig = [codiceUtente, registrationData.cognome, registrationData.nome];
-            await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, paramsUtentiConfig);
+            const utentiConfigFields = ['CODUTE', 'COGNOME', 'NOME'];
+            const utentiConfigPlaceholders = ['?', '?', '?'];
+            const utentiConfigParams = [codiceUtente, registrationData.cognome, registrationData.nome];
+
+            // Mapping dei campi opzionali
+            const optionalFields: [keyof typeof registrationData, string][] = [
+                ['cellulare', 'CELLULARE'],
+                ['flagSuper', 'FLGSUPER'],
+            ];
+
+            for (const [key, dbField] of optionalFields) {
+                const value = registrationData[key];
+                if (value !== undefined && value !== null) {
+                    utentiConfigFields.push(dbField);
+                    utentiConfigPlaceholders.push('?');
+                    utentiConfigParams.push(value);
+                }
+            }
+
+            const queryUtentiConfig = `INSERT INTO UTENTI_CONFIG (${utentiConfigFields.join(', ')}) VALUES (${utentiConfigPlaceholders.join(', ')})`;
+            await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, utentiConfigParams);
+
+            await this.insertUserFilters(codiceUtente, registrationData);
 
             if (!!registrationData.roles && registrationData.roles.length > 0) {
                 await this.permissionService.assignRolesToUser(codiceUtente, registrationData.roles);
