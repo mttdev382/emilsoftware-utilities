@@ -58,6 +58,9 @@ export class UserDto {
   @ApiPropertyOptional({ description: "Metadata JSON personalizzato.", example: "{\"theme\": \"dark\"}" })
   jsonMetadata?: string;
 
+  @ApiPropertyOptional({ description: "Ragione sociale cliente.", example: "ACME Corp SpA" })
+  ragSocCli?: string;
+
   @ApiPropertyOptional({ description: "Ruoli assegnati all'utente.", example: ["admin", "editor"] })
   roles?: string[];
 

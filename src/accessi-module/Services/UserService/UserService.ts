@@ -38,7 +38,8 @@ export class UserService {
                 G.CELLULARE as cellulare,
                 G.FLGSUPER as flag_super, 
                 G.PAGDEF as pagina_default,
-                G.JSON_METADATA as json_metadata
+                G.JSON_METADATA as json_metadata,
+                G.RAGSOCCLI as rag_soc_cli
             FROM UTENTI U INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE  
             WHERE STAREG <> ?
             ORDER BY U.CODUTE`;
@@ -105,7 +106,8 @@ export class UserService {
                 C.CODLINGUA AS codice_lingua, 
                 C.CELLULARE AS cellulare, 
                 C.FLGSUPER AS flag_super, 
-                C.PAGDEF AS pagina_default
+                C.PAGDEF AS pagina_default,
+                C.RAGSOCCLI AS rag_soc_cli
             FROM UTENTI U
             INNER JOIN UTENTI_CONFIG C ON C.CODUTE = U.CODUTE
             WHERE LOWER(U.USRNAME) = ?
@@ -327,6 +329,10 @@ export class UserService {
             if (user.jsonMetadata !== undefined) {
                 utentiConfigUpdates.push("json_metadata = ?");
                 utentiConfigParams.push(user.jsonMetadata);
+            }
+            if (user.ragSocCli !== undefined) {
+                utentiConfigUpdates.push("ragsoccli = ?");
+                utentiConfigParams.push(user.ragSocCli);
             }
 
             if (utentiConfigUpdates.length > 0) {
