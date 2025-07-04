@@ -46,4 +46,17 @@ export class RegisterRequest {
 
   @ApiPropertyOptional({ description: "Tipo di filtro applicato.", example: "esclusivo" })
   tipoFiltro?: string;
+
+  // Campi aggiuntivi utente
+  @ApiPropertyOptional({ description: "Avatar dell'utente.", example: "user.svg" })
+  avatar?: string;
+
+  @ApiPropertyOptional({ description: "Flag autenticazione a due fattori.", example: false })
+  flagDueFattori?: boolean;
+
+  @ApiPropertyOptional({ description: "Pagina di default dell'utente.", example: "/dashboard" })
+  paginaDefault?: string;
+
+  @ApiPropertyOptional({ description: "Ragione sociale cliente.", example: "ALIVAL STOCK" })
+  ragSocCli?: string;
 }

@@ -226,6 +226,10 @@ export class UserService {
             const optionalFields: [keyof typeof registrationData, string][] = [
                 ['cellulare', 'CELLULARE'],
                 ['flagSuper', 'FLGSUPER'],
+                ['avatar', 'AVATAR'], 
+                ['flagDueFattori', 'FLG2FATT'],
+                ['paginaDefault', 'PAGDEF'],
+                ['ragSocCli', 'RAGSOCCLI'], 
             ];
 
             for (const [key, dbField] of optionalFields) {
