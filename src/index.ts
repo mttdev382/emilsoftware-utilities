@@ -20,6 +20,4 @@ export * from "./allegati-module";
 export * from "es-node-firebird";
 export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode, DocumentGenerator };
 // Unified module exports
-export * from "./UnifiedModule";
-export * from "./initializeUnifiedModule";
 export * from "./swagger/SwaggerConfig";
