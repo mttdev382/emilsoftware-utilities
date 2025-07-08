@@ -41,10 +41,9 @@ export class UserService {
                 G.JSON_METADATA as json_metadata,
                 G.RAGSOCCLI as rag_soc_cli
             FROM UTENTI U INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE  
-            WHERE STAREG <> ?
             ORDER BY U.CODUTE`;
 
-            let users = await Orm.query(this.accessiOptions.databaseOptions, query, [StatoRegistrazione.DELETE]) as UserDto[];
+            let users = await Orm.query(this.accessiOptions.databaseOptions, query) as UserDto[];
             users = users.map(RestUtilities.convertKeysToCamelCase);
 
 

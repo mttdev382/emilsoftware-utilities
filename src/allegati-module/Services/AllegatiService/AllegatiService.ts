@@ -33,7 +33,7 @@ export class AllegatiService {
     constructor(@Inject('ALLEGATI_OPTIONS') private readonly allegatiOptions: AllegatiOptions) {
         this.ensureTableExists().catch(error => {
             console.error('[AllegatiService] Errore creazione tabella ALLEGATI:', error);
-            throw new InternalServerErrorException('Errore durante l\'inizializzazione del servizio allegati');
+           // throw new InternalServerErrorException('Errore durante l\'inizializzazione del servizio allegati');
         });
     }
 

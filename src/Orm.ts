@@ -24,7 +24,7 @@ export class Orm {
         });
     }
 
-    public static async query(options: Options, query: string, parameters: any[] = [], logQuery = false): Promise<any> {
+    public static async query(options: Options, query: string, parameters: any[] = [], logQuery = true): Promise<any> {
         try {
             return new Promise((resolve, reject): void => {
                 Firebird.attach(options, (err: any, db: Database) => {
@@ -51,7 +51,7 @@ export class Orm {
         }
     }
 
-    public static async execute(options: Options, query: string, parameters: any = [], logQuery = false): Promise<any> {
+    public static async execute(options: Options, query: string, parameters: any = [], logQuery = true): Promise<any> {
         try {
             return new Promise((resolve, reject): void => {
                 Firebird.attach(options, (err: any, db: Database) => {
