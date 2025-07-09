@@ -21,3 +21,4 @@ export * from "es-node-firebird";
 export { autobind, ExecutionTimeLogger, Logger, LogLevels, Orm, DateUtilities, RestUtilities, DatabaseUtilities, DatabaseUpdater, StatusCode, DocumentGenerator };
 // Unified module exports
 export * from "./swagger/SwaggerConfig";
+export * from "./initEmilsoftwareModule";
