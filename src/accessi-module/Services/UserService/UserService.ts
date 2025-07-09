@@ -39,8 +39,17 @@ export class UserService {
                 G.FLGSUPER as flag_super, 
                 G.PAGDEF as pagina_default,
                 G.JSON_METADATA as json_metadata,
-                G.RAGSOCCLI as rag_soc_cli
-            FROM UTENTI U INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE  
+                G.RAGSOCCLI as rag_soc_cli,
+                F.NUMREP AS num_rep,
+                F.IDXPERS AS idx_pers,
+                F.CODCLISUPER AS cod_cli_super,
+                F.CODAGE AS cod_age,
+                F.CODCLICOL AS cod_cli_col,
+                F.CODCLIENTI AS codice_clienti,
+                F.TIPFIL AS tip_fil
+            FROM UTENTI U 
+            INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
+            INNER JOIN FILTRI F ON F.CODUTE = U.CODUTE
             ORDER BY U.CODUTE`;
 
             let users = await Orm.query(this.accessiOptions.databaseOptions, query) as UserDto[];
