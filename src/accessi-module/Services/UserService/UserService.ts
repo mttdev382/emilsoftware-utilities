@@ -49,7 +49,7 @@ export class UserService {
                 F.TIPFIL AS tip_fil
             FROM UTENTI U 
             INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
-            INNER JOIN FILTRI F ON F.CODUTE = U.CODUTE
+            LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
             ORDER BY U.CODUTE`;
 
             let users = await Orm.query(this.accessiOptions.databaseOptions, query) as UserDto[];
