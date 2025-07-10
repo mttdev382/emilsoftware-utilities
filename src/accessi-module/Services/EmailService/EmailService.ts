@@ -39,19 +39,19 @@ export class EmailService {
             const { confirmationEmailUrl } = this.accessiOptions;
             const resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
 
-            let sPhrase : string;
-            sPhrase = ` Gentile utente,
-                        abbiamo ricevuto la tua richiesta.
+            let sPhrase: string;
+            sPhrase = ` Gentile utente,<br>
+                        abbiamo ricevuto la tua richiesta.<br><br>
 
-                        Per completare l'operazione, clicca sul link qui sotto:
-                        <a href="${resetUrl}">${resetUrl}</a>
+                        Per completare l'operazione, clicca sul link qui sotto:<br>
+                        <a href="${resetUrl}">completa la procedura</a><br><br>
 
-                        Se hai richiesto la registrazione a un servizio o la reimpostazione della password, questo passaggio è necessario.
-                        Se non sei stato tu a effettuare questa richiesta, puoi ignorare questo messaggio in tutta sicurezza.
+                        Se hai richiesto la registrazione al servizio o la reimpostazione della password, questo passaggio è necessario.<br>
+                        Se non sei stato tu a effettuare questa richiesta, puoi ignorare questo messaggio in tutta sicurezza.<br><br>
 
-                        Questa è una comunicazione automatica, ti preghiamo di non rispondere a questa email.
+                        Questa è una comunicazione automatica, ti preghiamo di non rispondere a questa email.<br><br>
 
-                        Grazie.`;            
+                        Grazie.<br>`;
             const html = this.GetHtmlMail(sPhrase);
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,
@@ -285,7 +285,7 @@ export class EmailService {
         sTxt += '                                            <table border="0" cellpadding="0" cellspacing="0" class="templateRow" width="100%" style="border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0">'
         sTxt += '                                                <tbody>'
         sTxt += '                                                    <tr>'
-        sTxt += '                                                        <td class="rowContainer kmFloatLeft" valign="top" style="border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0">'        
+        sTxt += '                                                        <td class="rowContainer kmFloatLeft" valign="top" style="border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0">'
         sTxt += '                                                            <table border="0" cellpadding="0" cellspacing="0" class="kmTextBlock" width="100%" style="border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0">'
         sTxt += '                                                                <tbody class="kmTextBlockOuter">'
         sTxt += '                                                                    <tr>'
@@ -294,7 +294,7 @@ export class EmailService {
         sTxt += '                                                                                <tbody>'
         sTxt += '                                                                                    <tr>'
         sTxt += '                                                                                        <td class="kmTextContent" valign="top" style="border-collapse:collapse;mso-table-lspace:0;mso-table-rspace:0;color:#272727;font-family:Helvetica, Arial;font-size:13px;line-height:200%;letter-spacing:normal;text-align:left;padding-top:40px;padding-bottom:40px;padding-left:40px;padding-right:40px;">'
-        sTxt += '                                                                                           <p>'+sPhrase+'<p>';
+        sTxt += '                                                                                           <p>' + sPhrase + '<p>';
         sTxt += '                                                                                        </td>'
         sTxt += '                                                                                    </tr>'
         sTxt += '                                                                                </tbody>'
