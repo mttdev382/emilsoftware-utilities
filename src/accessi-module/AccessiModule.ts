@@ -43,6 +43,7 @@ export interface AccessiOptions {
   databaseOptions: Options;
   confirmationEmailUrl: string;
   confirmationEmailReturnUrl: string;
+  confirmationEmailPrefix?: string;
   encryptionKey: string;
   mockDemoUser: boolean;
   jwtOptions: JwtOptions;

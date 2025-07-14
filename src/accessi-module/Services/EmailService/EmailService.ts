@@ -35,7 +35,7 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
-            const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl;
+            const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl + "&prefix=" + (this.accessiOptions.confirmationEmailPrefix ?? '');
             const { confirmationEmailUrl } = this.accessiOptions;
             const resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
 
