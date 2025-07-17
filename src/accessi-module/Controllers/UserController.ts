@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus, Query } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
 import { RestUtilities } from '../../Utilities';
@@ -35,9 +35,9 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: GetUsersResponse })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
     @Get('get-users')
-    async getUsers(@Res() res: Response) {
+    async getUsers(@Res() res: Response, @Query('email') email?: string) {
         try {
-            const users = await this.userService.getUsers();
+            const users = await this.userService.getUsers(email);
             return RestUtilities.sendBaseResponse(res, users);
         } catch (error) {
             this.logger.error('Errore durante il recupero degli utenti', error);

@@ -18,9 +18,11 @@ export class UserService {
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions, private readonly emailService: EmailService, private readonly permissionService: PermissionService
     ) { }
-    async getUsers(): Promise<GetUsersResult[]> {
+
+
+    async getUsers(email?: string): Promise<GetUsersResult[]> {
         try {
-            const query = ` 
+            let query = ` 
             SELECT  
                 U.CODUTE as codice_utente, 
                 U.USRNAME as email, 
@@ -48,11 +50,21 @@ export class UserService {
                 F.CODCLIENTI AS codice_clienti,
                 F.TIPFIL AS tip_fil
             FROM UTENTI U 
-            INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
-            LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
-            ORDER BY U.CODUTE`;
+            WHERE 1=1
+            `;
 
-            let users = await Orm.query(this.accessiOptions.databaseOptions, query) as UserDto[];
+            let queryParams: any[] = [];
+
+            if (email) {
+                query += ` AND LOWER(U.USRNAME) = ? `;
+                queryParams.push(email.trim().toLowerCase());
+            }
+
+            query += `INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
+            LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
+            ORDER BY U.CODUTE`
+
+            let users = await Orm.query(this.accessiOptions.databaseOptions, query, queryParams) as UserDto[];
             users = users.map(RestUtilities.convertKeysToCamelCase);
 
 
@@ -154,7 +166,7 @@ export class UserService {
 
             const fieldMapping: Record<string, { dbField: string; type: 'string' | 'number' }> = {
                 numeroReport: { dbField: 'NUMREP', type: 'number' },
-                indicePersonale: { dbField: 'IDXPERS', type: 'number' }, 
+                indicePersonale: { dbField: 'IDXPERS', type: 'number' },
                 codiceClienteSuper: { dbField: 'CODCLISUPER', type: 'string' },
                 codiceAgenzia: { dbField: 'CODAGE', type: 'string' },
                 codiceClienteCollegato: { dbField: 'CODCLICOL', type: 'string' },
@@ -169,25 +181,25 @@ export class UserService {
                 })
                 .map(([tsField, config]) => {
                     const value = filterData[tsField as keyof RegisterRequest];
-                    
+
                     if (config.type === 'number' && typeof value !== 'number') {
                         throw new Error(`Il campo ${tsField} deve essere un numero`);
                     }
                     if (config.type === 'string' && typeof value !== 'string') {
                         throw new Error(`Il campo ${tsField} deve essere una stringa`);
                     }
-                    
+
                     return { tsField, dbField: config.dbField, value };
                 });
 
             if (fieldsToInsert.length === 0) {
-                return; 
+                return;
             }
 
             await this.executeInTransaction(async () => {
                 await Orm.execute(
-                    this.accessiOptions.databaseOptions, 
-                    'DELETE FROM FILTRI WHERE CODUTE = ?', 
+                    this.accessiOptions.databaseOptions,
+                    'DELETE FROM FILTRI WHERE CODUTE = ?',
                     [codiceUtente]
                 );
 
@@ -208,7 +220,7 @@ export class UserService {
         await operation();
     }
 
- 
+
 
     async register(registrationData: RegisterRequest): Promise<string> {
         try {
@@ -236,10 +248,10 @@ export class UserService {
             const optionalFields: [keyof typeof registrationData, string][] = [
                 ['cellulare', 'CELLULARE'],
                 ['flagSuper', 'FLGSUPER'],
-                ['avatar', 'AVATAR'], 
+                ['avatar', 'AVATAR'],
                 ['flagDueFattori', 'FLG2FATT'],
                 ['paginaDefault', 'PAGDEF'],
-                ['ragSocCli', 'RAGSOCCLI'], 
+                ['ragSocCli', 'RAGSOCCLI'],
             ];
 
             for (const [key, dbField] of optionalFields) {
