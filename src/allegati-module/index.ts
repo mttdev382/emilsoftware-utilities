@@ -6,7 +6,6 @@ import { Logger } from "../Logger";
 
 export async function initializeAllegatiModule(app: Application, options: AllegatiOptions) {
     const logger: Logger = new Logger("initializeAllegatiModule");
-
     try {
         const nestExpressInstance = new ExpressAdapter(app);
         const nestApp = await NestFactory.create(AllegatiModule.forRoot(options), nestExpressInstance, {

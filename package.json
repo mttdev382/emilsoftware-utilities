@@ -10,7 +10,8 @@
     "build": "tsc && npm run copy-views",
     "copy-views": "node copy-views.js",
     "prepublishOnly": "npm run build",
-    "test:allegati": "ts-node src/tests/allegati/allegati.ts"
+    "test:allegati": "ts-node src/tests/allegati/allegati.ts",
+    "test:accessi": "npm run build && ts-node test/index.js"
   },
   "repository": {
     "type": "git",

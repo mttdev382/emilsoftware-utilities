@@ -1,7 +1,7 @@
 import winston from "winston";
 import * as path from "path";
 import { promises as fs } from "fs";
-import { blue, red, magenta, green, cyan } from 'colorette';
+import { blue, red, magenta, green, cyan, yellow } from 'colorette';
 
 export enum LogLevels {
     INFO = "INFO",
@@ -55,7 +55,6 @@ export class Logger {
             ],
             levels: {
                 error: 1,
-                warn: 2,
                 warning: 2,
                 info: 3,
                 http: 4,
@@ -160,6 +159,9 @@ export class Logger {
                 break;
             case LogLevels.DEBUG:
                 console.debug(magenta(`[DEBUG][${now}][${fileName}]`), logEntry.message);
+                break;
+            case LogLevels.WARNING:
+                console.debug(yellow(`[WARNING][${now}][${fileName}]`), logEntry.message);
                 break;
             case LogLevels.LOG:
                 console.log(cyan(`[LOG][${now}][${fileName}]`), logEntry.message);

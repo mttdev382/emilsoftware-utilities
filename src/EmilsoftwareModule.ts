@@ -1,6 +1,7 @@
 import { DynamicModule, Module } from "@nestjs/common";
 import { AccessiModule, AccessiOptions } from "./accessi-module/AccessiModule";
 import { AllegatiModule, AllegatiOptions } from "./allegati-module/AllegatiModule";
+import { Logger } from "./Logger";
 
 /**
  * Configuration options for the unified module that combines Accessi and Allegati functionality
@@ -17,13 +18,38 @@ export interface EmilsoftwareOptions {
 @Module({})
 export class EmilsoftwareModule {
     static forRoot(options: EmilsoftwareOptions): DynamicModule {
+
+        const logger: Logger = new Logger(EmilsoftwareModule.name);
+        let imports = [];
+        let exports = [];
+
+        if (!options) {
+            throw new Error("EmilsoftwareModule requires valid accessiOptions and allegatiOptions");
+        }
+
+
+        if (options.accessiOptions) {
+            logger.info("Initializing AccessiModule with provided options.");
+            imports.push(AccessiModule.forRoot(options.accessiOptions));
+            exports.push(AccessiModule);
+        }
+        else {
+            logger.warning("Accessi options are not provided. AccessiModule will not be initialized.");
+        }
+
+        if (options.allegatiOptions) {
+            logger.info("Initializing AllegatiModule with provided options.");
+            imports.push(AllegatiModule.forRoot(options.allegatiOptions));
+            exports.push(AllegatiModule);
+        }
+        else {
+            logger.warning("Allegati options are not provided. AllegatiModule will not be initialized.");
+        }
+
         return {
             module: EmilsoftwareModule,
-            imports: [
-                AccessiModule.forRoot(options.accessiOptions),
-                AllegatiModule.forRoot(options.allegatiOptions),
-            ],
-            exports: [AccessiModule, AllegatiModule],
+            imports,
+            exports
         };
     }
 } 
