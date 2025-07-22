@@ -20,7 +20,7 @@ export class UserService {
     ) { }
 
 
-    async getUsers(email?: string): Promise<GetUsersResult[]> {
+    async getUsers(filters?: { email?: string, codiceUtente?: number }, options?: { includeExtensionFields: boolean, includeGrants: boolean }): Promise<GetUsersResult[]> {
         try {
             let query = ` 
             SELECT  
@@ -50,43 +50,53 @@ export class UserService {
                 F.CODCLIENTI AS codice_clienti,
                 F.TIPFIL AS tip_fil
             FROM UTENTI U 
+            INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
+            LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
             WHERE 1=1
             `;
 
             let queryParams: any[] = [];
 
-            if (email) {
+            if (filters.email) {
                 query += ` AND LOWER(U.USRNAME) = ? `;
-                queryParams.push(email.trim().toLowerCase());
+                queryParams.push(filters.email.trim().toLowerCase());
             }
 
-            query += `INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
-            LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
-            ORDER BY U.CODUTE`
+            if (filters.codiceUtente) {
+                query += ` AND U.CODUTE = ? `;
+                queryParams.push(filters.codiceUtente);
+            }
+
+            query += ` ORDER BY U.CODUTE DESC `;
 
             let users = await Orm.query(this.accessiOptions.databaseOptions, query, queryParams) as UserDto[];
             users = users.map(RestUtilities.convertKeysToCamelCase);
 
-
             let usersResponse: GetUsersResult[] = [];
 
+            console.log("OPTIONS: ", options);
             for (const user of users) {
-                const userGrants = await this.permissionService.getUserRolesAndGrants(user.codiceUtente);
+                let userGrants = null;
 
-                let extensionFields = {};
+                if (options.includeGrants) userGrants = await this.permissionService.getUserRolesAndGrants(user.codiceUtente);
 
-                for (const ext of this.accessiOptions.extensionFieldsOptions) {
-                    const values = (
-                        await Orm.query(
-                            ext.databaseOptions,
-                            `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName
-                            } = ?`,
-                            [user.codiceUtente]
-                        )
-                    ).map(RestUtilities.convertKeysToCamelCase);
+                let extensionFields = options.includeExtensionFields ? {} : null;
 
-                    extensionFields[ext.objectKey] = values;
+                if (options.includeExtensionFields) {
+                    for (const ext of this.accessiOptions.extensionFieldsOptions) {
+                        const values = (
+                            await Orm.query(
+                                ext.databaseOptions,
+                                `SELECT ${ext.tableFields.join(",")} FROM ${ext.tableName} WHERE ${ext.tableJoinFieldName
+                                } = ?`,
+                                [user.codiceUtente]
+                            )
+                        ).map(RestUtilities.convertKeysToCamelCase);
+
+                        extensionFields[ext.objectKey] = values;
+                    }
                 }
+
                 let userResult: GetUsersResult = {
                     utente: user,
                     userGrants: userGrants,
@@ -95,6 +105,9 @@ export class UserService {
 
                 usersResponse.push(userResult);
             }
+
+            console.log("OPTIONS: ", options);
+
             return usersResponse;
         } catch (error) {
             throw error;

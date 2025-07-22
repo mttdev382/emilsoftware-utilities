@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Inject, Res, Param, Req, Delete, Put, Patch, HttpStatus, Query, ParseBoolPipe } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiCreatedResponse, ApiQuery } from '@nestjs/swagger';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { UserService } from '../Services/UserService/UserService';
@@ -34,13 +34,25 @@ export class UserController {
     @ApiOperation({ summary: 'Recupera la lista degli utenti', operationId: "getUsers" })
     @ApiResponse({ status: 200, description: 'Lista utenti recuperata con successo', type: GetUsersResponse })
     @ApiResponse({ status: 401, description: 'Credenziali non valide' })
+    @ApiQuery({ name: 'email', required: false, description: 'Email dell\'utente da cercare' })
+    @ApiQuery({ name: 'codiceUtente', required: false, description: "Codice dell'utente da cercare" })
+    @ApiQuery({ name: 'includeExtensionFields', required: false, description: "Includi extension fields (chiamata più pesante)" })
+    @ApiQuery({ name: 'includeGrants', required: false, description: "Includi Permessi (chiamata più pesante)" })
     @Get('get-users')
-    async getUsers(@Res() res: Response, @Query('email') email?: string) {
+    async getUsers(
+        @Res() res: Response,
+        @Query('email') email?: string,
+        @Query('codiceUtente') codiceUtente?: number,
+        @Query('includeExtensionFields', new ParseBoolPipe({ optional: true })) includeExtensionFields?: boolean,
+        @Query('includeGrants', new ParseBoolPipe({ optional: true })) includeGrants?: boolean
+    ) {
         try {
-            const users = await this.userService.getUsers(email);
+            let filters = { email, codiceUtente };
+            let options = { includeExtensionFields: includeExtensionFields ?? true, includeGrants: includeGrants ?? true };
+            const users = await this.userService.getUsers(filters, options);
             return RestUtilities.sendBaseResponse(res, users);
         } catch (error) {
-            this.logger.error('Errore durante il recupero degli utenti', error);
+            this.logger.error('Errore durante il recupero degli utenti: ', error);
             return RestUtilities.sendErrorMessage(res, error, UserController.name);
         }
     }
