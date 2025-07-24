@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.3.148 (2025-07-24)
+
+
+### Bug Fixes
+
+* doppio operationId ([1a0ef3b](https://github.com/mttdev382/emilsoftware-utilities/commit/1a0ef3b3cbbacd2437cfde175fae07a9be54b14c))
+
 ### 1.3.147 (2025-07-22)
 
 ### 1.3.146 (2025-07-22)
