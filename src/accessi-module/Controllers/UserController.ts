@@ -24,7 +24,7 @@ export class UserController {
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
 
-    @ApiOperation({ summary: 'Servire la pagina di reset password', operationId: "serveResetPasswordPage" })
+    @ApiOperation({ summary: 'Servire la pagina di reset password', operationId: "serveResetPasswordPageUser" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
     @Get('reset-password/:token')
     async serveResetPasswordPage(@Res() res: Response, @Param('token') token: string) {
