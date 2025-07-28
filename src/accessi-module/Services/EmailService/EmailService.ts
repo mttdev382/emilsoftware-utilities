@@ -20,7 +20,7 @@ export class EmailService {
     private transporter = nodemailer.createTransport(this.accessiOptions.emailOptions);
 
 
-    public async sendPasswordResetEmail(email: string): Promise<void> {
+    public async sendPasswordResetEmail(email: string, resetUrlCustom?: string, htmlMail?: string ): Promise<void> {
         try {
             const resetToken = uuidv4(); // Generiamo un nuovo token unico
 
@@ -35,12 +35,24 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
+            
+
             const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl + "&prefix=" + (this.accessiOptions.confirmationEmailPrefix ?? '');
             const { confirmationEmailUrl } = this.accessiOptions;
-            const resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
+            let resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
+
+            if (resetUrlCustom) {
+                resetUrl = resetUrlCustom + "?token=" + resetToken
+            }
 
             let sPhrase: string;
-            sPhrase = ` Gentile utente,<br>
+
+            if (htmlMail) {
+                sPhrase = htmlMail
+                sPhrase.replace('#link_conferma_password_url',resetUrl)
+                
+            } else {
+                sPhrase = ` Gentile utente,<br>
                         abbiamo ricevuto la tua richiesta.<br><br>
 
                         Per completare l'operazione, clicca sul link qui sotto:<br>
@@ -52,6 +64,9 @@ export class EmailService {
                         Questa è una comunicazione automatica, ti preghiamo di non rispondere a questa email.<br><br>
 
                         Grazie.<br>`;
+            }
+
+
             const html = this.GetHtmlMail(sPhrase);
             const mailOptions = {
                 from: this.accessiOptions.emailOptions.from,

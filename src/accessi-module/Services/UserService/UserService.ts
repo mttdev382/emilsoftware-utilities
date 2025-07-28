@@ -82,6 +82,7 @@ export class UserService {
 
                 let extensionFields = options.includeExtensionFields ? {} : null;
 
+                //todo: se non è prendente extensionFieldOptions va in errore. Risolvere il problema
                 if (options.includeExtensionFields) {
                     for (const ext of this.accessiOptions.extensionFieldsOptions) {
                         const values = (

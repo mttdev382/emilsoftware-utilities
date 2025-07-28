@@ -3,3 +3,4 @@
 /test
 /logs
 .env
+.vscode/settings.json

@@ -5,6 +5,7 @@ import { join } from 'path';
 import { RestUtilities } from '../../Utilities';
 import { AccessiOptions } from '../AccessiModule';
 import { EmailService } from '../Services/EmailService/EmailService';
+import { IsOptional } from 'class-validator';
 @ApiTags('Email')
 @Controller('accessi/email')
 export class EmailController {
@@ -23,15 +24,41 @@ export class EmailController {
     }
 
     @ApiOperation({ summary: 'Invia una e-mail per il reset della password', operationId: "sendPasswordResetEmail" })
-    @ApiBody({ schema: { properties: { email: { type: 'string', description: "L'email dell'utente che richiede il reset" } } } })
+    @ApiBody({ schema: { properties: {
+         email: { 
+            type: 'string',
+            description: "L'email dell'utente che richiede il reset" 
+         },
+         resetCustomUrl: {
+            type: 'string',
+            description: "Pagina di reset della password personalizzata",
+         },
+         htmlMail: {
+            type: 'string',
+            description: 'Corpo della mail in HTML'
+         }
+        },
+        required: ['email']
+    } })
     @ApiResponse({ status: 200, description: "L'email di reset è stata inviata con successo" })
     @ApiResponse({ status: 400, description: "Errore nella richiesta: protocollo o host non impostati" })
     @ApiResponse({ status: 500, description: "Errore interno durante l'invio dell'email" })
     @Post('send-reset-password-email')
-    async sendPasswordResetEmail(@Req() request: Request, @Body() sendResetPasswordData: { email: string }, @Res() res: Response) {
+    async sendPasswordResetEmail(
+        @Req() request: Request, 
+        @Body() sendResetPasswordData: { 
+            email: string, 
+            resetUrlCustom?: string, 
+            htmlMail?: string 
+        }, 
+        @Res() res: Response) {
         try {
 
-            await this.emailService.sendPasswordResetEmail(sendResetPasswordData.email);
+            await this.emailService.sendPasswordResetEmail(
+                sendResetPasswordData.email,
+                sendResetPasswordData.resetUrlCustom,
+                sendResetPasswordData.htmlMail
+            );
             return RestUtilities.sendOKMessage(res, "L'email di reset è stata inoltrata al destinatario.");
         } catch (error) {
             return RestUtilities.sendErrorMessage(res, error, EmailController.name);
