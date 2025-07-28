@@ -1,3 +1,10 @@
+# [1.4.0-dev.2](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2025-07-28)
+
+
+### Features
+
+* url, mail personalizzata ([af8475c](https://github.com/mttdev382/emilsoftware-utilities/commit/af8475c62d4e96e29a11fdc4450c6e45cee758ef))
+
 # [1.4.0-dev.1](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.3.148...v1.4.0-dev.1) (2025-07-28)
 
 
