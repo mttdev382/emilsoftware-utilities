@@ -29,7 +29,7 @@ export class EmailController {
             type: 'string',
             description: "L'email dell'utente che richiede il reset" 
          },
-         resetCustomUrl: {
+         resetUrlCustom: {
             type: 'string',
             description: "Pagina di reset della password personalizzata",
          },

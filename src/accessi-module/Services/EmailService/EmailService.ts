@@ -10,7 +10,6 @@ import { Logger } from '../../../Logger';
 @Injectable()
 export class EmailService {
 
-    logger: Logger = new Logger(EmailService.name)
 
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
@@ -38,15 +37,12 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
-
-
             const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl + "&prefix=" + (this.accessiOptions.confirmationEmailPrefix ?? '');
             const { confirmationEmailUrl } = this.accessiOptions;
             let resetUrl = `${confirmationEmailUrl}/api/accessi/email/reset-password-page/${resetToken}${returnUrlQueryParams}`;
 
             if (resetUrlCustom) {
                 resetUrl = resetUrlCustom + "?token=" + resetToken
-                this.logger.info('url personalizzato: ', resetUrl)
             }
 
             let sPhrase: string;
