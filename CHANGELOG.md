@@ -1,3 +1,10 @@
+# [1.4.0-dev.1](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.3.148...v1.4.0-dev.1) (2025-07-28)
+
+
+### Features
+
+* trigger dev release ([69f38f5](https://github.com/mttdev382/emilsoftware-utilities/commit/69f38f5212b7008c6547a57766f103d94bc22811))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
