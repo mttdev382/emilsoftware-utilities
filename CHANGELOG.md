@@ -1,3 +1,10 @@
+# [1.4.0-dev.3](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.2...v1.4.0-dev.3) (2025-07-28)
+
+
+### Bug Fixes
+
+* logging url return ([cc681e0](https://github.com/mttdev382/emilsoftware-utilities/commit/cc681e011a4d0ffaf0174d69fe0eabdf72a9b639))
+
 # [1.4.0-dev.2](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2025-07-28)
 
 
