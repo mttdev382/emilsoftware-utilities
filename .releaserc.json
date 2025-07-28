@@ -3,15 +3,28 @@
     "main",
     {
       "name": "dev",
-      "prerelease": "dev"
+      "prerelease": "dev",
+      "channel": "dev"
     }
   ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
-    "@semantic-release/npm",
-    "@semantic-release/github",
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": true,
+        "tarballDir": "dist",
+        "pkgRoot": "."
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": "dist/*.tgz"
+      }
+    ],
     "@semantic-release/git"
   ]
 }
