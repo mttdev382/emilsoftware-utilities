@@ -4,10 +4,13 @@ import { AccessiOptions } from '../../AccessiModule';
 import { Orm } from '../../../Orm';
 import { Inject, Injectable } from '@nestjs/common';
 import { StatoRegistrazione } from '../../Dtos/StatoRegistrazione';
+import { Logger } from '../../../Logger';
 
 
 @Injectable()
 export class EmailService {
+
+    logger: Logger = new Logger(EmailService.name)
 
     constructor(
         @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
@@ -20,7 +23,7 @@ export class EmailService {
     private transporter = nodemailer.createTransport(this.accessiOptions.emailOptions);
 
 
-    public async sendPasswordResetEmail(email: string, resetUrlCustom?: string, htmlMail?: string ): Promise<void> {
+    public async sendPasswordResetEmail(email: string, resetUrlCustom?: string, htmlMail?: string): Promise<void> {
         try {
             const resetToken = uuidv4(); // Generiamo un nuovo token unico
 
@@ -35,7 +38,7 @@ export class EmailService {
                 throw new Error("Email non trovata.");
             }
 
-            
+
 
             const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl + "&prefix=" + (this.accessiOptions.confirmationEmailPrefix ?? '');
             const { confirmationEmailUrl } = this.accessiOptions;
@@ -43,14 +46,15 @@ export class EmailService {
 
             if (resetUrlCustom) {
                 resetUrl = resetUrlCustom + "?token=" + resetToken
+                this.logger.info('url personalizzato: ', resetUrl)
             }
 
             let sPhrase: string;
 
             if (htmlMail) {
                 sPhrase = htmlMail
-                sPhrase.replace('#link_conferma_password_url',resetUrl)
-                
+                sPhrase.replace('#link_conferma_password_url', resetUrl)
+
             } else {
                 sPhrase = ` Gentile utente,<br>
                         abbiamo ricevuto la tua richiesta.<br><br>
