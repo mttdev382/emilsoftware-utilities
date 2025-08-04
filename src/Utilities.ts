@@ -146,6 +146,15 @@ export class RestUtilities {
         });
     }
 
+    static sendPasswordExpired(res: Response): Response {
+        return res.status(403).send({
+            severity: "warning",
+            statusCode: StatusCode.Warning,
+            code: "PASSWORD_EXPIRED",
+            message: "Password scaduta. E' necessario aggiornarla"
+        })
+    }
+
     /**
      * Sends a base response with a payload.
      * @param res - Express Response object.

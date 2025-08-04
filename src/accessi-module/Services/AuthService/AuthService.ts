@@ -64,7 +64,7 @@ export class AuthService {
         const targetDate = new Date(utente.dataScadenzaPassword);
 
         if (today >= targetDate) {
-            throw new Error("Password scaduta!");
+            throw new Error("PASSWORD_EXPIRED")
         }
 
         // Recupera i grants

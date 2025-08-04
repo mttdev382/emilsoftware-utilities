@@ -13,41 +13,41 @@ import { Logger } from '../../Logger';
 export class AuthController {
 
   logger: Logger = new Logger(AuthController.name);
-    constructor(
-        private readonly authService: AuthService,
-        @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
-    ) { }
+  constructor(
+    private readonly authService: AuthService,
+    @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
+  ) { }
 
-    @ApiOperation({ summary: 'Conferma il reset della password', operationId: "resetPassword" })
-    @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
-    @ApiBody({ schema: { properties: { newPassword: { type: 'string', description: 'Nuova password da impostare' } } } })
-    @ApiResponse({ status: 200, description: 'Password aggiornata con successo' })
-    @ApiResponse({ status: 400, description: 'Errore nella richiesta o token non valido' })
-    @Post('confirm-reset-password/:token')
-    async resetPassword(@Res() res: Response, @Param('token') token: string, @Body("newPassword") newPassword: string) {
-        try {
-            await this.authService.confirmResetPassword(token, newPassword);
-            return RestUtilities.sendOKMessage(res, 'Password aggiornata con successo!');
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AuthController.name);
-        }
+  @ApiOperation({ summary: 'Conferma il reset della password', operationId: "resetPassword" })
+  @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
+  @ApiBody({ schema: { properties: { newPassword: { type: 'string', description: 'Nuova password da impostare' } } } })
+  @ApiResponse({ status: 200, description: 'Password aggiornata con successo' })
+  @ApiResponse({ status: 400, description: 'Errore nella richiesta o token non valido' })
+  @Post('confirm-reset-password/:token')
+  async resetPassword(@Res() res: Response, @Param('token') token: string, @Body("newPassword") newPassword: string) {
+    try {
+      await this.authService.confirmResetPassword(token, newPassword);
+      return RestUtilities.sendOKMessage(res, 'Password aggiornata con successo!');
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AuthController.name);
     }
+  }
 
-    @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT', operationId: "getUserByToken" })
-    @ApiBody({ schema: { properties: { token: { type: 'string', description: 'JWT dell\'utente' } } } })
-    @ApiResponse({ status: 200, description: 'Informazioni utente recuperate con successo' })
-    @ApiResponse({ status: 401, description: 'Token non valido o scaduto' })
-    @Post('get-user-by-token')
-    async getUserByToken(@Body('token') token: string, @Res() res: Response) {
-        try {
-            if (!token) return RestUtilities.sendErrorMessage(res, 'Token non fornito', AuthController.name);
-            const decoded = jwt.verify(token, this.options.jwtOptions.secret);
-            if (!decoded) return RestUtilities.sendUnauthorized(res);
-            return RestUtilities.sendBaseResponse(res, { userData: decoded });
-        } catch (error) {
-            return RestUtilities.sendErrorMessage(res, error, AuthController.name);
-        }
+  @ApiOperation({ summary: 'Recupera le informazioni utente dal token JWT', operationId: "getUserByToken" })
+  @ApiBody({ schema: { properties: { token: { type: 'string', description: 'JWT dell\'utente' } } } })
+  @ApiResponse({ status: 200, description: 'Informazioni utente recuperate con successo' })
+  @ApiResponse({ status: 401, description: 'Token non valido o scaduto' })
+  @Post('get-user-by-token')
+  async getUserByToken(@Body('token') token: string, @Res() res: Response) {
+    try {
+      if (!token) return RestUtilities.sendErrorMessage(res, 'Token non fornito', AuthController.name);
+      const decoded = jwt.verify(token, this.options.jwtOptions.secret);
+      if (!decoded) return RestUtilities.sendUnauthorized(res);
+      return RestUtilities.sendBaseResponse(res, { userData: decoded });
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res, error, AuthController.name);
     }
+  }
 
   @ApiOperation({
     summary: 'Effettua il login utente',
@@ -64,10 +64,24 @@ export class AuthController {
     status: 401,
     description: 'Credenziali non valide',
   })
+  @ApiResponse({
+    status: 403,
+    description: "Password scaduta, è necessatio aggiornarla. ",
+    schema: {
+      example: {
+        message: {
+          severity: 'warning',
+          statusCode: 2, // o il valore di StatusCode.Warning
+          code: 'PASSWORD_EXPIRED',
+          message: 'Password scaduta. È necessario aggiornarla.',
+        }
+      }
+    }
+  })
   @Post('login')
   async login(@Body() loginRequest: LoginRequest, @Res() res: Response) {
     try {
-      
+
       const userData = await this.authService.login(loginRequest);
       if (!userData) {
         return RestUtilities.sendInvalidCredentials(res);
@@ -83,6 +97,12 @@ export class AuthController {
 
       return RestUtilities.sendBaseResponse(res, userData);
     } catch (error) {
+
+      if (error.message === 'PASSWORD_EXPIRED') {
+        this.logger.warning('Password scaduta, cambiare password ', error)
+        return RestUtilities.sendPasswordExpired(res)
+      }
+
       this.logger.error('Errore durante il login', error);
       return RestUtilities.sendInvalidCredentials(res);
     }
