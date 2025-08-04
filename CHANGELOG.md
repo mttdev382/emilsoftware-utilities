@@ -1,3 +1,10 @@
+# [1.4.0-dev.5](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.4...v1.4.0-dev.5) (2025-08-04)
+
+
+### Bug Fixes
+
+* aggiunta gestione password scaduta ([75e022d](https://github.com/mttdev382/emilsoftware-utilities/commit/75e022d30d11e07612a69d74a74ebe8256a8057d))
+
 # [1.4.0-dev.4](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.3...v1.4.0-dev.4) (2025-07-28)
 
 
