@@ -68,34 +68,6 @@ export class EmailService {
         }
     }
 
-    public async sendLoginConfirmationCode(email: string, code: string): Promise<void> {
-        try {
-            const sPhrase = `
-                Gentile utente,<br>
-                ecco il suo codice di conferma per l'accesso:<br><br>
-                <b>${code}</b><br><br>
-                Questo codice scadrà tra 15 minuti.<br>
-                Se non sei stato tu a effettuare questa richiesta, puoi ignorare questo messaggio in tutta sicurezza.<br><br>
-                Questa è una comunicazione automatica, ti preghiamo di non rispondere a questa email.<br><br>
-                Grazie.<br>
-            `;
-
-            const html = this.GetHtmlMail(sPhrase);
-            const mailOptions = {
-                from: this.accessiOptions.emailOptions.from,
-                to: email,
-                subject: "Codice di conferma accesso",
-                text: sPhrase,
-                html: html,
-            };
-
-            await this.transporter.sendMail(mailOptions);
-        } catch (error) {
-            console.error("Errore nell'invio dell'email di conferma accesso:", error);
-            throw new Error("Errore durante l'invio dell'email di conferma accesso.");
-        }
-    }
-
     private GetHtmlMail(sPhrase: string): string {
         let sTxt = '';
         sTxt += '<html xmlns="http://www.w3.org/1999/xhtml">'

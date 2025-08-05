@@ -7,64 +7,14 @@ import { UserService } from "../UserService/UserService";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { LoginRequest } from "../../Dtos/LoginRequest";
 import { LoginResponse, LoginResult } from "../../Dtos/LoginResponse";
-import { EmailService } from "../EmailService/EmailService";
-import { UserDto } from "../../Dtos/UserDto";
-import * as jwt from 'jsonwebtoken';
-
-const OTP_EXPIRATION_MINUTES = 15;
-const OTP_LENGTH = 6;
 
 @Injectable()
 export class AuthService {
     constructor(
         private userService: UserService,
         private permissionService: PermissionService,
-        private emailService: EmailService,
-        @Inject('ACCESSI_OPTIONS') private accessiOptions: AccessiOptions,
+        @Inject("ACCESSI_OPTIONS") private readonly accessiOptions: AccessiOptions
     ) { }
-
-    async telegramLogin(email: string, telegramId: string): Promise<{ otpRequired: boolean }> {
-        const utente = await this.userService.getUserByEmail(email.toLowerCase());
-
-        if (!utente) {
-            throw new Error("Utente non trovato.");
-        }
-
-        if (utente.idteleg === telegramId) {
-            return { otpRequired: false };
-        }
-
-        const code = Math.floor(Math.pow(10, OTP_LENGTH - 1) + Math.random() * (Math.pow(10, OTP_LENGTH) - Math.pow(10, OTP_LENGTH - 1) - 1)).toString();
-        const expiration = new Date();
-        expiration.setMinutes(expiration.getMinutes() + OTP_EXPIRATION_MINUTES);
-
-        await this.userService.updateUser(utente.codiceUtente, {
-            otp: code,
-            otpexp: expiration,
-        });
-
-        await this.emailService.sendLoginConfirmationCode(email, code);
-
-        return { otpRequired: true };
-    }
-
-    async verifyTelegramOtp(email: string, telegramId: string, otp: string): Promise<void> {
-        const utente = await this.userService.getUserByEmail(email.toLowerCase());
-
-        if (!utente) {
-            throw new Error("Utente non trovato.");
-        }
-
-        if (utente.otp !== otp || new Date() > new Date(utente.otpexp)) {
-            throw new Error("Codice non valido o scaduto.");
-        }
-
-        await this.userService.updateUser(utente.codiceUtente, {
-            idteleg: telegramId,
-            otp: null,
-            otpexp: null,
-        });
-    }
 
     async login(request: LoginRequest): Promise<LoginResult> {
 

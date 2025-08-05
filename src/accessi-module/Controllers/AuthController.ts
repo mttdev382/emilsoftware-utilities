@@ -7,26 +7,6 @@ import { AccessiOptions } from '../AccessiModule';
 import { AuthService } from '../Services/AuthService/AuthService';
 import { LoginRequest, LoginResponse } from '../Dtos';
 import { Logger } from '../../Logger';
-import { ApiProperty } from '@nestjs/swagger';
-
-class TelegramLoginRequest {
-  @ApiProperty()
-  email: string;
-
-  @ApiProperty()
-  telegramId: string;
-}
-
-class VerifyTelegramOtpRequest {
-  @ApiProperty()
-  email: string;
-
-  @ApiProperty()
-  telegramId: string;
-
-  @ApiProperty()
-  otp: string;
-}
 
 @ApiTags('Auth')
 @Controller('accessi/auth')
@@ -104,58 +84,6 @@ export class AuthController {
       return RestUtilities.sendBaseResponse(res, userData);
     } catch (error) {
       this.logger.error('Errore durante il login', error);
-      return RestUtilities.sendInvalidCredentials(res);
-    }
-  }
-
-  @ApiOperation({
-    summary: 'Login o avvio associazione per utente Telegram',
-    description: "Controlla se l'ID Telegram è già associato. Se lo è, l'accesso è confermato. Altrimenti, invia un codice OTP all'email dell'utente per la verifica.",
-    operationId: 'telegramLogin',
-  })
-  @ApiBody({ type: TelegramLoginRequest })
-  @ApiResponse({
-    status: 200,
-    description: "Operazione completata. Il campo 'otpRequired' indica se l'utente deve procedere con la verifica.",
-  })
-  @Post('telegram-login')
-  async telegramLogin(@Body() loginRequest: TelegramLoginRequest, @Res() res: Response) {
-    try {
-      if (!loginRequest.email || !loginRequest.telegramId) {
-        throw new Error("I campi 'email' e 'telegramId' sono obbligatori.");
-      }
-      const result = await this.authService.telegramLogin(loginRequest.email, loginRequest.telegramId);
-      return RestUtilities.sendBaseResponse(res, result);
-    } catch (error) {
-      this.logger.error("Errore durante il login Telegram", error);
-      return RestUtilities.sendErrorMessage(res, error, AuthController.name);
-    }
-  }
-
-  @ApiOperation({
-    summary: 'Verifica il codice OTP e completa l\'associazione Telegram',
-    description: "Verifica l'OTP ricevuto via email. Se corretto, associa l'ID Telegram all'account dell'utente.",
-    operationId: 'verifyTelegramOtp',
-  })
-  @ApiBody({ type: VerifyTelegramOtpRequest })
-  @ApiResponse({
-    status: 200,
-    description: 'ID Telegram associato con successo.',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Codice non valido o scaduto.',
-  })
-  @Post('verify-telegram-otp')
-  async verifyTelegramOtp(@Body() verifyRequest: VerifyTelegramOtpRequest, @Res() res: Response) {
-    try {
-      if (!verifyRequest.email || !verifyRequest.telegramId || !verifyRequest.otp) {
-        throw new Error("I campi 'email', 'telegramId' e 'otp' sono obbligatori.");
-      }
-      await this.authService.verifyTelegramOtp(verifyRequest.email, verifyRequest.telegramId, verifyRequest.otp);
-      return RestUtilities.sendOKMessage(res, "ID Telegram associato con successo.");
-    } catch (error) {
-      this.logger.error("Errore durante la verifica dell'OTP Telegram", error);
       return RestUtilities.sendInvalidCredentials(res);
     }
   }
