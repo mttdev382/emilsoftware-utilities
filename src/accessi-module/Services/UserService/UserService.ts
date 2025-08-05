@@ -296,7 +296,7 @@ export class UserService {
         }
     }
 
-    async updateUser(codiceUtente: number, user: UserDto): Promise<void> {
+    async updateUser(codiceUtente: number, user: Partial<UserDto>): Promise<void> {
         try {
             if (!codiceUtente) throw new Error("Impossibile aggiornare senza codice utente.");
 
@@ -315,6 +315,18 @@ export class UserService {
             if (user.statoRegistrazione !== undefined) {
                 utentiUpdates.push("stareg = ?");
                 utentiParams.push(user.statoRegistrazione);
+            }
+            if (user.otp !== undefined) {
+                utentiUpdates.push("otp = ?");
+                utentiParams.push(user.otp);
+            }
+            if (user.otpexp !== undefined) {
+                utentiUpdates.push("otpexp = ?");
+                utentiParams.push(user.otpexp);
+            }
+            if (user.idteleg !== undefined) {
+                utentiUpdates.push("idteleg = ?");
+                utentiParams.push(user.idteleg);
             }
 
             if (utentiUpdates.length > 0) {

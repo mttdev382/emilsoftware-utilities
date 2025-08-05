@@ -8,12 +8,43 @@ import { GroupWithMenusEntity } from "../../Dtos/GetGroupsWithMenusResponse";
 import { MenuEntity } from "../../Dtos/GetMenusResponse";
 import { Role } from "../../Dtos/Role";
 import { Inject, Injectable } from "@nestjs/common";
+import { UserService } from "../UserService/UserService";
 
 @Injectable()
 export class PermissionService {
     constructor(
-        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions
+        @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions,
+        private readonly userService: UserService,
     ) { }
+
+    public async getTelegramPermissionsByEmail(email: string): Promise<any> {
+        const user = await this.userService.getUserByEmail(email);
+        if (!user) {
+            throw new Error("Utente non trovato.");
+        }
+
+        const { grants } = await this.getUserRolesAndGrants(user.codiceUtente);
+        const userPermissions = new Set(grants.map(g => g.codiceMenu.trim()));
+
+        const permissionMap = {
+            prossime_consegne: 'MNUPLANNING',
+            ultimi_ddt: 'MNUDDT',
+            fatture: 'MNUDASHAMM',
+            scadenze: 'MNUDASHAMM',
+            confezionata_nome_cognome: 'MNUELENCO',
+            piana_reparto: 'MNUDASHRFID',
+            confezionata_mansione: 'MNUELENCO',
+            elenco_personale_reparto: 'MNUELENCO',
+            elenco_personale_mansione: 'MNUELENCO',
+        };
+
+        const telegramPermissions = {};
+        for (const key in permissionMap) {
+            telegramPermissions[key] = userPermissions.has(permissionMap[key]);
+        }
+
+        return telegramPermissions;
+    }
 
 
     public async addAbilitazioni(codiceUtente: number, menuAbilitazioni: any[]): Promise<void> {

@@ -92,4 +92,13 @@ export class UserDto {
 
   @ApiPropertyOptional({ description: "Tipo di filiale.", example: "HQ" })
   tipoFil?: string;
+
+  @ApiPropertyOptional({ description: "Telegram ID dell'utente.", example: "1234567890" })
+  idteleg?: string;
+
+  @ApiPropertyOptional({ description: "Codice di conferma login.", example: "ABC123" })
+  otp?: string;
+
+  @ApiPropertyOptional({ description: "Data di scadenza del codice di conferma login.", format: "date-time", example: "2024-03-20T10:00:00Z" })
+  otpexp?: Date;
 }

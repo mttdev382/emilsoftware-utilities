@@ -11,6 +11,7 @@ import { UserDto } from '../Dtos';
 import { RegisterResponse } from '../Dtos/RegisterResponse';
 import { RegisterRequest } from '../Dtos/RegisterRequest';
 import { Logger } from '../../Logger';
+import { PermissionService } from '../Services/PermissionService/PermissionService';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -21,8 +22,23 @@ export class UserController {
     constructor(
         private readonly userService: UserService,
         private readonly emailService: EmailService,
+        private readonly permissionService: PermissionService,
         @Inject('ACCESSI_OPTIONS') private readonly options: AccessiOptions
     ) { }
+
+    @ApiOperation({ summary: 'Recupera le abilitazioni di Telegram per un utente', operationId: "getTelegramPermissionsByEmail" })
+    @ApiResponse({ status: 200, description: 'Abilitazioni recuperate con successo' })
+    @ApiResponse({ status: 404, description: 'Utente non trovato' })
+    @Get('by-email/:email/telegram-permissions')
+    async getTelegramPermissionsByEmail(@Param('email') email: string, @Res() res: Response) {
+        try {
+            const permissions = await this.permissionService.getTelegramPermissionsByEmail(email);
+            return RestUtilities.sendBaseResponse(res, permissions);
+        } catch (error) {
+            this.logger.error('Errore durante il recupero delle abilitazioni di Telegram', error);
+            return RestUtilities.sendErrorMessage(res, error, UserController.name);
+        }
+    }
 
     @ApiOperation({ summary: 'Servire la pagina di reset password', operationId: "serveResetPasswordPageUser" })
     @ApiParam({ name: 'token', description: 'Token per il reset della password', required: true })
