@@ -26,16 +26,14 @@ export class EmailService {
         try {
             const resetToken = uuidv4(); // Generiamo un nuovo token unico
 
+            console.log("Generated reset token:", resetToken);
             // Aggiorna il campo keyReg nel database
-            const result = await Orm.query(
+            const result = await Orm.execute(
                 this.accessiOptions.databaseOptions,
-                "UPDATE UTENTI SET KEYREG = ?, STAREG = ? WHERE USRNAME = ? RETURNING CODUTE",
+                "UPDATE UTENTI SET KEYREG = ?, STAREG = ? WHERE USRNAME = ? ",
                 [resetToken, StatoRegistrazione.INVIO, email]
             );
 
-            if (result.length === 0) {
-                throw new Error("Email non trovata.");
-            }
 
             const returnUrlQueryParams = "?returnUrl=" + this.accessiOptions.confirmationEmailReturnUrl + "&prefix=" + (this.accessiOptions.confirmationEmailPrefix ?? '');
             const { confirmationEmailUrl } = this.accessiOptions;
