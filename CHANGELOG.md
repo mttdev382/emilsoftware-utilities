@@ -1,3 +1,10 @@
+# [1.4.0-dev.6](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.5...v1.4.0-dev.6) (2025-08-19)
+
+
+### Bug Fixes
+
+* errore nell'inserimento del keyreg per il reset della password ([a5e3914](https://github.com/mttdev382/emilsoftware-utilities/commit/a5e39148507e55ce3fb93cc4001725d0d5767202))
+
 # [1.4.0-dev.5](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.4...v1.4.0-dev.5) (2025-08-04)
 
 
