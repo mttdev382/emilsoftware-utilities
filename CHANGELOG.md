@@ -1,3 +1,10 @@
+# [1.4.0-dev.7](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.6...v1.4.0-dev.7) (2025-09-05)
+
+
+### Bug Fixes
+
+* revert modifiche log ([99d5728](https://github.com/mttdev382/emilsoftware-utilities/commit/99d5728a7d92d869db4f1930bb31c14963b81066))
+
 # [1.4.0-dev.6](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.5...v1.4.0-dev.6) (2025-08-19)
 
 
