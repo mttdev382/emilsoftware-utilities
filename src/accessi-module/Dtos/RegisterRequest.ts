@@ -1,62 +1,129 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { StatoRegistrazione } from './StatoRegistrazione';
-import { Permission } from './Permission';
-import { TipoAbilitazione } from './TipoAbilitazione';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { StatoRegistrazione } from "./StatoRegistrazione";
+import { Permission } from "./Permission";
+import { TipoAbilitazione } from "./TipoAbilitazione";
 
 export class RegisterRequest {
-  @ApiProperty({ description: "Email dell'utente.", example: "mario.rossi@dev.it" })
+  @ApiProperty({
+    description: "Email dell'utente.",
+    example: "mario.rossi@dev.it",
+  })
   email: string;
 
-  @ApiPropertyOptional({ description: "Cognome dell'utente.", example: "Rossi" })
+  @ApiPropertyOptional({
+    description: "Cognome dell'utente.",
+    example: "Rossi",
+  })
   cognome?: string;
 
   @ApiPropertyOptional({ description: "Nome dell'utente.", example: "Mario" })
   nome?: string;
 
-  @ApiPropertyOptional({ description: "Numero di cellulare.", example: "+393401234567", nullable: true })
+  @ApiPropertyOptional({
+    description: "Numero di cellulare.",
+    example: "+393401234567",
+    nullable: true,
+  })
   cellulare?: string | null;
 
   @ApiPropertyOptional({ description: "Flag superutente.", example: false })
   flagSuper?: boolean;
 
-  @ApiPropertyOptional({ description: "Ruoli assegnati all'utente.", example: ["admin", "editor"] })
+  @ApiPropertyOptional({
+    description: "Ruoli assegnati all'utente.",
+    example: ["admin", "editor"],
+  })
   roles?: string[];
 
-  @ApiPropertyOptional({ description: "Permessi assegnati all'utente.", type: [Permission], example: [{ codiceMenu: "MNUOFFICINA", tipoAbilitazione: TipoAbilitazione.SCRITTURA }] })
+  @ApiPropertyOptional({
+    description: "Permessi assegnati all'utente.",
+    type: [Permission],
+    example: [
+      {
+        codiceMenu: "MNUOFFICINA",
+        tipoAbilitazione: TipoAbilitazione.SCRITTURA,
+      },
+    ],
+  })
   permissions?: Permission[];
 
   // Filtri
-  @ApiPropertyOptional({ description: "Numero del report associato.", example: 1002 })
+  @ApiPropertyOptional({
+    description: "Numero del report associato.",
+    example: 1002,
+  })
   numeroReport?: number;
 
-  @ApiPropertyOptional({ description: "Indice personale dell'utente.", example: 15 })
+  @ApiPropertyOptional({
+    description: "Indice personale dell'utente.",
+    example: 15,
+  })
   indicePersonale?: number;
 
-  @ApiPropertyOptional({ description: "Codice del cliente principale (super).", example: "CLT_SUP_1234" })
+  @ApiPropertyOptional({
+    description: "Codice del cliente principale (super).",
+    example: "CLT_SUP_1234",
+  })
   codiceClienteSuper?: string;
 
-  @ApiPropertyOptional({ description: "Codice dell'agenzia associata.", example: "AGZ_5678" })
+  @ApiPropertyOptional({
+    description: "Codice dell'agenzia associata.",
+    example: "AGZ_5678",
+  })
   codiceAgenzia?: string;
 
-  @ApiPropertyOptional({ description: "Codice del cliente collegato.", example: "CLT_COL_8765" })
+  @ApiPropertyOptional({
+    description: "Codice del cliente collegato.",
+    example: "CLT_COL_8765",
+  })
   codiceClienteCollegato?: string;
 
-  @ApiPropertyOptional({ description: "Lista di codici clienti separati da virgola.", example: "CLT_123,CLT_456,CLT_789" })
+  @ApiPropertyOptional({
+    description: "Lista di codici clienti separati da virgola.",
+    example: "CLT_123,CLT_456,CLT_789",
+  })
   codiceClienti?: string;
 
-  @ApiPropertyOptional({ description: "Tipo di filtro applicato.", example: "esclusivo" })
+  @ApiPropertyOptional({
+    description: "Tipo di filtro applicato.",
+    example: "esclusivo",
+  })
   tipoFiltro?: string;
 
   // Campi aggiuntivi utente
-  @ApiPropertyOptional({ description: "Avatar dell'utente.", example: "user.svg" })
+  @ApiPropertyOptional({
+    description: "Avatar dell'utente.",
+    example: "user.svg",
+  })
   avatar?: string;
 
-  @ApiPropertyOptional({ description: "Flag autenticazione a due fattori.", example: false })
+  @ApiPropertyOptional({
+    description: "Flag autenticazione a due fattori.",
+    example: false,
+  })
   flagDueFattori?: boolean;
 
-  @ApiPropertyOptional({ description: "Pagina di default dell'utente.", example: "/dashboard" })
+  @ApiPropertyOptional({
+    description: "Pagina di default dell'utente.",
+    example: "/dashboard",
+  })
   paginaDefault?: string;
 
-  @ApiPropertyOptional({ description: "Ragione sociale cliente.", example: "ALIVAL STOCK" })
+  @ApiPropertyOptional({
+    description: "Ragione sociale cliente.",
+    example: "ALIVAL STOCK",
+  })
   ragSocCli?: string;
+
+  @ApiPropertyOptional({
+    description: "Link a una pagina di reset personalizzata",
+    example: "http://www.mio-progetto.it/reset-password",
+  })
+  resetUrlCustom?: string;
+
+  @ApiPropertyOptional({
+    description: "HTML mail personalizzato",
+    example: "<html></html>",
+  })
+  htmlMail?: string;
 }

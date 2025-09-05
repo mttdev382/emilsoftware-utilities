@@ -107,7 +107,7 @@ export class UserController {
     ) {
         try {
             const codiceUtente = await this.userService.register(registrationData);
-            await this.emailService.sendPasswordResetEmail(registrationData.email);
+            await this.emailService.sendPasswordResetEmail(registrationData.email, registrationData.resetUrlCustom, registrationData.htmlMail);
 
             return RestUtilities.sendBaseResponse(res, codiceUtente);
         } catch (error) {

@@ -44,6 +44,7 @@ export class EmailService {
             }
 
             let sPhrase: string;
+            console.log('reset_url', resetUrlCustom)
 
             if (htmlMail) {
                 sPhrase = htmlMail
