@@ -74,7 +74,7 @@ export class AuthService {
 
         // Recupera i filtri
         const filtri = await this.userService.getUserFilters(utente.codiceUtente);
-
+        
         const updateLastAccessDateQuery =
             "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
         await Orm.query(
