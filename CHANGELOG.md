@@ -1,3 +1,10 @@
+# [1.4.0-dev.8](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.7...v1.4.0-dev.8) (2025-09-05)
+
+
+### Bug Fixes
+
+* registrazione con resetUrlCustom e htmlMail custom, prima prendeva quelle di default obbligatoriamente. ([1cb0df8](https://github.com/mttdev382/emilsoftware-utilities/commit/1cb0df8b0ae8271be3afefa01a37db2b50b897b3))
+
 # [1.4.0-dev.7](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.6...v1.4.0-dev.7) (2025-09-05)
 
 
