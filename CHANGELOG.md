@@ -1,3 +1,10 @@
+# [1.4.0-dev.9](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.8...v1.4.0-dev.9) (2025-09-08)
+
+
+### Bug Fixes
+
+* parametro per bypassare scadenza password ([7d54b85](https://github.com/mttdev382/emilsoftware-utilities/commit/7d54b8553c31dc82ac868e6e3349433bfd8fa1b9))
+
 # [1.4.0-dev.8](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.7...v1.4.0-dev.8) (2025-09-05)
 
 
