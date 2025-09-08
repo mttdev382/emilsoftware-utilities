@@ -1,6 +1,6 @@
 /**
  * Modulo che gestisce le operazioni di accesso degli utenti, incluse le rotte, il controller e il modello.
- * 
+ *
  * @module AccessiModule
  * @author mttdev382
  */
@@ -16,19 +16,19 @@ import { PermissionController } from "./Controllers/PermissionController";
 import { UserController } from "./Controllers/UserController";
 
 export interface JwtOptions {
-  secret: string
-  expiresIn: string
+  secret: string;
+  expiresIn: string;
 }
 
 export interface EmailOptions {
-  host: string,
-  port: number,
-  secure: boolean,
-  from: string
+  host: string;
+  port: number;
+  secure: boolean;
+  from: string;
   auth: {
-    user: string,
-    pass: string
-  }
+    user: string;
+    pass: string;
+  };
 }
 
 export interface ExtensionFieldsOptions {
@@ -46,26 +46,30 @@ export interface AccessiOptions {
   confirmationEmailPrefix?: string;
   encryptionKey: string;
   mockDemoUser: boolean;
+  passwordExpiration?: boolean;
   jwtOptions: JwtOptions;
   emailOptions: EmailOptions;
   extensionFieldsOptions?: ExtensionFieldsOptions[];
 }
 
-
 @Global()
 @Module({
-  controllers: [EmailController, AuthController, PermissionController, UserController],
+  controllers: [
+    EmailController,
+    AuthController,
+    PermissionController,
+    UserController,
+  ],
   providers: [AuthService, UserService, EmailService, PermissionService],
   exports: [AuthService, UserService, EmailService, PermissionService],
 })
 export class AccessiModule {
   static forRoot(options: AccessiOptions): DynamicModule {
-
     return {
       module: AccessiModule,
       providers: [
         {
-          provide: 'ACCESSI_OPTIONS',
+          provide: "ACCESSI_OPTIONS",
           useValue: options,
         },
         AuthService,
@@ -73,8 +77,13 @@ export class AccessiModule {
         EmailService,
         PermissionService,
       ],
-      exports: ['ACCESSI_OPTIONS', AuthService, UserService, EmailService, PermissionService],
+      exports: [
+        "ACCESSI_OPTIONS",
+        AuthService,
+        UserService,
+        EmailService,
+        PermissionService,
+      ],
     };
   }
 }
-
