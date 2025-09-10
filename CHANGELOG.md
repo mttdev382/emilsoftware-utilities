@@ -1,3 +1,10 @@
+# [1.4.0-dev.10](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.9...v1.4.0-dev.10) (2025-09-10)
+
+
+### Bug Fixes
+
+* link personalizzato reset password ([a2aa3e3](https://github.com/mttdev382/emilsoftware-utilities/commit/a2aa3e30a612b62fe7c3da10f7cf11f6270cf795))
+
 # [1.4.0-dev.9](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.8...v1.4.0-dev.9) (2025-09-08)
 
 
