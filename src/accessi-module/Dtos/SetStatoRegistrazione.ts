@@ -10,8 +10,8 @@ export class SetStatoRegistrazioneDto {
 
   @ApiProperty({
     description: 'Nuovo stato di registrazione',
-    enum: [0, 5, 10, 20, 50, 99],
-    example: 20,
+    enum: StatoRegistrazione,
+    example: StatoRegistrazione.DELETE,
   })
   statoRegistrazione: StatoRegistrazione;
 }

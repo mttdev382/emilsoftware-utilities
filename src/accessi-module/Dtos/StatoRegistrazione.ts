@@ -6,3 +6,5 @@ export enum StatoRegistrazione {
   DELETE = 50,
   BLOCC = 99,
 }
+
+export const StatoRegistrazioneValues = [0, 5, 10, 20, 50, 99] as const;
