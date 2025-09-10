@@ -1,3 +1,10 @@
+# [1.4.0-dev.13](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.12...v1.4.0-dev.13) (2025-09-10)
+
+
+### Bug Fixes
+
+* dto ([2874e0b](https://github.com/mttdev382/emilsoftware-utilities/commit/2874e0b8bd867ca6cf653ea031985db62b622c17))
+
 # [1.4.0-dev.12](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.11...v1.4.0-dev.12) (2025-09-10)
 
 
