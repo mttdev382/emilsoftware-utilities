@@ -4,16 +4,16 @@
  * @module AccessiModule
  * @author mttdev382
  */
-import { Options } from "es-node-firebird";
-import { DynamicModule, Global, Module } from "@nestjs/common";
-import { AuthService } from "./Services/AuthService/AuthService";
-import { EmailService } from "./Services/EmailService/EmailService";
-import { PermissionService } from "./Services/PermissionService/PermissionService";
-import { UserService } from "./Services/UserService/UserService";
-import { EmailController } from "./Controllers/EmailController";
-import { AuthController } from "./Controllers/AuthController";
-import { PermissionController } from "./Controllers/PermissionController";
-import { UserController } from "./Controllers/UserController";
+import { Options } from 'es-node-firebird';
+import { DynamicModule, Global, Module } from '@nestjs/common';
+import { AuthService } from './Services/AuthService/AuthService';
+import { EmailService } from './Services/EmailService/EmailService';
+import { PermissionService } from './Services/PermissionService/PermissionService';
+import { UserService } from './Services/UserService/UserService';
+import { EmailController } from './Controllers/EmailController';
+import { AuthController } from './Controllers/AuthController';
+import { PermissionController } from './Controllers/PermissionController';
+import { UserController } from './Controllers/UserController';
 
 export interface JwtOptions {
   secret: string;
@@ -41,7 +41,15 @@ export interface ExtensionFieldsOptions {
 
 export interface AccessiOptions {
   databaseOptions: Options;
+  /**
+   * Basepath del sito es: 'http://www.il-mio-sito.it/nome-progetto(se c'è)'
+   */
   confirmationEmailUrl: string;
+  /**
+   * Percorso della pagina di reset personalizzata es. http://localhost:4200/#/admin/reset-password
+   * N.B si sostituisce al confirmationMailURl
+   */
+  customResetPage?: string;
   confirmationEmailReturnUrl: string;
   confirmationEmailPrefix?: string;
   encryptionKey: string;
@@ -54,12 +62,7 @@ export interface AccessiOptions {
 
 @Global()
 @Module({
-  controllers: [
-    EmailController,
-    AuthController,
-    PermissionController,
-    UserController,
-  ],
+  controllers: [EmailController, AuthController, PermissionController, UserController],
   providers: [AuthService, UserService, EmailService, PermissionService],
   exports: [AuthService, UserService, EmailService, PermissionService],
 })
@@ -69,7 +72,7 @@ export class AccessiModule {
       module: AccessiModule,
       providers: [
         {
-          provide: "ACCESSI_OPTIONS",
+          provide: 'ACCESSI_OPTIONS',
           useValue: options,
         },
         AuthService,
@@ -77,13 +80,7 @@ export class AccessiModule {
         EmailService,
         PermissionService,
       ],
-      exports: [
-        "ACCESSI_OPTIONS",
-        AuthService,
-        UserService,
-        EmailService,
-        PermissionService,
-      ],
+      exports: ['ACCESSI_OPTIONS', AuthService, UserService, EmailService, PermissionService],
     };
   }
 }

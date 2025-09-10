@@ -116,12 +116,6 @@ export class RegisterRequest {
   ragSocCli?: string;
 
   @ApiPropertyOptional({
-    description: "Link a una pagina di reset personalizzata",
-    example: "http://www.mio-progetto.it/reset-password",
-  })
-  resetUrlCustom?: string;
-
-  @ApiPropertyOptional({
     description: "HTML mail personalizzato",
     example: "<html></html>",
   })
