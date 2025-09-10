@@ -35,4 +35,7 @@ ACC_JWT_SECRET=your-secret-key
 Come parametri opzionali ci sono:
 ```env
 ACC_PASSWORD_EXPIRATION = true | false //se non c'è di default è false
+ACC_CUSTOM_RESET_PAGE = http://mio.sito.it/#/percorso/pagina 
 ```
+
+N.B impostando `ACC_CUSTOM_RESET_PAGE` viene completamente sovrascritta `ACC_CONFIRMATION_EMAIL_URL` che serve solemente in caso si voglia utilizzare la pagina che mette a disposizione di defualt la libreria
