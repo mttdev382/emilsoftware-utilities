@@ -1,3 +1,10 @@
+# [1.4.0-dev.12](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.11...v1.4.0-dev.12) (2025-09-10)
+
+
+### Bug Fixes
+
+* tipo per setStatoRegistrazione ([56646ba](https://github.com/mttdev382/emilsoftware-utilities/commit/56646ba16f8d566a68d4e368150eb7239e510cde))
+
 # [1.4.0-dev.11](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.10...v1.4.0-dev.11) (2025-09-10)
 
 
