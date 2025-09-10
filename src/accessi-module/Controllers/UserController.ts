@@ -34,6 +34,7 @@ import { StatoRegistrazione, UserDto } from '../Dtos';
 import { RegisterResponse } from '../Dtos/RegisterResponse';
 import { RegisterRequest } from '../Dtos/RegisterRequest';
 import { Logger } from '../../Logger';
+import { SetStatoRegistrazioneDto } from '../Dtos/SetStatoRegistrazione';
 
 @ApiTags('User')
 @Controller('accessi/user')
@@ -155,25 +156,6 @@ export class UserController {
     - 50: DELETE (eliminato)
     - 99: BLOCC (bloccato)`,
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['codiceUtente', 'statoRegistrazione'],
-      properties: {
-        codiceUtente: {
-          type: 'number',
-          description: "Codice identificativo dell'utente",
-          example: 123,
-        },
-        statoRegistrazione: {
-          type: 'number',
-          enum: [0, 5, 10, 20, 50, 99],
-          description: 'Nuovo stato di registrazione',
-          example: 20,
-        },
-      },
-    },
-  })
   @ApiResponse({
     status: 200,
     description: 'Stato registrazione aggiornato con successo',
@@ -186,13 +168,11 @@ export class UserController {
     status: 500,
     description: 'Errore interno del server',
   })
+  @ApiBody({ type: SetStatoRegistrazioneDto })
   @Post('set-stato')
-  async setStatoRegistrazione(
-    @Body('codiceUtente') codiceUtente: number,
-    @Body('statoRegistrazione') statoRegistrazione: StatoRegistrazione,
-    @Res() res: Response,
-  ) {
+  async setStatoRegistrazione(@Body() body: SetStatoRegistrazioneDto, @Res() res: Response) {
     try {
+      let { codiceUtente, statoRegistrazione } = body;
       if (!codiceUtente) throw new Error('Il codice utente è obbligatorio.');
       if (statoRegistrazione === undefined)
         throw new Error('Lo stato registrazione è obbligatorio.');
