@@ -1,3 +1,10 @@
+# [1.4.0-dev.11](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.10...v1.4.0-dev.11) (2025-09-10)
+
+
+### Bug Fixes
+
+* per triggerare libreria ([8599b4f](https://github.com/mttdev382/emilsoftware-utilities/commit/8599b4f5563742e5c4af73eb99e94a97967ad416))
+
 # [1.4.0-dev.10](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.9...v1.4.0-dev.10) (2025-09-10)
 
 
