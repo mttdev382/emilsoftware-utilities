@@ -407,6 +407,8 @@ export class UserService {
       if (!!user.permissions && user.permissions.length > 0) {
         await this.permissionService.assignPermissionsToUser(codiceUtente, user.permissions);
       }
+
+      await this.insertUserFilters(codiceUtente, user)
     } catch (error) {
       throw error;
     }
