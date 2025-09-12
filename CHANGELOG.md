@@ -1,3 +1,10 @@
+# [1.4.0-dev.14](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.13...v1.4.0-dev.14) (2025-09-12)
+
+
+### Bug Fixes
+
+* inserimento filtri in updateUser ([ff62aa7](https://github.com/mttdev382/emilsoftware-utilities/commit/ff62aa702e2a9cf980c3c9b91b002b43f8c66b0a))
+
 # [1.4.0-dev.13](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.12...v1.4.0-dev.13) (2025-09-10)
 
 
