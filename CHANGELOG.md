@@ -1,3 +1,10 @@
+# [1.4.0-dev.15](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.14...v1.4.0-dev.15) (2025-09-15)
+
+
+### Bug Fixes
+
+* tantissimi interface con tipo sbagliato e aggiornamento filtri in update utente ([d39da00](https://github.com/mttdev382/emilsoftware-utilities/commit/d39da00fad34a45baefad069187dcd440e3a3f27))
+
 # [1.4.0-dev.14](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.13...v1.4.0-dev.14) (2025-09-12)
 
 
