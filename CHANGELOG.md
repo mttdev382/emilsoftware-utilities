@@ -1,3 +1,10 @@
+# [1.4.0-dev.16](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.15...v1.4.0-dev.16) (2025-09-15)
+
+
+### Bug Fixes
+
+* inserimento o aggiornamento utente ([18d816c](https://github.com/mttdev382/emilsoftware-utilities/commit/18d816cef92b680fd4ef9e5ad0a537943a8c42e9))
+
 # [1.4.0-dev.15](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.14...v1.4.0-dev.15) (2025-09-15)
 
 
