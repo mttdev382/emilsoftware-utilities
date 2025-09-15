@@ -453,18 +453,24 @@ export class UserService {
       }
 
       await this.executeInTransaction(async () => {
-        const updates = fieldsToUpdate.map((f) => `${f.dbField} = ?`).join(', ');
-        const values = [...fieldsToUpdate.map((f) => f.value), codiceUtente];
+        // Prima verifichiamo se esiste il record
+        const checkQuery = `SELECT COUNT(*) as CNT FROM FILTRI WHERE CODUTE = ?`;
+        const existingRecord = await Orm.query(this.accessiOptions.databaseOptions, checkQuery, [
+          codiceUtente,
+        ]);
+        const exists = existingRecord[0].CNT > 0;
 
-        const updateQuery = `UPDATE FILTRI SET ${updates} WHERE CODUTE = ?`;
-        const result = await Orm.execute(this.accessiOptions.databaseOptions, updateQuery, values);
-
-        // If no record was updated, we need to insert a new one
-        if (!result) {
+        if (exists) {
+          // Se esiste, facciamo l'UPDATE
+          const updates = fieldsToUpdate.map((f) => `${f.dbField} = ?`).join(', ');
+          const values = [...fieldsToUpdate.map((f) => f.value), codiceUtente];
+          const updateQuery = `UPDATE FILTRI SET ${updates} WHERE CODUTE = ?`;
+          await Orm.execute(this.accessiOptions.databaseOptions, updateQuery, values);
+        } else {
+          // Se non esiste, facciamo l'INSERT
           const dbFields = ['CODUTE', ...fieldsToUpdate.map((f) => f.dbField)];
           const placeholders = dbFields.map(() => '?');
           const insertValues = [codiceUtente, ...fieldsToUpdate.map((f) => f.value)];
-
           const insertQuery = `INSERT INTO FILTRI (${dbFields.join(
             ', ',
           )}) VALUES (${placeholders.join(', ')})`;
