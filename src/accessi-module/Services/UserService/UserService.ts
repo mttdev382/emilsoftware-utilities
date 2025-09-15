@@ -433,7 +433,8 @@ export class UserService {
       const fieldsToUpdate = Object.entries(fieldMapping)
         .filter(([tsField]) => {
           const value = user[tsField as keyof UserDto];
-          return value !== undefined && value !== null && value !== '';
+          // Includiamo il campo se è definito (anche se è una stringa vuota)
+          return value !== undefined && value !== null;
         })
         .map(([tsField, config]) => {
           const value = user[tsField as keyof UserDto];
