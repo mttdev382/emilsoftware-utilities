@@ -78,18 +78,18 @@ export class UserDto {
   @ApiPropertyOptional({ description: "Indice personalizzato.", example: 200 })
   idxPers?: number;
 
-  @ApiPropertyOptional({ description: "Codice cliente super.", example: "CLI001" })
-  codiceClienteSuper?: string;
+  @ApiPropertyOptional({ description: "Codice cliente super.", example: 123 })
+  codiceClienteSuper?: number;
 
-  @ApiPropertyOptional({ description: "Codice agente.", example: "AGT456" })
-  codiceAge?: string;
+  @ApiPropertyOptional({ description: "Codice agente.", example: 123 })
+  codiceAge?: number;
 
-  @ApiPropertyOptional({ description: "Codice cliente collettivo.", example: "CLCOL789" })
-  codiceClienteCol?: string;
+  @ApiPropertyOptional({ description: "Codice cliente collettivo.", example: 123 })
+  codiceClienteCol?: number;
 
   @ApiPropertyOptional({ description: "Codici multipli clienti.", example: "CLI001, CLI002" })
   codiceClienti?: string;
 
   @ApiPropertyOptional({ description: "Tipo di filiale.", example: "HQ" })
-  tipoFil?: string;
+  tipoFil?: number;
 }

@@ -62,21 +62,21 @@ export class RegisterRequest {
 
   @ApiPropertyOptional({
     description: "Codice del cliente principale (super).",
-    example: "CLT_SUP_1234",
+    example: 123,
   })
-  codiceClienteSuper?: string;
+  codiceClienteSuper?: number;
 
   @ApiPropertyOptional({
     description: "Codice dell'agenzia associata.",
-    example: "AGZ_5678",
+    example: 123,
   })
-  codiceAgenzia?: string;
+  codiceAgenzia?: number;
 
   @ApiPropertyOptional({
     description: "Codice del cliente collegato.",
-    example: "CLT_COL_8765",
+    example: "123",
   })
-  codiceClienteCollegato?: string;
+  codiceClienteCollegato?: number;
 
   @ApiPropertyOptional({
     description: "Lista di codici clienti separati da virgola.",
@@ -88,7 +88,7 @@ export class RegisterRequest {
     description: "Tipo di filtro applicato.",
     example: "esclusivo",
   })
-  tipoFiltro?: string;
+  tipoFiltro?: number;
 
   // Campi aggiuntivi utente
   @ApiPropertyOptional({
