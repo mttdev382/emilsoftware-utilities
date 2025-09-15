@@ -1,3 +1,10 @@
+# [1.4.0-dev.18](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.17...v1.4.0-dev.18) (2025-09-15)
+
+
+### Bug Fixes
+
+* interfaces ([e98380d](https://github.com/mttdev382/emilsoftware-utilities/commit/e98380d90ac4f37e9cc97c2dd0b4aab6c37fad35))
+
 # [1.4.0-dev.17](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.16...v1.4.0-dev.17) (2025-09-15)
 
 
