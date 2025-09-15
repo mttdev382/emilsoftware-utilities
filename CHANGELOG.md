@@ -1,3 +1,10 @@
+# [1.4.0-dev.17](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.16...v1.4.0-dev.17) (2025-09-15)
+
+
+### Bug Fixes
+
+* cancella codClienti ([a3e9aba](https://github.com/mttdev382/emilsoftware-utilities/commit/a3e9aba7424857593917fa77208077f2602ace44))
+
 # [1.4.0-dev.16](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.15...v1.4.0-dev.16) (2025-09-15)
 
 
