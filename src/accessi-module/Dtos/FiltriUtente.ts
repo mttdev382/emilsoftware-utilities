@@ -63,5 +63,5 @@ export class FiltriUtente {
   })
   @IsString()
   @IsOptional()
-  tipoFiltro?: string;
+  tipoFiltro?: number;
 }

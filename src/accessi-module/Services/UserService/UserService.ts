@@ -51,7 +51,7 @@ export class UserService {
                 F.CODAGE AS cod_age,
                 F.CODCLICOL AS cod_cli_col,
                 F.CODCLIENTI AS codice_clienti,
-                F.TIPFIL AS tip_fil
+                F.TIPFIL AS tipo_filtro
             FROM UTENTI U 
             INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
             LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
@@ -198,7 +198,7 @@ export class UserService {
         codiceAgenzia: { dbField: 'CODAGE', type: 'number' },
         codiceClienteCollegato: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
-        tipoFiltro: { dbField: 'TIPFIL', type: 'string' },
+        tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
       };
 
       const fieldsToInsert = Object.entries(fieldMapping)
@@ -427,7 +427,7 @@ export class UserService {
         codAge: { dbField: 'CODAGE', type: 'number' },
         codCliCol: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
-        tipFil: { dbField: 'TIPFIL', type: 'string' },
+        tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
       };
 
       const fieldsToUpdate = Object.entries(fieldMapping)
