@@ -1,3 +1,10 @@
+# [1.4.0-dev.19](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.18...v1.4.0-dev.19) (2025-09-19)
+
+
+### Bug Fixes
+
+* aggiunto il filtro idxPostazione nella tabella dei filtri e la gestione per quanto riguarda la registrazione, l'aggiornamento e l'inserimento, recupero sia da getFiltri che dall'utente. ([a083d33](https://github.com/mttdev382/emilsoftware-utilities/commit/a083d33320db5e60406e5467004fabf43b987231))
+
 # [1.4.0-dev.18](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.17...v1.4.0-dev.18) (2025-09-15)
 
 
