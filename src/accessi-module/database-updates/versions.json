@@ -1,0 +1,11 @@
+{
+    "updatePaths": [
+        {
+            "fromVersion": "1.0.0",
+            "toVersion": "1.1.0",
+            "script": "V1.0.0_to_1.1.0.sql",
+            "description": "Aggiunto Tipo filtro postazione e menu MNUVERRFID"
+        }
+    ],
+    "latestVersion": "1.1.0"
+}

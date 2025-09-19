@@ -64,4 +64,7 @@ export class FiltriUtente {
   @IsString()
   @IsOptional()
   tipoFiltro?: number;
+
+  @ApiPropertyOptional({ description: "idx della postazione nella tabella ANTENNE_POS di PROLAV", example: "12" })
+  idxPostazione?: number;
 }

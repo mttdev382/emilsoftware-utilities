@@ -51,7 +51,8 @@ export class UserService {
                 F.CODAGE AS cod_age,
                 F.CODCLICOL AS cod_cli_col,
                 F.CODCLIENTI AS codice_clienti,
-                F.TIPFIL AS tipo_filtro
+                F.TIPFIL AS tipo_filtro,
+                F.IDXPOS AS idx_postazione
             FROM UTENTI U 
             INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
             LEFT JOIN FILTRI F ON F.CODUTE = U.CODUTE
@@ -175,7 +176,8 @@ export class UserService {
                 F.CODAGE AS codice_agenzia, 
                 F.CODCLICOL AS codice_cliente_collegato,
                 F.CODCLIENTI AS codice_clienti, 
-                F.TIPFIL AS tipo_filtro
+                F.TIPFIL AS tipo_filtro,
+                F.IDXPOS AS idx_postazione
             FROM FILTRI F
             WHERE F.CODUTE = ?
         `;
@@ -199,6 +201,7 @@ export class UserService {
         codiceClienteCollegato: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
         tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
+        idxPostazione: { dbField: 'IDXPOS', type: 'number' },
       };
 
       const fieldsToInsert = Object.entries(fieldMapping)
@@ -428,6 +431,7 @@ export class UserService {
         codCliCol: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
         tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
+        idxPostazione: { dbField: 'IDXPOS', type: 'number' },
       };
 
       const fieldsToUpdate = Object.entries(fieldMapping)

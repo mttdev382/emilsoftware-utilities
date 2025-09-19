@@ -120,4 +120,10 @@ export class RegisterRequest {
     example: "<html></html>",
   })
   htmlMail?: string;
+  
+  @ApiPropertyOptional({
+    description: 'idx della postazione nella tabella ANTENNE_POS di PROLAV',
+    example: '12',
+  })
+  idxPostazione?: number;
 }
