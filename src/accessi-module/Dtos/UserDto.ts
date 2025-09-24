@@ -126,7 +126,7 @@ export class UserDto {
   codiceClienteSuper?: number;
 
   @ApiPropertyOptional({ description: 'Codice agente.', example: 123 })
-  codiceAge?: number;
+  codAge?: number;
 
   @ApiPropertyOptional({ description: 'Codice cliente collettivo.', example: 123 })
   codiceClienteCol?: number;

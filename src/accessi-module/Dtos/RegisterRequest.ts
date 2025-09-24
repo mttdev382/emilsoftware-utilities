@@ -67,10 +67,10 @@ export class RegisterRequest {
   codiceClienteSuper?: number;
 
   @ApiPropertyOptional({
-    description: "Codice dell'agenzia associata.",
+    description: "Codice dell'agen te associato.",
     example: 123,
   })
-  codiceAgenzia?: number;
+  codAge?: number;
 
   @ApiPropertyOptional({
     description: "Codice del cliente collegato.",

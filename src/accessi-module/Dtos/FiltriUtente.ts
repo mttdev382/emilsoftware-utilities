@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsInt, IsNumber, IsOptional, IsString, Min } from "class-validator";
 
 export class FiltriUtente {
 
@@ -34,12 +34,12 @@ export class FiltriUtente {
   codiceClienteSuper?: string | null;
 
   @ApiPropertyOptional({
-    description: 'Codice dell\'agenzia associata',
-    example: 'AGZ_5678'
+    description: 'Codice dell\'agente associato',
+    example: 1
   })
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  codiceAgenzia?: string;
+  codAge?: number;
 
   @ApiPropertyOptional({
     description: 'Codice del cliente collegato',
