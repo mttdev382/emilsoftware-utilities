@@ -1,3 +1,10 @@
+# [1.4.0-dev.20](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.19...v1.4.0-dev.20) (2025-09-24)
+
+
+### Bug Fixes
+
+* dto filtro ([511137a](https://github.com/mttdev382/emilsoftware-utilities/commit/511137a5d3bdcb3f0165b78e95c2695be49bffd4))
+
 # [1.4.0-dev.19](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.18...v1.4.0-dev.19) (2025-09-19)
 
 
