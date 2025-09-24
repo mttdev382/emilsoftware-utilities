@@ -134,8 +134,8 @@ export class UserDto {
   @ApiPropertyOptional({ description: 'Codici multipli clienti.', example: 'CLI001, CLI002' })
   codiceClienti?: string;
 
-  @ApiPropertyOptional({ description: 'Tipo di filiale.', example: 'HQ' })
-  tipoFil?: number;
+  @ApiPropertyOptional({ description: 'Tipo di filtro.', example: 'HQ' })
+  tipoFiltro?: number;
 
   @ApiPropertyOptional({
     description: 'idx della postazione nella tabella ANTENNE_POS di PROLAV',
