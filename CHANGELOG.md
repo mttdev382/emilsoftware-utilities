@@ -1,3 +1,10 @@
+# [1.4.0-dev.21](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.20...v1.4.0-dev.21) (2025-09-24)
+
+
+### Bug Fixes
+
+* dto per agenti ([893628b](https://github.com/mttdev382/emilsoftware-utilities/commit/893628b6cff49a1d84ac9f0b06f3fb4323828095))
+
 # [1.4.0-dev.20](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.19...v1.4.0-dev.20) (2025-09-24)
 
 
