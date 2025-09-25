@@ -1,3 +1,33 @@
+# [1.5.0-dev.1](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0...v1.5.0-dev.1) (2025-09-25)
+
+
+### Bug Fixes
+
+* aggiunta gestione password scaduta ([75e022d](https://github.com/mttdev382/emilsoftware-utilities/commit/75e022d30d11e07612a69d74a74ebe8256a8057d))
+* aggiunto il filtro idxPostazione nella tabella dei filtri e la gestione per quanto riguarda la registrazione, l'aggiornamento e l'inserimento, recupero sia da getFiltri che dall'utente. ([a083d33](https://github.com/mttdev382/emilsoftware-utilities/commit/a083d33320db5e60406e5467004fabf43b987231))
+* cancella codClienti ([a3e9aba](https://github.com/mttdev382/emilsoftware-utilities/commit/a3e9aba7424857593917fa77208077f2602ace44))
+* dto ([2874e0b](https://github.com/mttdev382/emilsoftware-utilities/commit/2874e0b8bd867ca6cf653ea031985db62b622c17))
+* dto filtro ([511137a](https://github.com/mttdev382/emilsoftware-utilities/commit/511137a5d3bdcb3f0165b78e95c2695be49bffd4))
+* dto per agenti ([893628b](https://github.com/mttdev382/emilsoftware-utilities/commit/893628b6cff49a1d84ac9f0b06f3fb4323828095))
+* errore nell'inserimento del keyreg per il reset della password ([a5e3914](https://github.com/mttdev382/emilsoftware-utilities/commit/a5e39148507e55ce3fb93cc4001725d0d5767202))
+* inidirizzo pagina reset ([7cb22c3](https://github.com/mttdev382/emilsoftware-utilities/commit/7cb22c36998d07e73d0f9779b25b5632671b07ff))
+* inserimento filtri in updateUser ([ff62aa7](https://github.com/mttdev382/emilsoftware-utilities/commit/ff62aa702e2a9cf980c3c9b91b002b43f8c66b0a))
+* inserimento o aggiornamento utente ([18d816c](https://github.com/mttdev382/emilsoftware-utilities/commit/18d816cef92b680fd4ef9e5ad0a537943a8c42e9))
+* interfaces ([e98380d](https://github.com/mttdev382/emilsoftware-utilities/commit/e98380d90ac4f37e9cc97c2dd0b4aab6c37fad35))
+* link personalizzato reset password ([a2aa3e3](https://github.com/mttdev382/emilsoftware-utilities/commit/a2aa3e30a612b62fe7c3da10f7cf11f6270cf795))
+* logging url return ([cc681e0](https://github.com/mttdev382/emilsoftware-utilities/commit/cc681e011a4d0ffaf0174d69fe0eabdf72a9b639))
+* parametro per bypassare scadenza password ([7d54b85](https://github.com/mttdev382/emilsoftware-utilities/commit/7d54b8553c31dc82ac868e6e3349433bfd8fa1b9))
+* per triggerare libreria ([8599b4f](https://github.com/mttdev382/emilsoftware-utilities/commit/8599b4f5563742e5c4af73eb99e94a97967ad416))
+* registrazione con resetUrlCustom e htmlMail custom, prima prendeva quelle di default obbligatoriamente. ([1cb0df8](https://github.com/mttdev382/emilsoftware-utilities/commit/1cb0df8b0ae8271be3afefa01a37db2b50b897b3))
+* revert modifiche log ([99d5728](https://github.com/mttdev382/emilsoftware-utilities/commit/99d5728a7d92d869db4f1930bb31c14963b81066))
+* tantissimi interface con tipo sbagliato e aggiornamento filtri in update utente ([d39da00](https://github.com/mttdev382/emilsoftware-utilities/commit/d39da00fad34a45baefad069187dcd440e3a3f27))
+* tipo per setStatoRegistrazione ([56646ba](https://github.com/mttdev382/emilsoftware-utilities/commit/56646ba16f8d566a68d4e368150eb7239e510cde))
+
+
+### Features
+
+* url, mail personalizzata ([af8475c](https://github.com/mttdev382/emilsoftware-utilities/commit/af8475c62d4e96e29a11fdc4450c6e45cee758ef))
+
 # [1.4.0](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.3.148...v1.4.0) (2025-07-28)
 
 
