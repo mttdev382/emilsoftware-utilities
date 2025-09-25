@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.3.148...v1.4.0) (2025-07-28)
+
+
+### Features
+
+* trigger dev release ([69f38f5](https://github.com/mttdev382/emilsoftware-utilities/commit/69f38f5212b7008c6547a57766f103d94bc22811))
+* trigger prod release ([fc8330e](https://github.com/mttdev382/emilsoftware-utilities/commit/fc8330e04f8766399f4d3d09cfcc8f834f141f3e))
+
 # [1.4.0-dev.21](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0-dev.20...v1.4.0-dev.21) (2025-09-24)
 
 
