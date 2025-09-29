@@ -1,37 +1,48 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsInt, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsIn, IsInt, IsNumber, IsOptional, IsPort, IsString, Min, ValidateNested } from 'class-validator';
+import { BaseResponse } from './BaseResponse';
+import { TipoFiltro } from './TipoFiltro';
 
 export class FiltriUtente {
 
   @ApiProperty({
-    description: 'Progressivo identificativo del filtro',
+    description: 'Codice dell\'utente',
     example: 1
   })
-  @IsInt({ message: "Il progressivo deve essere un numero intero." })
-  @Min(1, { message: "Il progressivo deve essere maggiore di 0." })
-  progressivo?: number;
-
-  @ApiProperty({
-    description: 'Numero del report associato',
-    example: 1002
-  })
-  @IsInt({ message: "Il numero del report deve essere un numero intero." })
-  numeroReport?: number;
-
-  @ApiProperty({
-    description: 'Indice personale dell\'utente',
-    example: 15
-  })
-  @IsInt({ message: "L'indice personale deve essere un numero intero." })
-  indicePersonale?: number;
+  codUte: number
 
   @ApiPropertyOptional({
-    description: 'Codice del cliente principale (super)',
-    example: 'CLT_SUP_1234'
+    description: 'Progressivo identificativo del filtro',
+    example: 1,
   })
-  @IsString()
+  @IsInt({ message: 'Il progressivo deve essere un numero intero.' })
+  @Min(1, { message: 'Il progressivo deve essere maggiore di 0.' })
+  progressivo?: number;
+
+  @ApiPropertyOptional({
+    description: 'Numero del reparto associato',
+    example: 1002,
+  })
+  @IsInt({ message: 'Il numero del reparto deve essere un numero intero.' })
   @IsOptional()
-  codiceClienteSuper?: string | null;
+  numRep?: number;
+
+  @ApiPropertyOptional({
+    description: 'Idx personale',
+    example: 15,
+  })
+  @IsInt({ message: "L'indice personale deve essere un numero intero." })
+  @IsOptional()
+  idxPers?: number;
+
+  @ApiPropertyOptional({
+    description: 'Codice Cliente padre (codcli di esgest)',
+    example: 1,
+  })
+  @IsNumber()
+  @IsOptional()
+  codCliSuper?: number;
 
   @ApiPropertyOptional({
     description: 'Codice dell\'agente associato',
@@ -43,28 +54,55 @@ export class FiltriUtente {
 
   @ApiPropertyOptional({
     description: 'Codice del cliente collegato',
-    example: 'CLT_COL_8765'
+    example: 1,
   })
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  codiceClienteCollegato?: string;
+  codCliCol?: number;
 
   @ApiPropertyOptional({
     description: 'Lista di codici clienti separati da virgola',
-    example: 'CLT_123,CLT_456,CLT_789'
+    example: '123,456,789',
   })
   @IsString()
   @IsOptional()
-  codiceClienti?: string;
+  codClienti?: string;
 
   @ApiPropertyOptional({
     description: 'Tipo di filtro applicato',
-    example: 'esclusivo'
+    example: 99,
   })
-  @IsString()
+  @IsNumber()
   @IsOptional()
-  tipoFiltro?: number;
+  tipFil?: number;
 
-  @ApiPropertyOptional({ description: "idx della postazione nella tabella ANTENNE_POS di PROLAV", example: "12" })
-  idxPostazione?: number;
+  @ApiPropertyOptional({
+    description: 'idx della postazione nella tabella ANTENNE_POS di PROLAV',
+    example: 12,
+  })
+  idxPos?: number;
+
+  @ApiPropertyOptional({
+    description: 'Codice dipendente di esgest',
+    example: 12
+  })
+  @IsNumber()
+  @IsOptional()
+  codDip?: number
+}
+
+export class GetFiltriUtenteResponse extends BaseResponse {
+      @ApiProperty({ type: FiltriUtente })
+      @ValidateNested({ each: true })
+      @Type(() => FiltriUtente)
+    Result : FiltriUtente[]
+}
+
+export class GetFiltriUtenteRequest {
+    @ApiPropertyOptional({
+        description: 'Codice utente',
+    })
+    @IsNumber()
+    @IsOptional()
+    codUte?: number
 }

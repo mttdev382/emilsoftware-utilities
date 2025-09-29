@@ -1,9 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { StatoRegistrazione } from './StatoRegistrazione';
 import { Permission } from './Permission';
 import { TipoAbilitazione } from './TipoAbilitazione';
+import { FiltriUtente } from './FiltriUtente';
 
-export class UserDto {
+export class UserDto extends OmitType(FiltriUtente, ['codUte'] as const)  {
   @ApiProperty({ description: "Codice identificativo univoco dell'utente.", example: 'USR123' })
   codiceUtente: number;
 
@@ -111,35 +112,4 @@ export class UserDto {
   })
   permissions?: Permission[];
 
-  // Campi extra dalla JOIN
-
-  @ApiPropertyOptional({ description: 'Progressivo interno.', example: 1001 })
-  prog?: number;
-
-  @ApiPropertyOptional({ description: 'Numero di report.', example: 5 })
-  numRep?: number;
-
-  @ApiPropertyOptional({ description: 'Indice personalizzato.', example: 200 })
-  idxPers?: number;
-
-  @ApiPropertyOptional({ description: 'Codice cliente super.', example: 123 })
-  codiceClienteSuper?: number;
-
-  @ApiPropertyOptional({ description: 'Codice agente.', example: 123 })
-  codAge?: number;
-
-  @ApiPropertyOptional({ description: 'Codice cliente collettivo.', example: 123 })
-  codiceClienteCol?: number;
-
-  @ApiPropertyOptional({ description: 'Codici multipli clienti.', example: 'CLI001, CLI002' })
-  codiceClienti?: string;
-
-  @ApiPropertyOptional({ description: 'Tipo di filtro.', example: 'HQ' })
-  tipoFiltro?: number;
-
-  @ApiPropertyOptional({
-    description: 'idx della postazione nella tabella ANTENNE_POS di PROLAV',
-    example: '12',
-  })
-  idxPostazione?: number;
 }
