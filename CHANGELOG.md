@@ -1,3 +1,15 @@
+# [1.5.0-dev.2](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2025-10-01)
+
+
+### Bug Fixes
+
+* gestione unica per inserire e aggiornare i filtri ([2c56a86](https://github.com/mttdev382/emilsoftware-utilities/commit/2c56a8640b0541982e912e3385e4be79dde7f2be))
+
+
+### Features
+
+* aggiunte chiamate per TipiFiltro e FiltriUtente ([63a69ff](https://github.com/mttdev382/emilsoftware-utilities/commit/63a69ffa46d3dc26e19566f5d3b6b7a62d1c7b8a))
+
 # [1.5.0-dev.1](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.4.0...v1.5.0-dev.1) (2025-09-25)
 
 
