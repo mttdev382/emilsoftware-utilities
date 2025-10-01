@@ -1,3 +1,10 @@
+# [1.5.0-dev.3](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.5.0-dev.2...v1.5.0-dev.3) (2025-10-01)
+
+
+### Bug Fixes
+
+* aggiunto endpoint per inserimento filtri utente ([cc718d6](https://github.com/mttdev382/emilsoftware-utilities/commit/cc718d6d2bcc2c2065e91d28492f14b5c924716e))
+
 # [1.5.0-dev.2](https://github.com/mttdev382/emilsoftware-utilities/compare/v1.5.0-dev.1...v1.5.0-dev.2) (2025-10-01)
 
 
