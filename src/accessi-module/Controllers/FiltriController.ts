@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Query, Res } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { RestUtilities } from '../../Utilities';
@@ -57,6 +57,29 @@ export class FiltriController {
       return RestUtilities.sendBaseResponse(res, response);
     } catch (error) {
       return RestUtilities.sendErrorMessage(res, error, FiltriController.name);
+    }
+  }
+
+  @Post('utente')
+  @ApiOperation({
+    operationId: 'saveFiltriUtente',
+    summary: 'Inserisce o aggiorna i filtri di un utente',
+    description: 'Permette di salvare (inserire o aggiornare) i filtri associati ad un utente specifico'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Filtri utente salvati con successo'
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Errore interno durante il salvataggio dei filtri utente',
+  })
+  async saveFiltriUtente(@Res() res : Response, @Body() req: FiltriUtente) {
+    try {
+      const response = await this.filtriService.upsertFiltriUtente(req.codUte, req)
+      return RestUtilities.sendOKMessage(res,`Aggiornamento filtri per l'utente ${req.codUte} effettuato correttamente`)
+    } catch (error) {
+      return RestUtilities.sendErrorMessage(res,error,FiltriController.name)
     }
   }
 }
