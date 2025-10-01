@@ -53,7 +53,7 @@ export class FiltriController {
   async getFiltriUtente(@Res() res: Response, @Query() req: GetFiltriUtenteRequest) {
     try {
       let {codUte} = req
-      const response = await this.filtriService.getFiltriUtente(codUte);
+      const response = await this.filtriService.getFiltriUser(codUte);
       return RestUtilities.sendBaseResponse(res, response);
     } catch (error) {
       return RestUtilities.sendErrorMessage(res, error, FiltriController.name);

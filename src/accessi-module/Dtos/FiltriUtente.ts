@@ -106,3 +106,16 @@ export class GetFiltriUtenteRequest {
     @IsOptional()
     codUte?: number
 }
+
+export const FILTRI_UTENTE_DB_MAPPING = {
+  progressivo:  { dbField: 'PROG',        numeric: true  },
+  numRep:       { dbField: 'NUMREP',      numeric: true  },
+  idxPers:      { dbField: 'IDXPERS',     numeric: true  },
+  codCliSuper:  { dbField: 'CODCLISUPER', numeric: true  },
+  codAge:       { dbField: 'CODAGE',      numeric: true  },
+  codCliCol:    { dbField: 'CODCLICOL',   numeric: true  },
+  codClienti:   { dbField: 'CODCLIENTI',  numeric: false },
+  tipFil:       { dbField: 'TIPFIL',      numeric: true  },
+  idxPos:       { dbField: 'IDXPOS',      numeric: true  },
+  codDip:       { dbField: 'CODDIP',      numeric: true  },
+} as const;

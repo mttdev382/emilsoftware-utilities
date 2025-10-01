@@ -10,6 +10,7 @@ import { GetUsersResponse, GetUsersResult } from '../../Dtos/GetUsersResponse';
 import { PermissionService } from '../PermissionService/PermissionService';
 import { UserDto } from '../../Dtos';
 import { RegisterRequest } from '../../Dtos/RegisterRequest';
+import { FiltriService } from '../FiltriService/FiltriService';
 
 @autobind
 @Injectable()
@@ -18,6 +19,7 @@ export class UserService {
     @Inject('ACCESSI_OPTIONS') private readonly accessiOptions: AccessiOptions,
     private readonly emailService: EmailService,
     private readonly permissionService: PermissionService,
+    private readonly filtriService: FiltriService
   ) {}
 
   async getUsers(
@@ -50,8 +52,8 @@ export class UserService {
                 F.CODCLISUPER AS cod_cli_super,
                 F.CODAGE AS cod_age,
                 F.CODCLICOL AS cod_cli_col,
-                F.CODCLIENTI AS codice_clienti,
-                F.TIPFIL AS tipo_filtro,
+                F.CODCLIENTI AS cod_clienti,
+                F.TIPFIL AS tip_fil,
                 F.IDXPOS AS idx_postazione
             FROM UTENTI U 
             INNER JOIN UTENTI_CONFIG G ON U.CODUTE = G.CODUTE
@@ -166,26 +168,27 @@ export class UserService {
     return utenti.length > 0 ? utenti[0] : null;
   }
 
-  async getUserFilters(codiceUtente: number): Promise<FiltriUtente[]> {
-    const query = `
-            SELECT 
-                F.PROG AS progressivo, 
-                F.NUMREP AS numero_report, 
-                F.IDXPERS AS indice_personale,
-                F.CODCLISUPER AS codice_cliente_super, 
-                F.CODAGE AS cod_age, 
-                F.CODCLICOL AS codice_cliente_collegato,
-                F.CODCLIENTI AS codice_clienti, 
-                F.TIPFIL AS tipo_filtro,
-                F.IDXPOS AS idx_postazione
-            FROM FILTRI F
-            WHERE F.CODUTE = ?
-        `;
 
-    return (await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente]).then(
-      (results) => results.map(RestUtilities.convertKeysToCamelCase),
-    )) as FiltriUtente[];
-  }
+  // async getUserFilters(codiceUtente: number): Promise<FiltriUtente[]> {
+  //   const query = `
+  //           SELECT 
+  //               F.PROG AS progressivo, 
+  //               F.NUMREP AS numero_report, 
+  //               F.IDXPERS AS indice_personale,
+  //               F.CODCLISUPER AS codice_cliente_super, 
+  //               F.CODAGE AS cod_age, 
+  //               F.CODCLICOL AS codice_cliente_collegato,
+  //               F.CODCLIENTI AS codice_clienti, 
+  //               F.TIPFIL AS tipo_filtro,
+  //               F.IDXPOS AS idx_postazione
+  //           FROM FILTRI F
+  //           WHERE F.CODUTE = ?
+  //       `;
+
+  //   return (await Orm.query(this.accessiOptions.databaseOptions, query, [codiceUtente]).then(
+  //     (results) => results.map(RestUtilities.convertKeysToCamelCase),
+  //   )) as FiltriUtente[];
+  // }
 
   async insertUserFilters(codiceUtente: number, filterData: RegisterRequest): Promise<void> {
     try {
@@ -200,7 +203,7 @@ export class UserService {
         codAge: { dbField: 'CODAGE', type: 'number' },
         codiceClienteCollegato: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
-        tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
+        tipFil: { dbField: 'TIPFIL', type: 'number' },
         idxPostazione: { dbField: 'IDXPOS', type: 'number' },
       };
 
@@ -300,7 +303,8 @@ export class UserService {
       )}) VALUES (${utentiConfigPlaceholders.join(', ')})`;
       await Orm.execute(this.accessiOptions.databaseOptions, queryUtentiConfig, utentiConfigParams);
 
-      await this.insertUserFilters(codiceUtente, registrationData);
+      //await this.insertUserFilters(codiceUtente, registrationData);
+      await this.filtriService.upsertFiltriUtente(codiceUtente, registrationData)
 
       if (!!registrationData.roles && registrationData.roles.length > 0) {
         await this.permissionService.assignRolesToUser(codiceUtente, registrationData.roles);
@@ -411,7 +415,8 @@ export class UserService {
         await this.permissionService.assignPermissionsToUser(codiceUtente, user.permissions);
       }
 
-      await this.updateUserFilters(codiceUtente, user);
+      //await this.updateUserFilters(codiceUtente, user);
+      await this.filtriService.upsertFiltriUtente(codiceUtente, user)
     } catch (error) {
       throw error;
     }
@@ -430,7 +435,7 @@ export class UserService {
         codAge: { dbField: 'CODAGE', type: 'number' },
         codCliCol: { dbField: 'CODCLICOL', type: 'number' },
         codiceClienti: { dbField: 'CODCLIENTI', type: 'string' },
-        tipoFiltro: { dbField: 'TIPFIL', type: 'number' },
+        tipFil: { dbField: 'TIPFIL', type: 'number' },
         idxPostazione: { dbField: 'IDXPOS', type: 'number' },
       };
 
