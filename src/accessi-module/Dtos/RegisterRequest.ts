@@ -1,9 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional, OmitType } from "@nestjs/swagger";
 import { StatoRegistrazione } from "./StatoRegistrazione";
 import { Permission } from "./Permission";
 import { TipoAbilitazione } from "./TipoAbilitazione";
+import { FiltriUtente } from "./FiltriUtente";
 
-export class RegisterRequest {
+export class RegisterRequest extends OmitType(FiltriUtente, ['codUte'] as const) {
   @ApiProperty({
     description: "Email dell'utente.",
     example: "mario.rossi@dev.it",
@@ -47,48 +48,6 @@ export class RegisterRequest {
   })
   permissions?: Permission[];
 
-  // Filtri
-  @ApiPropertyOptional({
-    description: "Numero del report associato.",
-    example: 1002,
-  })
-  numeroReport?: number;
-
-  @ApiPropertyOptional({
-    description: "Indice personale dell'utente.",
-    example: 15,
-  })
-  indicePersonale?: number;
-
-  @ApiPropertyOptional({
-    description: "Codice del cliente principale (super).",
-    example: 123,
-  })
-  codiceClienteSuper?: number;
-
-  @ApiPropertyOptional({
-    description: "Codice dell'agen te associato.",
-    example: 123,
-  })
-  codAge?: number;
-
-  @ApiPropertyOptional({
-    description: "Codice del cliente collegato.",
-    example: "123",
-  })
-  codiceClienteCollegato?: number;
-
-  @ApiPropertyOptional({
-    description: "Lista di codici clienti separati da virgola.",
-    example: "CLT_123,CLT_456,CLT_789",
-  })
-  codiceClienti?: string;
-
-  @ApiPropertyOptional({
-    description: "Tipo di filtro applicato.",
-    example: "esclusivo",
-  })
-  tipoFiltro?: number;
 
   // Campi aggiuntivi utente
   @ApiPropertyOptional({
@@ -121,9 +80,4 @@ export class RegisterRequest {
   })
   htmlMail?: string;
   
-  @ApiPropertyOptional({
-    description: 'idx della postazione nella tabella ANTENNE_POS di PROLAV',
-    example: '12',
-  })
-  idxPostazione?: number;
 }

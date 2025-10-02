@@ -7,12 +7,14 @@ import { UserService } from "../UserService/UserService";
 import { PermissionService } from "../PermissionService/PermissionService";
 import { LoginRequest } from "../../Dtos/LoginRequest";
 import { LoginResponse, LoginResult } from "../../Dtos/LoginResponse";
+import { FiltriService } from "../FiltriService/FiltriService";
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private permissionService: PermissionService,
+    private filtriService: FiltriService,
     @Inject("ACCESSI_OPTIONS") private readonly accessiOptions: AccessiOptions
   ) {}
 
@@ -83,7 +85,7 @@ export class AuthService {
     );
 
     // Recupera i filtri
-    const filtri = await this.userService.getUserFilters(utente.codiceUtente);
+    const filtri = await this.filtriService.getFiltriUser(utente.codiceUtente);
 
     const updateLastAccessDateQuery =
       "UPDATE UTENTI SET DATLASTLOGIN = CURRENT_TIMESTAMP WHERE CODUTE = ?";
